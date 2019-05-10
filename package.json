@@ -1,0 +1,36 @@
+{
+    "name": "jupyterlab_globus",
+    "version": "0.1.5",
+    "description": "Incorporates Globus functionality",
+    "keywords": [
+        "jupyter",
+        "jupyterlab",
+        "jupyterlab-extension"
+    ],
+    "homepage": "https://github.com/Garri1105/jupyterlab_globus",
+    "bugs": {
+        "url": "https://github.com/Garri1105/jupyterlab_globus/issues"
+    },
+    "license": "BSD-3-Clause",
+    "author": "Juan David Garrido",
+    "files": [
+        "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+        "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    ],
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Garri1105/jupyterlab_globus.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf lib",
+        "watch": "tsc -w"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "jupyterlab": {
+        "extension": true
+    }
+}
