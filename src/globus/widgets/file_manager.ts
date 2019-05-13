@@ -1,4 +1,5 @@
 import {Widget} from '@phosphor/widgets';
+import { BehaviorSubject } from 'rxjs';
 import {
     activateEndpoint,
     endpointSearch, endpointSearchById,
@@ -20,7 +21,6 @@ import {
     GlobusTransferItem,
     GlobusTransferTask
 } from "../api/models";
-// import Timer = NodeJS.Timer;
 import {GCP_ENDPOINT_ID} from "./globus_connect_personal";
 import {
     LOADING_LABEL,
@@ -50,7 +50,6 @@ import {
     displayError,
     sortList, isEndpointId, GLOBUS_FETCH_ERROR
 } from "../../utils";
-import {BehaviorSubject} from "rxjs/internal/BehaviorSubject";
 import * as moment from 'moment';
 import * as $ from 'jquery';
 
@@ -111,7 +110,7 @@ export class GlobusFileManager extends Widget {
     private sourceGroup: HTMLDivElement;
     private destinationGroup: HTMLDivElement;
     private transferGroup: HTMLFormElement;
-    private parentGroup$: BehaviorSubject<HTMLElement>;
+    private parentGroup$ = new BehaviorSubject<HTMLElement>(null);
     private timeout = null;
 
     constructor() {
@@ -1015,7 +1014,7 @@ export class GlobusFileManager extends Widget {
         this.node.appendChild(this.transferGroup);
 
         this.parentGroup$ = new BehaviorSubject(this.originalGroup);
-        this.parentGroup$.subscribe(globusParentGroup => {
+        this.parentGroup$.asObservable().subscribe(globusParentGroup => {
                 let selectedItems = globusParentGroup.getElementsByClassName(GLOBUS_SELECTED);
 
                 let menuSelect: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_MENU_SELECT);
