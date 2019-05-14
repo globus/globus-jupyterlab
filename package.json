@@ -1,6 +1,6 @@
 {
     "name": "jupyterlab_globus",
-    "version": "0.1.5",
+    "version": "0.2.0",
     "description": "Incorporates Globus functionality",
     "keywords": [
         "jupyter",

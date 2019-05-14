@@ -14,6 +14,8 @@ https://www.slideshare.net/ianfoster/scaling-collaborative-data-science-with-glo
 
 ```bash
 jupyter labextension install jupyterlab_globus
+jupyter lab build
+jupyter lab
 ```
 
 ## Notes
