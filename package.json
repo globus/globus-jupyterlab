@@ -7,9 +7,9 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/Garri1105/jupyterlab_globus",
+    "homepage": "https://github.com/gneezyn/jupyterlab_globus",
     "bugs": {
-        "url": "https://github.com/Garri1105/jupyterlab_globus/issues"
+        "url": "https://github.com/gneezyn/jupyterlab_globus/issues"
     },
     "license": "BSD-3-Clause",
     "author": "Juan David Garrido",
