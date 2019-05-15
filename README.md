@@ -9,11 +9,19 @@ https://www.slideshare.net/ianfoster/scaling-collaborative-data-science-with-glo
 ## Prerequisites
 
 * JupyterLab 0.34.7
+* Create your own Native App registration for use with the examples. Visit the [Globus Developer Pages](https://developers.globus.org) to register an App.
+    * When registering the App you'll be asked for some information, including the redirect URL and any scopes you will be requesting.
+        * Check the "Will be used by a native application" checkbox
+        * Redirect URL: `https://auth.globus.org/v2/web/auth-code`, `https://localhost:8888`
+        * Scopes: `urn:globus:auth:scope:transfer.api.globus.org:all`, `urn:globus:auth:scope:search.api.globus.org:all`, `openid`, `profile`, `email`
+* Replace the UUID for `CLIENT_ID` in [`client.ts`](src/globus/api/client.ts).
 
 ## Installation
 
 ```bash
 jupyter labextension install jupyterlab_globus
+jupyter lab build
+jupyter lab
 ```
 
 ## Notes

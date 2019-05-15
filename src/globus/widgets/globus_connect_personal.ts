@@ -1,7 +1,7 @@
 import {FileBrowser, IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {Widget, PanelLayout} from '@phosphor/widgets';
 import {Drive, ServerConnection} from '@jupyterlab/services';
-import {} from 'node';
+// import {} from 'node';
 import {IDocumentManager} from '@jupyterlab/docmanager';
 import {JupyterLab} from "@jupyterlab/application";
 import {
@@ -12,6 +12,7 @@ import {
     LOADING_ICON,
     LOADING_LABEL
 } from "../../utils";
+// import { node } from "prop-types";
 
 const GLOBUS_CONNECT_PERSONAL = 'jp-Globus-connect-personal';
 const GCP_ERROR_SCREEN = 'jp-GlobusConnectPersonal-errorScreen';

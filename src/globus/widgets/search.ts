@@ -22,7 +22,7 @@ import * as $ from "jquery";
 import {GlobusMetaResult, GlobusSearchResult} from "../api/models";
 import {GlobusWidgetManager} from "../widget_manager";
 import {FILE_MANAGER, GlobusFileManager} from "./file_manager";
-import JSONFormatter from 'json-formatter-js'
+import JSONFormatter from 'json-formatter-js';
 
 
 // TODO Filtering needs to be done better. If a filter is a number like # of atoms, then it should add an input box instead of checkboxes

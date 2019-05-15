@@ -1,56 +1,58 @@
 {
-  "name": "jupyterlab_globus",
-  "version": "0.1.5",
-  "description": "Incorporates Globus functionality",
-  "keywords": [
-    "jupyter",
-    "jupyterlab",
-    "jupyterlab-extension"
-  ],
-  "homepage": "https://github.com/Garri1105/jupyterlab_globus",
-  "bugs": {
-    "url": "https://github.com/Garri1105/jupyterlab_globus/issues"
-  },
-  "license": "BSD-3-Clause",
-  "author": "Juan David Garrido",
-  "files": [
-    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
-  ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Garri1105/jupyterlab_globus.git"
-  },
-  "scripts": {
-    "build": "tsc",
-    "clean": "rimraf lib",
-    "watch": "tsc -w"
-  },
-  "dependencies": {
-    "@jupyterlab/application": "^0.19.1",
-    "@jupyterlab/apputils": "^0.18.4",
-    "@jupyterlab/filebrowser": "^0.19.4",
-    "@jupyterlab/services": "^3.2.1",
-    "@jupyterlab/terminal": "^0.18.4",
-    "@types/crypto-js": "^3.1.43",
-    "@types/jquery": "^3.3.29",
-    "crypto-js": "^3.1.9-1",
-    "jquery": "^3.4.1",
-    "json-formatter-js": "^2.2.1",
-    "marked": "^0.6.2",
-    "moment": "^2.24.0",
-    "npm": "^6.9.0",
-    "rxjs": "^6.5.1",
-    "tar": "^4.4.2"
-  },
-  "devDependencies": {
-    "@types/node": "^10.14.6",
-    "rimraf": "^2.6.3",
-    "typescript": "~2.6.0"
-  },
-  "jupyterlab": {
-    "extension": true
-  }
+    "name": "jupyterlab_globus",
+    "version": "0.2.0",
+    "description": "Incorporates Globus functionality",
+    "keywords": [
+        "jupyter",
+        "jupyterlab",
+        "jupyterlab-extension"
+    ],
+    "homepage": "https://github.com/gneezyn/jupyterlab_globus",
+    "bugs": {
+        "url": "https://github.com/gneezyn/jupyterlab_globus/issues"
+    },
+    "license": "BSD-3-Clause",
+    "author": "Juan David Garrido",
+    "contributors": [
+        "Netta Gneezy"
+    ],
+    "files": [
+        "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+        "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    ],
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Garri1105/jupyterlab_globus.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "clean": "rimraf lib",
+        "watch": "tsc -w"
+    },
+    "dependencies": {
+        "@jupyterlab/application": "^0.19.1",
+        "@jupyterlab/apputils": "^0.19.1",
+        "@jupyterlab/filebrowser": "^0.19.4",
+        "@jupyterlab/services": "^3.2.1",
+        "@jupyterlab/terminal": "^0.19.1",
+        "@types/crypto-js": "^3.1.43",
+        "@types/jquery": "^3.3.29",
+        "crypto-js": "^3.1.9-1",
+        "jquery": "^3.4.1",
+        "json-formatter-js": "^2.2.1",
+        "marked": "^0.6.2",
+        "npm": "^6.9.0",
+        "rxjs": "^6.5.2",
+        "tar": "^4.4.8"
+    },
+    "devDependencies": {
+        "@types/node": "^12.0.1",
+        "rimraf": "^2.6.3",
+        "typescript": "^3.4.5"
+    },
+    "jupyterlab": {
+        "extension": true
+    }
 }
