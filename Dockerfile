@@ -13,7 +13,7 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.s
     echo 'e1045ee415162f944b6aebfe560b8fee */tmp/miniconda.sh' | md5sum -c - && \
     bash /tmp/miniconda.sh -f -b -p /opt/conda && \
     /opt/conda/bin/conda install --yes -c conda-forge \
-        python=3.6 sqlalchemy tornado jinja2 traitlets requests pip pycurl \
+        python=3.6 sqlalchemy tornado requests pip pycurl \
         nodejs configurable-http-proxy && \
     /opt/conda/bin/pip install --upgrade pip && \
     rm /tmp/miniconda.sh
