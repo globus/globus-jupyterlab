@@ -12,7 +12,7 @@
 # ENV NODE_PATH /usr/local/nvm/v$NODE_VERSION/lib/node_modules
 # ENV PATH /usr/local/nvm/versions/node/v$NODE_VERSION/bin:$PATH
 
-FROM nokolaik/python3.7-nodejs10
+FROM node:10.15.3
 
 WORKDIR /jup
 
