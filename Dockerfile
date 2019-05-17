@@ -21,7 +21,10 @@ ENV PATH=/opt/conda/bin:$PATH
 
 RUN pip install jupyter -U && pip install jupyterlab
 
-RUN jupyter labextension install jupyterlab_globus
+
+COPY package*.json ./
+RUN npm install
+RUN jupyter labextension install .
 RUN jupyter lab build
 # RUN jupyter lab
 EXPOSE 8888
