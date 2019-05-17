@@ -24,7 +24,7 @@
     "types": "lib/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Garri1105/jupyterlab_globus.git"
+        "url": "https://github.com/gneezyn/jupyterlab_globus.git"
     },
     "scripts": {
         "build": "tsc",
