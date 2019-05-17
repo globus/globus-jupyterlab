@@ -1,3 +1,8 @@
+FROM ubuntu
+
+RUN apt-get update
+RUN apt-get install nodejs npm
+
 FROM python:3.6
 
 WORKDIR /jup
