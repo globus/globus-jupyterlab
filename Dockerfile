@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y curl && apt-get -y autoclean
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 10.15.3
 
-RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
 RUN source $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default
 
