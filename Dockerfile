@@ -1,23 +1,25 @@
-# FROM ubuntu:latest
+FROM ubuntu:18.04
 
-# RUN apt-get update && apt-get install -y curl && apt-get -y autoclean
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y install wget git bzip2 && \
+    apt-get purge && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+ENV LANG C.UTF-8
 
-# # ENV NVM_DIR /usr/local/nvm
-# ENV NODE_VERSION 10.15.3
-
-# RUN curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-
-# RUN source /usr/local/nvm/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default
-
-# ENV NODE_PATH /usr/local/nvm/v$NODE_VERSION/lib/node_modules
-# ENV PATH /usr/local/nvm/versions/node/v$NODE_VERSION/bin:$PATH
-
-FROM node:10.15.3
-
-WORKDIR /jup
+RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
+    echo 'e1045ee415162f944b6aebfe560b8fee */tmp/miniconda.sh' | md5sum -c - && \
+    bash /tmp/miniconda.sh -f -b -p /opt/conda && \
+    /opt/conda/bin/conda install --yes -c conda-forge \
+        python=3.6 sqlalchemy tornado jinja2 traitlets requests pip pycurl \
+        nodejs configurable-http-proxy && \
+    /opt/conda/bin/pip install --upgrade pip && \
+    rm /tmp/miniconda.sh
+ENV PATH=/opt/conda/bin:$PATH
 
 RUN pip install jupyter -U && pip install jupyterlab
-
 
 RUN jupyter labextension install jupyterlab_globus
 RUN jupyter lab build
@@ -25,6 +27,20 @@ RUN jupyter lab build
 EXPOSE 8888
 
 ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
+
+# FROM node:10.15.3
+
+# WORKDIR /jup
+
+# RUN pip install jupyter -U && pip install jupyterlab
+
+
+# RUN jupyter labextension install jupyterlab_globus
+# RUN jupyter lab build
+# RUN jupyter lab
+# EXPOSE 8888
+
+# ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
 # Create app directory (for holding code inside the image)
 # WORKDIR /usr/src/app
 
