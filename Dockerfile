@@ -24,6 +24,7 @@ RUN pip install jupyter -U && pip install jupyterlab
 
 COPY package*.json ./
 RUN npm install
+RUN npm run build 
 RUN jupyter labextension install .
 RUN jupyter lab build
 # RUN jupyter lab
