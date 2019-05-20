@@ -45,4 +45,4 @@ RUN jupyter lab build
 EXPOSE 8888
 # , "lab", "--ip=127.0.0.1", "--allow-root"
 ENTRYPOINT ["jupyter lab"]  
-CMD ["--op=127.0.0.1", "--allow-root"]
+CMD ["--ip=127.0.0.1", "--allow-root"]
