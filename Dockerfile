@@ -29,8 +29,6 @@ ENV HOME /home/${NB_USER}
 
 RUN adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
 
-# WORKDIR ${HOME}
-
 COPY . ${HOME}
 USER root
 RUN chown -R ${NB_UID} ${HOME}
@@ -38,15 +36,15 @@ USER ${NB_USER}
 
 # COPY package*.json ./
 # RUN npm ci
-RUN ls 
-# RUN npm install
-# RUN npm run build 
-# RUN jupyter labextension install . --debug
-# RUN jupyter lab build
-# # RUN jupyter lab
-# EXPOSE 8888
+WORKDIR ${HOME}
+RUN npm install
+RUN npm run build 
+RUN jupyter labextension install . 
+RUN jupyter lab build
+# RUN jupyter lab
+EXPOSE 8888
 
-# ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
+ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
 
 # FROM node:10.15.3
 
