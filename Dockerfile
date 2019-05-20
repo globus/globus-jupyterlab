@@ -21,7 +21,7 @@
 
 # RUN pip install jupyter -U && pip install jupyterlab && pip install notebook
 
-FROM jupyter/scipy-notebook:abdb27a6dfbb
+FROM jupyter/base-notebook:abdb27a6dfbb
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -31,6 +31,9 @@ ENV HOME /home/${NB_USER}
 USER root
 RUN id -u ${NB_USER} &>/dev/null || adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
 
+ARG JUPYTER_LAB=yes
+ENV JUPYTER_ENABLE_LAB ${JUPYTER_LAB}
+
 COPY . ${HOME}
 USER root
 RUN chown -R ${NB_UID} ${HOME}
@@ -39,10 +42,9 @@ USER ${NB_USER}
 WORKDIR ${HOME}
 RUN npm install
 RUN npm run build 
-# RUN jupyter labextension install . 
-# RUN jupyter lab build
+RUN jupyter labextension install . 
+RUN jupyter lab build
 
-# EXPOSE 8888
-# # , "lab", "--ip=127.0.0.1", "--allow-root"
+EXPOSE 8888
 # ENTRYPOINT ["jupyter lab"]  
 # CMD ["--ip=127.0.0.1", "--allow-root"]
