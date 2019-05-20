@@ -28,13 +28,13 @@ ENV USER ${NB_USER}
 ENV HOME /home/${NB_USER}
 
 RUN adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
-WORKDIR ${HOME}
+# WORKDIR ${HOME}
 
 COPY package*.json ./
 RUN npm ci
 RUN npm install
 RUN npm run build 
-RUN jupyter labextension install .
+RUN jupyter labextension install . --debug
 RUN jupyter lab build
 # RUN jupyter lab
 EXPOSE 8888
