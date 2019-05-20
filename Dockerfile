@@ -19,27 +19,34 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.s
     rm /tmp/miniconda.sh
 ENV PATH=/opt/conda/bin:$PATH
 
-RUN pip install jupyter -U && pip install jupyterlab
+RUN pip install jupyter -U && pip install jupyterlab && pip install notebook
 
-RUN pip install --no-cache notebook
-ARG NB_USER
-ARG NB_UID
+ARG NB_USER=admin
+ARG NB_UID=1000
 ENV USER ${NB_USER}
+ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
 RUN adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
+
 # WORKDIR ${HOME}
 
-COPY package*.json ./
-RUN npm ci
-RUN npm install
-RUN npm run build 
-RUN jupyter labextension install . --debug
-RUN jupyter lab build
-# RUN jupyter lab
-EXPOSE 8888
+COPY . ${HOME}
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
 
-ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
+# COPY package*.json ./
+# RUN npm ci
+RUN ls 
+# RUN npm install
+# RUN npm run build 
+# RUN jupyter labextension install . --debug
+# RUN jupyter lab build
+# # RUN jupyter lab
+# EXPOSE 8888
+
+# ENTRYPOINT ["jupyter", "lab", "--ip=127.0.0.1", "--allow-root"]
 
 # FROM node:10.15.3
 
