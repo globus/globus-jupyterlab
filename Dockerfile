@@ -39,10 +39,10 @@ USER ${NB_USER}
 WORKDIR ${HOME}
 RUN npm install
 RUN npm run build 
-RUN jupyter labextension install . 
-RUN jupyter lab build
+# RUN jupyter labextension install . 
+# RUN jupyter lab build
 
-EXPOSE 8888
-# , "lab", "--ip=127.0.0.1", "--allow-root"
-ENTRYPOINT ["jupyter lab"]  
-CMD ["--ip=127.0.0.1", "--allow-root"]
+# EXPOSE 8888
+# # , "lab", "--ip=127.0.0.1", "--allow-root"
+# ENTRYPOINT ["jupyter lab"]  
+# CMD ["--ip=127.0.0.1", "--allow-root"]
