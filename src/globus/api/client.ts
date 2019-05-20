@@ -56,7 +56,8 @@ export function oauth2SignIn() {
     let timer = setInterval(async () => {
         try {
             // If this line succeeds, it means that we are back in our domain and we have a valid AuthToken
-            let url = new URL(popup.location.href);
+            //let url = new URL(popup.location.href);
+            let url = new URL('https://auth.globus.org/v2/web/auth-code');
 
             popup.close();
             await exchangeOAuth2Token(url.searchParams.get('code'), verifier)
