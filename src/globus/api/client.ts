@@ -3,8 +3,9 @@ import CryptoJS = require('crypto-js');
 import {queryParams} from "../../utils";
 import {GlobusResponse} from "./models";
 
-const CLIENT_ID = '7c9085aa-3bcf-4a5b-a7b8-77e41daa4d1a';
-const REDIRECT_URI = window.location.href;
+//const CLIENT_ID = '7c9085aa-3bcf-4a5b-a7b8-77e41daa4d1a';
+const CLIENT_ID = '21498f95-b107-4c9a-a9c3-7bcc2183445f';
+const REDIRECT_URI = 'https://hub.mybinder.org/hub/login';
 const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
 const GLOBUS_AUTH_URL = 'https://auth.globus.org/v2/oauth2/authorize';
@@ -59,6 +60,7 @@ export function oauth2SignIn() {
             let url = new URL(popup.location.href);
 
             popup.close();
+
             await exchangeOAuth2Token(url.searchParams.get('code'), verifier)
                 .then(data => {
                     clearInterval(timer);
