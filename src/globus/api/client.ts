@@ -4,7 +4,7 @@ import {queryParams} from "../../utils";
 import {GlobusResponse} from "./models";
 
 const CLIENT_ID = '7c9085aa-3bcf-4a5b-a7b8-77e41daa4d1a';
-const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
+const REDIRECT_URI = 'https://mybinder.org';
 const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
 const GLOBUS_AUTH_URL = 'https://auth.globus.org/v2/oauth2/authorize';
@@ -56,12 +56,10 @@ export function oauth2SignIn() {
     let timer = setInterval(async () => {
         try {
             // If this line succeeds, it means that we are back in our domain and we have a valid AuthToken
-            //let url = new URL(popup.location.href);
-            let url = new URL('https://auth.globus.org/v2/web/auth-code');
-            if(popup.location.href === 'https://auth.globus.org/v2/web/auth-code'){
-               popup.close();
-            }
-            //popup.close();
+            let url = new URL(popup.location.href);
+
+            popup.close();
+
             await exchangeOAuth2Token(url.searchParams.get('code'), verifier)
                 .then(data => {
                     clearInterval(timer);
