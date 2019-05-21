@@ -1,5 +1,7 @@
 # jupyterlab_globus
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gneezyn/jupyterlab_globus/binderhub)
+
 Incorporates Globus functionality. Compatible with Windows, iOS and Linux.
 For snapshots of the project visit the following link and see slide 24 and onwards!
 
