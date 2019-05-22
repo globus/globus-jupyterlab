@@ -137,7 +137,7 @@ export function createDescriptionElement(dList: HTMLDListElement, term: string, 
  * Globus Endpoint ID Regex
  * @type {RegExp}
  */
-export const ENDPOINT_ID_REG_EXP = new RegExp('[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}');
+export const ENDPOINT_ID_REG_EXP = new RegExp('^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}');
 
 /**
  * @param {string} query
