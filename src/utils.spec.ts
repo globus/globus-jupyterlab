@@ -65,7 +65,7 @@ describe('Byte Conversion', () => {
 
     it('1st case for valid input', () => {
         const result = convertBytes(1699325);
-        expect(result).to.equal("2 MB");
+        expect(result).to.equal("1.7 MB");
     });
 
     it('2nd case for valid input', () => {
@@ -75,22 +75,22 @@ describe('Byte Conversion', () => {
 
     it('3rd case for valid input', () => {
         const result = convertBytes(1056);
-        expect(result).to.equal("1 KB");
+        expect(result).to.equal("1.06 KB");
     });
 
     it('4th case for valid input', () => {
         const result = convertBytes(580926);
-        expect(result).to.equal("581 KB");
+        expect(result).to.equal("580.93 KB");
     });
 
     it('5th case for valid input', () => {
         const result = convertBytes(33092604651);
-        expect(result).to.equal("33 GB");
+        expect(result).to.equal("33.09 GB");
     });
 
     it('6th case for valid input', () => {
         const result = convertBytes(6705201348306090);
-        expect(result).to.equal("6705 TB");
+        expect(result).to.equal("6705.20 TB");
     });
 
 });

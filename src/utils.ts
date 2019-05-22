@@ -162,6 +162,11 @@ export function convertBytes(size: number): string {
 
     let suffix = ['B', 'KB', 'MB', 'GB', 'TB'];
 
+    if (Math.floor(base) > 4) {
+        let diff = size.toString().length - 12;
+        return `${(Math.pow(1000, base - Math.floor(base)) * Math.pow(10, diff - 1)).toFixed(2)} ${suffix[4]}`;
+    }
+
     return `${Math.round(Math.pow(1000, base - Math.floor(base)) * 100) / 100} ${suffix[Math.floor(base)]}`;
 }
 
