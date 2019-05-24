@@ -21,5 +21,3 @@ RUN npm install
 RUN npm run build 
 RUN jupyter labextension install . 
 RUN jupyter lab build
-
-EXPOSE 8888
