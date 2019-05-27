@@ -53,6 +53,10 @@ export function listDirectoryContents(endpointId: string, dirPath: string = '/~/
  * @returns {Promise<GlobusEndpointList>}
  */
 export function endpointSearch(query: string): Promise<GlobusEndpointList> {
+    if (query.length <= 0) {
+        let no_query = null;
+        return makeTransferRequest(`${GLOBUS_TRANSFER_API_URL}/endpoint_search?filter_fulltext=${no_query}`) as Promise<GlobusEndpointList>;
+    }
     return makeTransferRequest(`${GLOBUS_TRANSFER_API_URL}/endpoint_search?filter_fulltext=${query}`) as Promise<GlobusEndpointList>;
 }
 
