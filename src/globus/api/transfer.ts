@@ -53,6 +53,7 @@ export function listDirectoryContents(endpointId: string, dirPath: string = '/~/
  * @returns {Promise<GlobusEndpointList>}
  */
 export function endpointSearch(query: string): Promise<GlobusEndpointList> {
+    // check is needed so that filter_fulltext always gets a value
     if (query.length <= 0) {
         let no_query = null;
         return makeTransferRequest(`${GLOBUS_TRANSFER_API_URL}/endpoint_search?filter_fulltext=${no_query}`) as Promise<GlobusEndpointList>;

@@ -164,8 +164,6 @@ export function makeGlobusRequest(url: string, options: any): Promise<GlobusResp
     return new Promise<GlobusResponse>((resolve, reject) => {
         fetch(url, options).then(async response => {
             if (response.status >= 400) {
-                console.log("URL: " + url);
-                console.log("Options: " + options.toString());
                 reject(await response.json());
             }
             else {
