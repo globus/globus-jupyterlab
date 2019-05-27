@@ -17,6 +17,6 @@
 * Run the following commands (make sure you are in the root project directory):
     * `npm install`
     * `npm run build`
-    * `jupyter labextension install .` (make sure to include the '.' at the end)
+    * `jupyter labextension install .` (make sure to include the '.' at the end so that the local version is installed)
     * `jupyter lab build`
     * `jupyter lab`
