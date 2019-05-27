@@ -21,7 +21,6 @@ const GLOBUS_TRANSFER_API_URL = 'https://transfer.api.globusonline.org/v0.10';
  * @returns {Promise<any>}
  */
 export function activateEndpoint(endpointId: string): Promise<any> {
-    // TODO Deal with failed activations
     return makeTransferRequest(
         `${GLOBUS_TRANSFER_API_URL}/endpoint/${endpointId}/autoactivate`,{
             method: 'POST',
