@@ -7,11 +7,11 @@ export interface GlobusObject {
 }
 
 export interface GlobusItem extends GlobusObject {
-    DATA_TYPE: 'file' | 'task' | 'endpoint' | 'transfer_item' | 'delete_item';
+    DATA_TYPE: 'file' | 'task' | 'endpoint' | 'shared_endpoint' | 'transfer_item' | 'delete_item';
 }
 
 export interface GlobusResponse extends GlobusObject {
-    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
+    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'endpoint' | 'shared_endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
 }
 
 export interface GlobusOperation extends GlobusObject {
@@ -62,7 +62,7 @@ export interface GlobusFileItem {
 }
 
 export interface GlobusEndpointItem extends GlobusItem, GlobusResponse {
-    DATA_TYPE: 'endpoint';
+    DATA_TYPE: 'endpoint' | 'shared_endpoint';
     id: string;
     display_name: string;
     organization?: string;
