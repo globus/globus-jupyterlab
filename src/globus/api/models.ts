@@ -11,11 +11,11 @@ export interface GlobusItem extends GlobusObject {
 }
 
 export interface GlobusResponse extends GlobusObject {
-    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'endpoint' | 'shared_endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
+    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'share_result' | 'endpoint' | 'shared_endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
 }
 
 export interface GlobusOperation extends GlobusObject {
-    DATA_TYPE: 'rename' | 'mkdir' | 'transfer' | 'delete';
+    DATA_TYPE: 'rename' | 'mkdir' | 'transfer' | 'delete' | 'shared_endpoint';
 }
 
 export interface GlobusItemList extends GlobusResponse {
@@ -39,6 +39,14 @@ export interface GlobusEndpointList extends GlobusItemList {
     offset: number;
     DATA: GlobusEndpointItem[];
 }
+
+// export interface GlobusSharedEndpointList extends GlobusItemList {
+//     DATA_TYPE: 'shared_endpoint_list';
+//     has_next_page: boolean;
+//     limit: number;
+//     offset: number;
+//     DATA: GlobusEndpointItem[];
+// }
 
 export interface GlobusFileList extends GlobusItemList {
     DATA_TYPE: 'file_list';
@@ -187,7 +195,7 @@ export interface GlobusNewDirectoryOperation extends GlobusOperation {
 }
 
 export interface GlobusTaskOperation extends GlobusOperation {
-    DATA_TYPE: 'transfer' | 'delete';
+    DATA_TYPE: 'transfer' | 'delete' | 'shared_endpoint';
     submission_id: string;
     label?: string;
     notify_on_succeeded?: boolean;
@@ -210,6 +218,13 @@ export interface GlobusTransferTask extends GlobusTaskOperation {
     recursive_symlinks?: 'ignore' | 'keep' | 'copy';
 }
 
+export interface GlobusShareTask extends GlobusTaskOperation {
+    DATA_TYPE: 'shared_endpoint';
+    host_endpoint: string;
+    host_path: string;
+    display_name: string;
+}
+
 export interface GlobusDeleteTask extends GlobusTaskOperation {
     DATA_TYPE: 'delete';
     endpoint: string;
@@ -225,7 +240,7 @@ export interface GlobusSubmissionId extends GlobusResponse {
 }
 
 export interface GlobusOperationResponse extends GlobusResponse {
-    DATA_TYPE: 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result';
+    DATA_TYPE: 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'share_result';
     code: string;
     message: string;
     resource: string;
@@ -233,7 +248,7 @@ export interface GlobusOperationResponse extends GlobusResponse {
 }
 
 export interface GlobusTaskResponse extends GlobusOperationResponse {
-    DATA_TYPE: 'transfer_result' | 'delete_result';
+    DATA_TYPE: 'transfer_result' | 'delete_result' | 'share_result';
     task_id: string;
     submission_id: string;
 }

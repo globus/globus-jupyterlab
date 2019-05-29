@@ -19,7 +19,8 @@ import {
     GlobusRenameOperation,
     GlobusSubmissionId,
     GlobusTransferItem,
-    GlobusTransferTask
+    GlobusTransferTask,
+    GlobusShareTask
 } from "../api/models";
 import {GCP_ENDPOINT_ID} from "./globus_connect_personal";
 import {
@@ -73,7 +74,7 @@ const FILEMANAGER_MENU_REFRESH = 'jp-FileManager-menuRefresh';
 const FILEMANAGER_MENU_SORT = 'jp-FileManager-menuSort';
 const FILEMANAGER_MENU_OPTIONS = 'jp-FileManager-menuOptions';
 const FILEMANAGER_MENU_OPTION = 'jp-FileManager-menuOption';
-// const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; TODO uncomment when supported
+const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; //TODO uncomment when supported
 const FILEMANAGER_OPTION_TRANSFER = 'jp-FileManager-optionTransfer';
 const FILEMANAGER_OPTION_NEWFOLDER = 'jp-FileManager-optionNewFolder';
 const FILEMANAGER_OPTION_RENAME = 'jp-FileManager-optionRename';
@@ -110,6 +111,7 @@ export class GlobusFileManager extends Widget {
     private sourceGroup: HTMLDivElement;
     private destinationGroup: HTMLDivElement;
     private transferGroup: HTMLFormElement;
+    private shareGroup: HTMLFormElement;
     private parentGroup$ = new BehaviorSubject<HTMLElement>(null);
     private timeout = null;
 
@@ -431,6 +433,7 @@ export class GlobusFileManager extends Widget {
                 this.sourceGroup.style.display = 'flex';
                 this.destinationGroup.style.display = 'flex';
                 this.transferGroup.style.display = 'flex';
+                this.shareGroup.style.display = 'flex';
                 this.originalGroup.style.display = 'none';
                 this.setGCPDestination();
                 this.onClickHeaderHandler({target: getGlobusElement(this.searchGroup.parentElement, GLOBUS_HEADER)});
@@ -469,6 +472,14 @@ export class GlobusFileManager extends Widget {
 
     private onClickGlobusGroupHandler(e: any) {
         this.parentGroup$.next(e.currentTarget);
+    }
+
+    private async createSharedEndpoint(e: any) {
+        let hostPathInput: HTMLInputElement = getGlobusElement(this.sourceGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
+        let hostEndpoint: HTMLElement = getGlobusElement(this.sourceGroup, GLOBUS_OPEN);
+
+        //display name, description, keywords
+        // let displayName: HTMLInputElement = getGlobusElement(this.sourceGroup,)
     }
 
     private async startTransfer(e: any) {
@@ -794,9 +805,9 @@ export class GlobusFileManager extends Widget {
         let fileList: HTMLUListElement = document.createElement('ul');
         fileList.className = `${GLOBUS_LIST} ${FILEMANAGER_FILE_LIST} ${GLOBUS_BORDER}`;
 
-        // let shareOption = document.createElement('li'); TODO uncomment when supported
-        // shareOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_SHARE}`;
-        // shareOption.textContent = 'Share';
+        let shareOption = document.createElement('li'); //TODO uncomment when supported
+        shareOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_SHARE}`;
+        shareOption.textContent = 'Share';
 
         let transferOption = document.createElement('li');
         transferOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_TRANSFER}`;
@@ -1012,6 +1023,7 @@ export class GlobusFileManager extends Widget {
         this.node.appendChild(this.sourceGroup);
         this.node.appendChild(this.destinationGroup);
         this.node.appendChild(this.transferGroup);
+        this.node.appendChild(this.shareGroup);
 
         this.parentGroup$ = new BehaviorSubject(this.originalGroup);
         this.parentGroup$.asObservable().subscribe(globusParentGroup => {
@@ -1058,22 +1070,22 @@ export class GlobusFileManager extends Widget {
                         optionNewFolder.classList.remove(GLOBUS_DISABLED);
                 }
 
-                // let optionShare: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_SHARE); TODO uncomment when supported
-                // if (optionShare) {
-                //     switch (selectedItems.length) {
-                //         case 0:
-                //             optionShare.classList.remove(GLOBUS_DISABLED);
-                //             break;
-                //         case 1:
-                //             (selectedItems.item(0) as HTMLLIElement).type === 'dir' ?
-                //                 optionShare.classList.remove(GLOBUS_DISABLED) :
-                //                 optionShare.classList.add(GLOBUS_DISABLED);
-                //             break;
-                //         default:
-                //             optionShare.classList.add(GLOBUS_DISABLED);
-                //             break;
-                //     }
-                // }
+                let optionShare: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_SHARE); //TODO uncomment when supported
+                if (optionShare) {
+                    switch (selectedItems.length) {
+                        case 0:
+                            optionShare.classList.remove(GLOBUS_DISABLED);
+                            break;
+                        case 1:
+                            (selectedItems.item(0) as HTMLLIElement).type === 'dir' ?
+                                optionShare.classList.remove(GLOBUS_DISABLED) :
+                                optionShare.classList.add(GLOBUS_DISABLED);
+                            break;
+                        default:
+                            optionShare.classList.add(GLOBUS_DISABLED);
+                            break;
+                    }
+                }
             },
             e => {
                 console.log(e)

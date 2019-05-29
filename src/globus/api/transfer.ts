@@ -8,7 +8,8 @@ import {
     GlobusSubmissionId,
     GlobusTaskList,
     GlobusTaskResponse,
-    GlobusTransferTask
+    GlobusTransferTask,
+    GlobusShareTask
 } from "./models";
 import {makeGlobusRequest, Private} from "./client";
 import tokens = Private.tokens;
@@ -71,10 +72,10 @@ export function endpointSearchById(endpointId: string): Promise<GlobusEndpointIt
 
 /**
  * Takes in a task (transfer or delete) and returns the appropriate response
- * @param {GlobusTransferTask | GlobusDeleteTask} task
+ * @param {GlobusTransferTask | GlobusDeleteTask | GlobusShareTask} task
  * @returns {Promise<GlobusTaskResponse>}
  */
-export function submitTask(task: GlobusTransferTask | GlobusDeleteTask): Promise<GlobusTaskResponse> {
+export function submitTask(task: GlobusTransferTask | GlobusDeleteTask | GlobusShareTask): Promise<GlobusTaskResponse> {
     return makeTransferRequest(
         `${GLOBUS_TRANSFER_API_URL}/${task.DATA_TYPE}`, {
             method: 'POST',
