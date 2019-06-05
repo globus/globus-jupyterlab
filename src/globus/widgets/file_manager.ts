@@ -479,7 +479,32 @@ export class GlobusFileManager extends Widget {
         let hostEndpoint: HTMLElement = getGlobusElement(this.sourceGroup, GLOBUS_OPEN);
 
         //display name, description, keywords
-        // let displayName: HTMLInputElement = getGlobusElement(this.sourceGroup,)
+        let displayNameInput: HTMLInputElement = getGlobusElement(this.sourceGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
+        // let descriptionInput: HTMLInputElement = getGlobusElement(this.sourceGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
+        // let keywordsInput: HTMLInputElement = getGlobusElement(this.searchGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
+
+        let submissionId: GlobusSubmissionId = await requestSubmissionId();
+
+        let taskShare: GlobusShareTask = {
+            DATA_TYPE: 'shared_endpoint',
+            host_endpoint: hostEndpoint.id,
+            host_path: hostPathInput.value,
+            display_name: displayNameInput.value,
+            submission_id: submissionId.value
+        };
+
+        // if (descriptionInput.value.length > 0) {
+        //     taskShare['description'] = descriptionInput.value;
+        // }
+
+        console.log(taskShare);
+        submitTask(taskShare).then(data => {
+            console.log("no error");
+            console.log(data);
+        }).catch(e => {
+            console.log("error occurred");
+            console.log(e);
+        })
     }
 
     private async startTransfer(e: any) {
@@ -827,7 +852,7 @@ export class GlobusFileManager extends Widget {
 
         let dirOptions: HTMLUListElement = document.createElement('ul');
         dirOptions.className = `${GLOBUS_LIST} ${FILEMANAGER_DIR_OPTIONS} ${GLOBUS_BORDER}`;
-        // dirOptions.appendChild(shareOption);
+        dirOptions.appendChild(shareOption);
         dirOptions.appendChild(transferOption);
         dirOptions.appendChild(newFolderOption);
         dirOptions.appendChild(renameOption);
