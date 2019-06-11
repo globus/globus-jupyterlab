@@ -230,6 +230,17 @@ export class GlobusSearch extends Widget {
         fileManager.transferFile(index.retrieveFiles($.data(result, 'data')));
     }
 
+    private shareClicked(e: any) {
+        //debugger
+        // let result = getGlobusElement(this.parentGroup, GLOBUS_OPEN);
+        let indexSelect: HTMLSelectElement = getGlobusElement(this.parentGroup, SEARCH_INDEX_SELECT) as HTMLSelectElement;
+        let index = $.data(indexSelect.options[indexSelect.selectedIndex], 'value');
+        console.log(index);
+        (this.parent as GlobusWidgetManager).switchToWidget(FILE_MANAGER);
+        // let fileManager: GlobusFileManager = (this.parent as GlobusWidgetManager).getWidgetInstance(FILE_MANAGER) as GlobusFileManager;
+        // fileManager.shareEndpoint(index.re);
+    }
+
     private resultClicked(index: GlobusIndex, e: any) {
         let resultData = $.data(e.currentTarget, 'data');
 
@@ -363,6 +374,11 @@ export class GlobusSearch extends Widget {
         transferButton.textContent = 'Transfer';
         transferButton.className = GLOBUS_BUTTON;
         transferButton.addEventListener('click', this.transferClicked.bind(this));
+
+        let shareButton = document.createElement('div');
+        shareButton.textContent = 'Share';
+        shareButton.className = GLOBUS_BUTTON;
+        shareButton.addEventListener('click', this.shareClicked.bind(this));
 
         let overviewGroup = document.createElement('div');
         overviewGroup.className = `${GLOBUS_DISPLAY_FLEX} ${SEARCH_OVERVIEW_GROUP}`;

@@ -123,7 +123,7 @@ export interface GlobusEndpointItem extends GlobusItem, GlobusResponse {
 export interface GlobusTaskItem extends GlobusItem {
     DATA_TYPE: 'task';
     task_id: string;
-    type: 'TRANSFER' | 'DELETE';
+    type: 'TRANSFER' | 'DELETE' | 'SHARE';
     status: 'ACTIVE' | 'INACTIVE' | 'SUCCEDED' | 'FAILED';
     fatal_error: any | null;
     label: string | null;
