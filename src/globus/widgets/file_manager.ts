@@ -448,6 +448,7 @@ export class GlobusFileManager extends Widget {
                 this.shareGroup.style.display = 'flex';
                 this.hostGroup.style.display = 'flex';
                 this.originalGroup.style.display = 'flex';
+                // debugger;
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_DELETE}`)) {
                 this.deleteSelected(globusParentGroup).then(r => {this.retrieveDirectoryContents(filePathInput, fileList); console.log(r)}).catch(e => console.log(e));
@@ -1120,6 +1121,8 @@ export class GlobusFileManager extends Widget {
                     selectedItems.length === 0 ?  menuSelect.textContent = 'select all' : menuSelect.textContent = 'select none';
                 }
 
+                // Issue: infoDiv appears to be undefined (when clicking on "Share" menu option)
+                debugger;
                 let infoDiv: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_SEARCH_INFO);
                 if (infoDiv) {
                     let groupHeader: HTMLElement = getGlobusElement(globusParentGroup, GLOBUS_HEADER);
