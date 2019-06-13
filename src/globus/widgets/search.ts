@@ -221,6 +221,8 @@ export class GlobusSearch extends Widget {
     }
 
     private transferClicked(e: any) {
+        debugger;
+        console.log("transfer clicked");
         let result = getGlobusElement(this.parentGroup, GLOBUS_OPEN);
         let indexSelect: HTMLSelectElement = getGlobusElement(this.parentGroup, SEARCH_INDEX_SELECT) as HTMLSelectElement;
         let index = $.data(indexSelect.options[indexSelect.selectedIndex], 'value');
@@ -231,14 +233,14 @@ export class GlobusSearch extends Widget {
     }
 
     private shareClicked(e: any) {
-        //debugger
+        debugger;
         // let result = getGlobusElement(this.parentGroup, GLOBUS_OPEN);
         let indexSelect: HTMLSelectElement = getGlobusElement(this.parentGroup, SEARCH_INDEX_SELECT) as HTMLSelectElement;
         let index = $.data(indexSelect.options[indexSelect.selectedIndex], 'value');
         console.log(index);
         (this.parent as GlobusWidgetManager).switchToWidget(FILE_MANAGER);
-        // let fileManager: GlobusFileManager = (this.parent as GlobusWidgetManager).getWidgetInstance(FILE_MANAGER) as GlobusFileManager;
-        // fileManager.shareEndpoint(index.re);
+        let fileManager: GlobusFileManager = (this.parent as GlobusWidgetManager).getWidgetInstance(FILE_MANAGER) as GlobusFileManager;
+        fileManager.shareEndpoint();   
     }
 
     private resultClicked(index: GlobusIndex, e: any) {
@@ -385,6 +387,7 @@ export class GlobusSearch extends Widget {
         overviewGroup.appendChild(overviewMenu);
         overviewGroup.appendChild(overview);
         overviewGroup.appendChild(transferButton);
+        overviewGroup.appendChild(shareButton);
         overviewGroup.style.display = 'none';
 
         /* ------------- </overviewGroup> ------------- */

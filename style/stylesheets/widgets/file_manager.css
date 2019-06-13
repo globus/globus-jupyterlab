@@ -217,11 +217,11 @@
 
 .jp-Globus-file-manager .jp-FileManager-createShareBtn {
     align-self: center;
-    background: transparent;
+    /* background: transparent; */
     margin: 10px;
 }
 
-.jp-Globus-file-manager jp-FileManager-createShareBtn:after {
+.jp-Globus-file-manager .jp-FileManager-createShareBtn:after {
     content: '';
     display: inline-block;
     float: right;
