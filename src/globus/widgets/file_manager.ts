@@ -138,8 +138,8 @@ export class GlobusFileManager extends Widget {
     }
 
     /**
-     * Retrieves all of the endpoints in a given list (of endpoints) that match
-     * a given query (not a Regular Expression).
+     * Checks that the given query is a valid endpoint ID and generates a list
+     * of all endpoints that match the query.
      * @param {string} query 
      * @param {HTMLUListElement} endpointList 
      * @returns {Promise}
@@ -177,6 +177,12 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Generates HTML elements for each endpoint in a list (of endpoints) and 
+     * updates the given HTMLUListElement.
+     * @param {GlobusEndpointList} data 
+     * @param {HTMLUListElement} endpointList 
+     */
     private displayEndpoints(data: GlobusEndpointList, endpointList: HTMLUListElement) {
         for (let i = 0; i < data.DATA.length; i++) {
             let endpointData = data.DATA[i];
@@ -203,6 +209,13 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Gets all of the endpoints in a given list (of endpoints) that match the user
+     * input provided. 
+     * @param {HTMLInputElement} endpointInput 
+     * @param {HTMLUListElement} endpointList 
+     * @returns {Promise}
+     */
     private retrieveEndpoints(endpointInput: HTMLInputElement, endpointList: HTMLUListElement) {
         return new Promise<void>((resolve) => {
             if (endpointInput.value.length > 0) {
@@ -228,6 +241,12 @@ export class GlobusFileManager extends Widget {
         })
     }
 
+    /**
+     * Used as an event listener method that is called every time an endpoint
+     * is clicked.
+     * @param {any} e 
+     * @returns {Promise}
+     */
     private endpointClicked(e: any) {
         this.currentEndpoint = e.currentTarget;
         let endpoint: HTMLElement = e.currentTarget;
@@ -247,6 +266,12 @@ export class GlobusFileManager extends Widget {
         return this.retrieveDirectoryContents(filePathInput, fileList);
     }
 
+    /**
+     * Gets and displays the contents of a directory at a given path.
+     * @param {string} dirPath 
+     * @param {HTMLUListElement} fileList 
+     * @returns {Promise}
+     */
     private fetchDirectoryContents(dirPath: string, fileList: HTMLUListElement) {
         let globusParentGroup: HTMLElement = getGlobusParentGroup(fileList);
         let endpoint: HTMLElement = getGlobusElement(globusParentGroup, GLOBUS_OPEN);
@@ -264,6 +289,12 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Generates HTML elements for item in a list (of files/directories) and 
+     * updates the given HTMLUListElement.
+     * @param {GlobusFileList} data 
+     * @param {HTMLUListElement} fileList 
+     */
     private displayDirectoryContents(data: GlobusFileList, fileList: HTMLUListElement) {
         for (let i = 0; i < data.DATA.length; i++) {
             let fileData = data.DATA[i];
@@ -295,6 +326,13 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Gets all of the files/directories in a given list that match the user
+     * input provided. 
+     * @param {HTMLInputElement} filePathInput 
+     * @param {HTMLUListElement} fileList 
+     * @returns {Promise}
+     */
     private retrieveDirectoryContents(filePathInput: HTMLInputElement, fileList: HTMLUListElement) {
         if (filePathInput.value.length === 0) {
             filePathInput.value = '/~/';
@@ -315,6 +353,11 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Used as an event listener method that is called every time a file is
+     * clicked.
+     * @param {any} e 
+     */
     private fileClicked(e: any) {
         let file: HTMLLIElement = e.currentTarget;
 
@@ -331,6 +374,11 @@ export class GlobusFileManager extends Widget {
         file.classList.toggle(GLOBUS_SELECTED);
     }
 
+    /**
+     * Used as an event listener method that is called every time a file is
+     * double-clicked.
+     * @param {any} e 
+     */
     private fileDblClicked(e: any) {
         let file: HTMLLIElement = e.currentTarget;
         let fileData: GlobusFileItem = $.data(file, 'data');
@@ -352,6 +400,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time the 'up'
+     * key is pressed while the cursor is in the endpointInput.
+     * @param {any} e 
+     */
     private onKeyUpEndpointInputHandler(e: any) {
         if (e.target.matches(`.${FILEMANAGER_ENDPOINT_INPUT}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -371,6 +424,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time the input
+     * field for the path changes.
+     * @param {any} e 
+     */
     private onChangeFilePathInputHandler(e: any) {
         if (e.target.matches(`.${FILEMANAGER_FILE_PATH_INPUT}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -380,6 +438,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time an item on the
+     * endpoint menu bar (i.e., sort) is clicked.
+     * @param {any} e 
+     */
     private onClickDirMenuButtonHandler(e: any) {
         if (e.target.matches(`.${GLOBUS_MENU_BTN}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -432,6 +495,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time an option
+     * from the endpoint submenu (i.e., Transfer, Share) is clicked.
+     * @param {any} e 
+     */
     private onClickMenuOptionHandler(e: any) {
         let globusParentGroup = getGlobusParentGroup(e.target);
         let dirOptions: HTMLUListElement = getGlobusElement(globusParentGroup, FILEMANAGER_DIR_OPTIONS) as HTMLUListElement;
