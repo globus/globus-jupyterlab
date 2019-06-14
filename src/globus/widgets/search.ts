@@ -347,22 +347,10 @@ export class GlobusSearch extends Widget {
         let overview = document.createElement('ul');
         overview.className = `${GLOBUS_LIST} ${SEARCH_OVERVIEW} ${GLOBUS_BORDER}`;
 
-        // let transferButton = document.createElement('div');
-        // transferButton.textContent = 'Transfer';
-        // transferButton.className = GLOBUS_BUTTON;
-        // transferButton.addEventListener('click', this.transferClicked.bind(this));
-
-        // let shareButton = document.createElement('div');
-        // shareButton.textContent = 'Share';
-        // shareButton.className = GLOBUS_BUTTON;
-        // shareButton.addEventListener('click', this.shareClicked.bind(this));
-
         let overviewGroup = document.createElement('div');
         overviewGroup.className = `${GLOBUS_DISPLAY_FLEX} ${SEARCH_OVERVIEW_GROUP}`;
         overviewGroup.appendChild(overviewMenu);
         overviewGroup.appendChild(overview);
-        // overviewGroup.appendChild(transferButton);
-        // overviewGroup.appendChild(shareButton);
         overviewGroup.style.display = 'none';
 
         /* ------------- </overviewGroup> ------------- */
