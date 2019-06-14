@@ -8,8 +8,7 @@ import {
     GlobusSubmissionId,
     GlobusTaskList,
     GlobusTaskResponse,
-    GlobusTransferTask,
-    GlobusShareTask
+    GlobusTransferTask
 } from "./models";
 import {makeGlobusRequest, Private} from "./client";
 import tokens = Private.tokens;
@@ -72,10 +71,10 @@ export function endpointSearchById(endpointId: string): Promise<GlobusEndpointIt
 
 /**
  * Takes in a task (transfer or delete) and returns the appropriate response
- * @param {GlobusTransferTask | GlobusDeleteTask | GlobusShareTask} task
+ * @param {GlobusTransferTask | GlobusDeleteTask} task
  * @returns {Promise<GlobusTaskResponse>}
  */
-export function submitTask(task: GlobusTransferTask | GlobusDeleteTask | GlobusShareTask): Promise<GlobusTaskResponse> {
+export function submitTask(task: GlobusTransferTask | GlobusDeleteTask): Promise<GlobusTaskResponse> {
     return makeTransferRequest(
         `${GLOBUS_TRANSFER_API_URL}/${task.DATA_TYPE}`, {
             method: 'POST',
@@ -84,6 +83,31 @@ export function submitTask(task: GlobusTransferTask | GlobusDeleteTask | GlobusS
             },
             body: JSON.stringify(task)
         }) as Promise<GlobusTaskResponse>;
+}
+
+export function sharedEndpiontRequest(task: any): Promise<GlobusTaskResponse> {
+    debugger;
+    let url = `${GLOBUS_TRANSFER_API_URL}/` + 'shared_endpoint';
+    return makeTransferRequest(
+        url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(task)
+        }) as Promise<GlobusTaskResponse>;
+
+    // let options = {
+    //     'method': 'POST',
+    //     'headers': {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${tokens.transferToken}`
+    //     }, 
+    //     'DATA': [task]
+    // };
+
+    // let url = `${GLOBUS_TRANSFER_API_URL}/` + 'shared_endpoint';
+    // return makeGlobusRequest(url, options);
 }
 
 /**

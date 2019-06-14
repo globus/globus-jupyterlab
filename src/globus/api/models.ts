@@ -195,7 +195,7 @@ export interface GlobusNewDirectoryOperation extends GlobusOperation {
 }
 
 export interface GlobusTaskOperation extends GlobusOperation {
-    DATA_TYPE: 'transfer' | 'delete' | 'shared_endpoint';
+    DATA_TYPE: 'transfer' | 'delete';
     submission_id: string;
     label?: string;
     notify_on_succeeded?: boolean;
@@ -218,12 +218,12 @@ export interface GlobusTransferTask extends GlobusTaskOperation {
     recursive_symlinks?: 'ignore' | 'keep' | 'copy';
 }
 
-export interface GlobusShareTask extends GlobusTaskOperation {
-    DATA_TYPE: 'shared_endpoint';
-    host_endpoint: string;
-    host_path: string;
-    display_name: string;
-}
+// export interface GlobusShareTask extends GlobusTaskOperation {
+//     DATA_TYPE: 'shared_endpoint';
+//     host_endpoint: string;
+//     host_path: string;
+//     display_name: string;
+// }
 
 export interface GlobusDeleteTask extends GlobusTaskOperation {
     DATA_TYPE: 'delete';

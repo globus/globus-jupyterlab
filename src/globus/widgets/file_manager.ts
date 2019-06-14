@@ -6,7 +6,8 @@ import {
     listDirectoryContents,
     requestSubmissionId,
     submitOperation,
-    submitTask
+    submitTask,
+    sharedEndpiontRequest
 } from "../api/transfer";
 import {
     GlobusDeleteItem,
@@ -19,8 +20,7 @@ import {
     GlobusRenameOperation,
     GlobusSubmissionId,
     GlobusTransferItem,
-    GlobusTransferTask,
-    GlobusShareTask
+    GlobusTransferTask
 } from "../api/models";
 import {GCP_ENDPOINT_ID} from "./globus_connect_personal";
 import {
@@ -54,8 +54,6 @@ import {
 import * as moment from 'moment';
 import * as $ from 'jquery';
 
-// TODO Uncomment share option when it is supported
-
 /**
  * CSS classes
  */
@@ -78,7 +76,7 @@ const FILEMANAGER_MENU_REFRESH = 'jp-FileManager-menuRefresh';
 const FILEMANAGER_MENU_SORT = 'jp-FileManager-menuSort';
 const FILEMANAGER_MENU_OPTIONS = 'jp-FileManager-menuOptions';
 const FILEMANAGER_MENU_OPTION = 'jp-FileManager-menuOption';
-const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; //TODO uncomment when supported
+const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; 
 const FILEMANAGER_OPTION_TRANSFER = 'jp-FileManager-optionTransfer';
 const FILEMANAGER_OPTION_NEWFOLDER = 'jp-FileManager-optionNewFolder';
 const FILEMANAGER_OPTION_RENAME = 'jp-FileManager-optionRename';
@@ -112,14 +110,13 @@ const ITEM_TYPE: any = {
 export class GlobusFileManager extends Widget {
     private searchGroup: HTMLDivElement;
     private originalGroup: HTMLDivElement;
-    // private hostGroup: HTMLDivElement;
     private sourceGroup: HTMLDivElement;
     private destinationGroup: HTMLDivElement;
     private transferGroup: HTMLFormElement;
     private shareGroup: HTMLFormElement;
     private parentGroup$ = new BehaviorSubject<HTMLElement>(null);
     private timeout = null;
-    private currentEndpoint;
+    private currentEndpoint: any;
     private shareClicked: boolean = false;
 
     constructor() {
@@ -132,11 +129,21 @@ export class GlobusFileManager extends Widget {
         this.update();
     }
 
+    /**
+     * Updates the UI of this widget by removing and recreating the HTMLElements.
+     */
     onUpdateRequest() {
         removeChildren(this.node);
         this.createHTMLElements();
     }
 
+    /**
+     * Retrieves all of the endpoints in a given list (of endpoints) that match
+     * a given query (not a Regular Expression).
+     * @param {string} query 
+     * @param {HTMLUListElement} endpointList 
+     * @returns {Promise}
+     */
     private fetchEndpoints(query: string, endpointList: HTMLUListElement) {
         return new Promise<void>((resolve) => {
             if (isEndpointId(query)) {
@@ -435,7 +442,6 @@ export class GlobusFileManager extends Widget {
             dirOptions.hidden = true;
 
             if (e.target.matches(`.${FILEMANAGER_OPTION_TRANSFER}`)) {
-                // debugger;
                 this.sourceGroup.appendChild(this.searchGroup);
                 this.parentGroup$.next(this.sourceGroup);
                 this.sourceGroup.style.display = 'flex';
@@ -446,14 +452,10 @@ export class GlobusFileManager extends Widget {
                 this.onClickHeaderHandler({target: getGlobusElement(this.searchGroup.parentElement, GLOBUS_HEADER)});
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_SHARE}`)) {
-                // debugger;
-                // this.hostGroup.appendChild(this.searchGroup);
                 this.shareClicked = true;
                 this.parentGroup$.next(this.shareGroup);
-                // this.hostGroup.style.display = 'flex';
                 this.shareGroup.style.display = 'flex';
                 this.originalGroup.style.display = 'none';
-                // this.onClickHeaderHandler({target: getGlobusElement(this.hostGroup.parentElement, GLOBUS_HEADER)});
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_DELETE}`)) {
                 this.deleteSelected(globusParentGroup).then(r => {this.retrieveDirectoryContents(filePathInput, fileList); console.log(r)}).catch(e => console.log(e));
@@ -494,22 +496,24 @@ export class GlobusFileManager extends Widget {
     }
 
     private async createSharedEndpoint(e: any) {
-        let hostPathInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
-        let hostEndpoint: HTMLElement = getGlobusElement(this.shareGroup, GLOBUS_OPEN);
+        let hostInfo: HTMLDivElement = getGlobusElement(this.shareGroup, FILEMANAGER_SEARCH_INFO) as HTMLDivElement;
 
-        //display name, description, keywords
+        let hostPath = '/~/';
+
+        if (hostInfo) {
+            hostPath = hostInfo.textContent.split(":")[1].trim();
+        }
+
+        // display name, description, keywords
         let displayNameInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_DISPLAY_NAME_INPUT) as HTMLInputElement;
         let descriptionInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_DESCRIPTION_INPUT) as HTMLInputElement;
         let keywordsInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_KEYWORDS_INPUT) as HTMLInputElement;
 
-        let submissionId: GlobusSubmissionId = await requestSubmissionId();
-
-        let taskShare: GlobusShareTask = {
+        let taskShare: any = {
             DATA_TYPE: 'shared_endpoint',
-            host_endpoint: hostEndpoint.id,
-            host_path: hostPathInput.value,
-            display_name: displayNameInput.value,
-            submission_id: submissionId.value
+            host_endpoint: this.currentEndpoint.id,
+            host_path: hostPath,
+            display_name: displayNameInput.value
         };
 
         if (descriptionInput.value.length > 0) {
@@ -520,13 +524,13 @@ export class GlobusFileManager extends Widget {
         }
 
         console.log(taskShare);
-        submitTask(taskShare).then(data => {
+        sharedEndpiontRequest(taskShare).then(data => {
             console.log("no error");
             console.log(data);
         }).catch(e => {
             console.log("error occurred");
             console.log(e);
-        })
+        });
     }
 
     private async startTransfer(e: any) {
@@ -849,8 +853,7 @@ export class GlobusFileManager extends Widget {
         let fileList: HTMLUListElement = document.createElement('ul');
         fileList.className = `${GLOBUS_LIST} ${FILEMANAGER_FILE_LIST} ${GLOBUS_BORDER}`;
 
-        // share menu option defined
-        let shareOption = document.createElement('li'); //TODO uncomment when supported
+        let shareOption = document.createElement('li'); 
         shareOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_SHARE}`;
         shareOption.textContent = 'Share';
 
@@ -915,30 +918,9 @@ export class GlobusFileManager extends Widget {
 
         /* ------------- </originalGroup> ------------- */
 
-
-        /* ------------- <hostGroup> ------------- */
-        /* Host (creating share endpoint) screen. Hidden */
-        // let hostHeader = document.createElement('div');
-        // hostHeader.textContent = 'Host';
-        // hostHeader.className = `${GLOBUS_HEADER} ${GLOBUS_BORDER}`;
-        // hostHeader.addEventListener('click', this.onClickHeaderHandler);
-
-        // let hostInfo = document.createElement('div');
-        // hostInfo.className = `${FILEMANAGER_SEARCH_INFO} ${GLOBUS_BORDER}`;
-        // hostInfo.style.display = 'none';
-
-        // this.hostGroup = document.createElement('div');
-        // this.hostGroup.className = GLOBUS_PARENT_GROUP;
-        // this.hostGroup.appendChild(hostHeader);
-        // this.hostGroup.appendChild(hostInfo);
-        // this.hostGroup.addEventListener('click', this.onClickGlobusGroupHandler.bind(this));
-        // this.hostGroup.style.display = 'none';
-
-        /* ------------- </hostGroup> ------------- */
-
         /* ------------- <shareGroup> ------------- */
         /* host info */
-        let hostInfo = document.createElement('div');
+        let hostInfo: HTMLDivElement = document.createElement('div');
         hostInfo.className = `${FILEMANAGER_SEARCH_INFO}`;
 
         /* display, description, and keywords */
@@ -1127,7 +1109,6 @@ export class GlobusFileManager extends Widget {
         this.node.appendChild(this.sourceGroup);
         this.node.appendChild(this.destinationGroup);
         this.node.appendChild(this.transferGroup);
-        // this.node.appendChild(this.hostGroup);
         this.node.appendChild(this.shareGroup);
 
         this.parentGroup$ = new BehaviorSubject(this.originalGroup);
@@ -1141,7 +1122,6 @@ export class GlobusFileManager extends Widget {
 
                 let infoDiv: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_SEARCH_INFO);
                 if (infoDiv) {
-                    // debugger;
                     let groupHeader: HTMLElement = getGlobusElement(globusParentGroup, GLOBUS_HEADER);
                     let endpointList: HTMLUListElement = getGlobusElement(globusParentGroup, FILEMANAGER_ENDPOINT_LIST) as HTMLUListElement;
                     let endpointInput: HTMLInputElement = getGlobusElement(globusParentGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
@@ -1156,7 +1136,6 @@ export class GlobusFileManager extends Widget {
                         }
                     }
                     else if (this.shareClicked) {
-                        // let hostDiv: HTMLElement = getGlobusElement(this.shareGroup, FILEMANAGER_SEARCH_INFO);
                         let endpointInput: HTMLInputElement = getGlobusElement(this.searchGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
                         let filePathInput: HTMLInputElement = getGlobusElement(this.searchGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
                         
@@ -1179,7 +1158,6 @@ export class GlobusFileManager extends Widget {
                             if ((selectedItems.item(0) as HTMLLIElement).type === 'dir') {
                                 optionShare.classList.remove(GLOBUS_DISABLED);
                             }
-                                // optionShare.classList.add(GLOBUS_DISABLED);
                             break;
                         default:
                             optionShare.classList.add(GLOBUS_DISABLED);
@@ -1187,9 +1165,6 @@ export class GlobusFileManager extends Widget {
                     }
                 } 
 
-                // if (this.shareGroup.style.display === 'flex') {
-
-                // }
 
                 let optionDelete: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_DELETE);
                 if (optionDelete) {
@@ -1225,11 +1200,6 @@ export class GlobusFileManager extends Widget {
         this.createHTMLElements();
         let endpointInput: HTMLInputElement = getGlobusElement(this.originalGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
         
-        // let filePathInput: HTMLInputElement = getGlobusElement(this.originalGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
-        // let fileList: HTMLUListElement = getGlobusElement(this.originalGroup, FILEMANAGER_FILE_LIST) as HTMLUListElement;
-
-        // endpointInput.value = endpointId;
-        // filePathInput.value = path;
         let endpointList: HTMLUListElement = getGlobusElement(this.originalGroup, FILEMANAGER_ENDPOINT_LIST) as HTMLUListElement;
 
         let optionShare: HTMLElement = getGlobusElement(this.originalGroup, FILEMANAGER_OPTION_SHARE);
@@ -1237,14 +1207,6 @@ export class GlobusFileManager extends Widget {
         this.retrieveEndpoints(endpointInput, endpointList).then(() => {
             this.endpointClicked({currentTarget: endpointList.firstChild}).then(() => {
                 this.onClickMenuOptionHandler({target: optionShare});
-                // this.retrieveDirectoryContents(filePathInput, fileList).then(() => {
-                //     for (let i = 0; i < fileList.children.length; i++) {
-                //         if (files.fileNames.indexOf((fileList.children[i].firstChild as HTMLElement).title) > -1) {
-                //             fileList.children[i].classList.add(GLOBUS_SELECTED);
-                //         }
-                //     }
-                //     this.parentGroup$.next(this.shareGroup);
-                // });
                 this.parentGroup$.next(this.shareGroup);
             });
         });
