@@ -85,8 +85,12 @@ export function submitTask(task: GlobusTransferTask | GlobusDeleteTask): Promise
         }) as Promise<GlobusTaskResponse>;
 }
 
+/**
+ * Takes in a share "task" and returns the appropriate response
+ * @param {any} task 
+ * @returns {Promise<GlobusTaskResponse}
+ */
 export function sharedEndpiontRequest(task: any): Promise<GlobusTaskResponse> {
-    debugger;
     let url = `${GLOBUS_TRANSFER_API_URL}/` + 'shared_endpoint';
     return makeTransferRequest(
         url, {
@@ -96,18 +100,6 @@ export function sharedEndpiontRequest(task: any): Promise<GlobusTaskResponse> {
             },
             body: JSON.stringify(task)
         }) as Promise<GlobusTaskResponse>;
-
-    // let options = {
-    //     'method': 'POST',
-    //     'headers': {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `Bearer ${tokens.transferToken}`
-    //     }, 
-    //     'DATA': [task]
-    // };
-
-    // let url = `${GLOBUS_TRANSFER_API_URL}/` + 'shared_endpoint';
-    // return makeGlobusRequest(url, options);
 }
 
 /**

@@ -40,14 +40,6 @@ export interface GlobusEndpointList extends GlobusItemList {
     DATA: GlobusEndpointItem[];
 }
 
-// export interface GlobusSharedEndpointList extends GlobusItemList {
-//     DATA_TYPE: 'shared_endpoint_list';
-//     has_next_page: boolean;
-//     limit: number;
-//     offset: number;
-//     DATA: GlobusEndpointItem[];
-// }
-
 export interface GlobusFileList extends GlobusItemList {
     DATA_TYPE: 'file_list';
     path: string;
@@ -217,13 +209,6 @@ export interface GlobusTransferTask extends GlobusTaskOperation {
     delete_destination_extra?: boolean;
     recursive_symlinks?: 'ignore' | 'keep' | 'copy';
 }
-
-// export interface GlobusShareTask extends GlobusTaskOperation {
-//     DATA_TYPE: 'shared_endpoint';
-//     host_endpoint: string;
-//     host_path: string;
-//     display_name: string;
-// }
 
 export interface GlobusDeleteTask extends GlobusTaskOperation {
     DATA_TYPE: 'delete';

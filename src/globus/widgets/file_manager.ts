@@ -1215,7 +1215,7 @@ export class GlobusFileManager extends Widget {
                         infoDiv.textContent = 'No endpoint selected'
                     }
                 }
-                // debugger;
+                
                 let optionShare: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_SHARE); 
                 if (optionShare) {
                     switch (selectedItems.length) {
