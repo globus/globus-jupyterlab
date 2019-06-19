@@ -17,6 +17,19 @@
     overflow-wrap: break-word;
 }
 
+.jp-Globus-file-manager .jp-FileManager-shareInfo {
+    background: white;
+    border: 1px solid var(--jp-Globus-borderGray);
+    padding: 5px 10px;
+    color: var(--jp-Globus-textGray);
+    font-style: italic;
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
 .jp-Globus-file-manager .jp-FileManager-menuSelect {
     width: 60px;
 }
@@ -200,6 +213,22 @@
     pointer-events: none;
     cursor: default;
     filter: brightness(180%);
+}
+
+.jp-Globus-file-manager .jp-FileManager-createShareBtn {
+    align-self: center;
+    margin: 10px;
+}
+
+.jp-Globus-file-manager .jp-FileManager-createShareBtn:after {
+    content: '';
+    display: inline-block;
+    float: right;
+    height: 20px;
+    width: 20px;
+    margin-right: 20px;
+    background: var(--jp-Globus-icon-start) no-repeat;
+    background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferResult {

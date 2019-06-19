@@ -7,15 +7,15 @@ export interface GlobusObject {
 }
 
 export interface GlobusItem extends GlobusObject {
-    DATA_TYPE: 'file' | 'task' | 'endpoint' | 'transfer_item' | 'delete_item';
+    DATA_TYPE: 'file' | 'task' | 'endpoint' | 'shared_endpoint' | 'transfer_item' | 'delete_item';
 }
 
 export interface GlobusResponse extends GlobusObject {
-    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
+    DATA_TYPE: 'submission_id' | 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'share_result' | 'endpoint' | 'shared_endpoint' | 'task_list' | 'endpoint_list' | 'file_list';
 }
 
 export interface GlobusOperation extends GlobusObject {
-    DATA_TYPE: 'rename' | 'mkdir' | 'transfer' | 'delete';
+    DATA_TYPE: 'rename' | 'mkdir' | 'transfer' | 'delete' | 'shared_endpoint';
 }
 
 export interface GlobusItemList extends GlobusResponse {
@@ -62,7 +62,7 @@ export interface GlobusFileItem {
 }
 
 export interface GlobusEndpointItem extends GlobusItem, GlobusResponse {
-    DATA_TYPE: 'endpoint';
+    DATA_TYPE: 'endpoint' | 'shared_endpoint';
     id: string;
     display_name: string;
     organization?: string;
@@ -115,7 +115,7 @@ export interface GlobusEndpointItem extends GlobusItem, GlobusResponse {
 export interface GlobusTaskItem extends GlobusItem {
     DATA_TYPE: 'task';
     task_id: string;
-    type: 'TRANSFER' | 'DELETE';
+    type: 'TRANSFER' | 'DELETE' | 'SHARE';
     status: 'ACTIVE' | 'INACTIVE' | 'SUCCEDED' | 'FAILED';
     fatal_error: any | null;
     label: string | null;
@@ -225,7 +225,7 @@ export interface GlobusSubmissionId extends GlobusResponse {
 }
 
 export interface GlobusOperationResponse extends GlobusResponse {
-    DATA_TYPE: 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result';
+    DATA_TYPE: 'result' | 'mkdir_result' | 'transfer_result' | 'delete_result' | 'share_result';
     code: string;
     message: string;
     resource: string;
@@ -233,7 +233,7 @@ export interface GlobusOperationResponse extends GlobusResponse {
 }
 
 export interface GlobusTaskResponse extends GlobusOperationResponse {
-    DATA_TYPE: 'transfer_result' | 'delete_result';
+    DATA_TYPE: 'transfer_result' | 'delete_result' | 'share_result';
     task_id: string;
     submission_id: string;
 }

@@ -16,12 +16,10 @@ import {
     GLOBUS_LIST_ITEM_SUBTITLE,
     GLOBUS_MENU,
     GLOBUS_MENU_BTN,
-    GLOBUS_ACTIVE, GLOBUS_LIST_ITEM, hideChildren, GLOBUS_BUTTON, GLOBUS_OPEN,
+    GLOBUS_ACTIVE, GLOBUS_LIST_ITEM, hideChildren, GLOBUS_OPEN,
 } from "../../utils";
 import * as $ from "jquery";
 import {GlobusMetaResult, GlobusSearchResult} from "../api/models";
-import {GlobusWidgetManager} from "../widget_manager";
-import {FILE_MANAGER, GlobusFileManager} from "./file_manager";
 import JSONFormatter from 'json-formatter-js';
 
 
@@ -220,16 +218,6 @@ export class GlobusSearch extends Widget {
         });
     }
 
-    private transferClicked(e: any) {
-        let result = getGlobusElement(this.parentGroup, GLOBUS_OPEN);
-        let indexSelect: HTMLSelectElement = getGlobusElement(this.parentGroup, SEARCH_INDEX_SELECT) as HTMLSelectElement;
-        let index = $.data(indexSelect.options[indexSelect.selectedIndex], 'value');
-
-        (this.parent as GlobusWidgetManager).switchToWidget(FILE_MANAGER);
-        let fileManager: GlobusFileManager = (this.parent as GlobusWidgetManager).getWidgetInstance(FILE_MANAGER) as GlobusFileManager;
-        fileManager.transferFile(index.retrieveFiles($.data(result, 'data')));
-    }
-
     private resultClicked(index: GlobusIndex, e: any) {
         let resultData = $.data(e.currentTarget, 'data');
 
@@ -359,16 +347,10 @@ export class GlobusSearch extends Widget {
         let overview = document.createElement('ul');
         overview.className = `${GLOBUS_LIST} ${SEARCH_OVERVIEW} ${GLOBUS_BORDER}`;
 
-        let transferButton = document.createElement('div');
-        transferButton.textContent = 'Transfer';
-        transferButton.className = GLOBUS_BUTTON;
-        transferButton.addEventListener('click', this.transferClicked.bind(this));
-
         let overviewGroup = document.createElement('div');
         overviewGroup.className = `${GLOBUS_DISPLAY_FLEX} ${SEARCH_OVERVIEW_GROUP}`;
         overviewGroup.appendChild(overviewMenu);
         overviewGroup.appendChild(overview);
-        overviewGroup.appendChild(transferButton);
         overviewGroup.style.display = 'none';
 
         /* ------------- </overviewGroup> ------------- */

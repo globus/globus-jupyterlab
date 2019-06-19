@@ -21,7 +21,6 @@ const GLOBUS_TRANSFER_API_URL = 'https://transfer.api.globusonline.org/v0.10';
  * @returns {Promise<any>}
  */
 export function activateEndpoint(endpointId: string): Promise<any> {
-    // TODO Deal with failed activations
     return makeTransferRequest(
         `${GLOBUS_TRANSFER_API_URL}/endpoint/${endpointId}/autoactivate`,{
             method: 'POST',
@@ -53,6 +52,11 @@ export function listDirectoryContents(endpointId: string, dirPath: string = '/~/
  * @returns {Promise<GlobusEndpointList>}
  */
 export function endpointSearch(query: string): Promise<GlobusEndpointList> {
+    // check is needed so that filter_fulltext always gets a value
+    if (query.length <= 0) {
+        let no_query = null;
+        return makeTransferRequest(`${GLOBUS_TRANSFER_API_URL}/endpoint_search?filter_fulltext=${no_query}`) as Promise<GlobusEndpointList>;
+    }
     return makeTransferRequest(`${GLOBUS_TRANSFER_API_URL}/endpoint_search?filter_fulltext=${query}`) as Promise<GlobusEndpointList>;
 }
 
@@ -73,6 +77,23 @@ export function endpointSearchById(endpointId: string): Promise<GlobusEndpointIt
 export function submitTask(task: GlobusTransferTask | GlobusDeleteTask): Promise<GlobusTaskResponse> {
     return makeTransferRequest(
         `${GLOBUS_TRANSFER_API_URL}/${task.DATA_TYPE}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(task)
+        }) as Promise<GlobusTaskResponse>;
+}
+
+/**
+ * Takes in a share "task" and returns the appropriate response
+ * @param {any} task 
+ * @returns {Promise<GlobusTaskResponse}
+ */
+export function sharedEndpiontRequest(task: any): Promise<GlobusTaskResponse> {
+    let url = `${GLOBUS_TRANSFER_API_URL}/` + 'shared_endpoint';
+    return makeTransferRequest(
+        url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -53,8 +53,6 @@ import {
 import * as moment from 'moment';
 import * as $ from 'jquery';
 
-// TODO Uncomment share option when it is supported
-
 /**
  * CSS classes
  */
@@ -73,7 +71,7 @@ const FILEMANAGER_MENU_REFRESH = 'jp-FileManager-menuRefresh';
 const FILEMANAGER_MENU_SORT = 'jp-FileManager-menuSort';
 const FILEMANAGER_MENU_OPTIONS = 'jp-FileManager-menuOptions';
 const FILEMANAGER_MENU_OPTION = 'jp-FileManager-menuOption';
-// const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; TODO uncomment when supported
+const FILEMANAGER_OPTION_SHARE = 'jp-FileManager-optionShare'; 
 const FILEMANAGER_OPTION_TRANSFER = 'jp-FileManager-optionTransfer';
 const FILEMANAGER_OPTION_NEWFOLDER = 'jp-FileManager-optionNewFolder';
 const FILEMANAGER_OPTION_RENAME = 'jp-FileManager-optionRename';
@@ -101,6 +99,8 @@ const ITEM_TYPE: any = {
     'file': FILEMANAGER_FILE_TYPE
 };
 
+const FILEMANAGER_CREATE_SHARE_URL = 'https://app.globus.org/file-manager/collections/<host_endpoint_id>/shares/create?back=file-manager&hostPath=<host_path>';
+
 /**
  * Widget for hosting the Globus File Manager.
  */
@@ -112,6 +112,7 @@ export class GlobusFileManager extends Widget {
     private transferGroup: HTMLFormElement;
     private parentGroup$ = new BehaviorSubject<HTMLElement>(null);
     private timeout = null;
+    private currentEndpoint: any;
 
     constructor() {
         super();
@@ -123,11 +124,21 @@ export class GlobusFileManager extends Widget {
         this.update();
     }
 
+    /**
+     * Updates the UI of this widget by removing and recreating the HTMLElements.
+     */
     onUpdateRequest() {
         removeChildren(this.node);
         this.createHTMLElements();
     }
 
+    /**
+     * Checks that the given query is a valid endpoint ID and generates a list
+     * of all endpoints that match the query.
+     * @param {string} query 
+     * @param {HTMLUListElement} endpointList 
+     * @returns {Promise}
+     */
     private fetchEndpoints(query: string, endpointList: HTMLUListElement) {
         return new Promise<void>((resolve) => {
             if (isEndpointId(query)) {
@@ -161,6 +172,12 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Generates HTML elements for each endpoint in a list (of endpoints) and 
+     * updates the given HTMLUListElement.
+     * @param {GlobusEndpointList} data 
+     * @param {HTMLUListElement} endpointList 
+     */
     private displayEndpoints(data: GlobusEndpointList, endpointList: HTMLUListElement) {
         for (let i = 0; i < data.DATA.length; i++) {
             let endpointData = data.DATA[i];
@@ -187,6 +204,13 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Gets all of the endpoints in a given list (of endpoints) that match the user
+     * input provided. 
+     * @param {HTMLInputElement} endpointInput 
+     * @param {HTMLUListElement} endpointList 
+     * @returns {Promise}
+     */
     private retrieveEndpoints(endpointInput: HTMLInputElement, endpointList: HTMLUListElement) {
         return new Promise<void>((resolve) => {
             if (endpointInput.value.length > 0) {
@@ -212,7 +236,14 @@ export class GlobusFileManager extends Widget {
         })
     }
 
+    /**
+     * Used as an event listener method that is called every time an endpoint
+     * is clicked.
+     * @param {any} e 
+     * @returns {Promise}
+     */
     private endpointClicked(e: any) {
+        this.currentEndpoint = e.currentTarget;
         let endpoint: HTMLElement = e.currentTarget;
         let endpointList: HTMLElement = endpoint.parentElement;
 
@@ -230,6 +261,12 @@ export class GlobusFileManager extends Widget {
         return this.retrieveDirectoryContents(filePathInput, fileList);
     }
 
+    /**
+     * Gets and displays the contents of a directory at a given path.
+     * @param {string} dirPath 
+     * @param {HTMLUListElement} fileList 
+     * @returns {Promise}
+     */
     private fetchDirectoryContents(dirPath: string, fileList: HTMLUListElement) {
         let globusParentGroup: HTMLElement = getGlobusParentGroup(fileList);
         let endpoint: HTMLElement = getGlobusElement(globusParentGroup, GLOBUS_OPEN);
@@ -247,6 +284,12 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Generates HTML elements for item in a list (of files/directories) and 
+     * updates the given HTMLUListElement.
+     * @param {GlobusFileList} data 
+     * @param {HTMLUListElement} fileList 
+     */
     private displayDirectoryContents(data: GlobusFileList, fileList: HTMLUListElement) {
         for (let i = 0; i < data.DATA.length; i++) {
             let fileData = data.DATA[i];
@@ -278,6 +321,13 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Gets all of the files/directories in a given list that match the user
+     * input provided. 
+     * @param {HTMLInputElement} filePathInput 
+     * @param {HTMLUListElement} fileList 
+     * @returns {Promise}
+     */
     private retrieveDirectoryContents(filePathInput: HTMLInputElement, fileList: HTMLUListElement) {
         if (filePathInput.value.length === 0) {
             filePathInput.value = '/~/';
@@ -298,6 +348,11 @@ export class GlobusFileManager extends Widget {
         });
     }
 
+    /**
+     * Used as an event listener method that is called every time a file is
+     * clicked.
+     * @param {any} e 
+     */
     private fileClicked(e: any) {
         let file: HTMLLIElement = e.currentTarget;
 
@@ -314,6 +369,11 @@ export class GlobusFileManager extends Widget {
         file.classList.toggle(GLOBUS_SELECTED);
     }
 
+    /**
+     * Used as an event listener method that is called every time a file is
+     * double-clicked.
+     * @param {any} e 
+     */
     private fileDblClicked(e: any) {
         let file: HTMLLIElement = e.currentTarget;
         let fileData: GlobusFileItem = $.data(file, 'data');
@@ -335,6 +395,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time the 'up'
+     * key is pressed while the cursor is in the endpointInput.
+     * @param {any} e 
+     */
     private onKeyUpEndpointInputHandler(e: any) {
         if (e.target.matches(`.${FILEMANAGER_ENDPOINT_INPUT}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -354,6 +419,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time the input
+     * field for the path changes.
+     * @param {any} e 
+     */
     private onChangeFilePathInputHandler(e: any) {
         if (e.target.matches(`.${FILEMANAGER_FILE_PATH_INPUT}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -363,6 +433,11 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time an item on the
+     * endpoint menu bar (i.e., sort) is clicked.
+     * @param {any} e 
+     */
     private onClickDirMenuButtonHandler(e: any) {
         if (e.target.matches(`.${GLOBUS_MENU_BTN}`)) {
             let globusParentGroup: HTMLElement = getGlobusParentGroup(e.target);
@@ -415,10 +490,14 @@ export class GlobusFileManager extends Widget {
         }
     }
 
+    /**
+     * Used as an event listener method that is called every time an option
+     * from the endpoint submenu (i.e., Transfer, Share) is clicked.
+     * @param {any} e 
+     */
     private onClickMenuOptionHandler(e: any) {
         let globusParentGroup = getGlobusParentGroup(e.target);
         let dirOptions: HTMLUListElement = getGlobusElement(globusParentGroup, FILEMANAGER_DIR_OPTIONS) as HTMLUListElement;
-
         if (e.target.matches(`.${FILEMANAGER_MENU_OPTION}`)) {
             let filePathInput: HTMLInputElement = getGlobusElement(globusParentGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
             let fileList: HTMLUListElement = getGlobusElement(globusParentGroup, FILEMANAGER_FILE_LIST) as HTMLUListElement;
@@ -434,6 +513,9 @@ export class GlobusFileManager extends Widget {
                 this.originalGroup.style.display = 'none';
                 this.setGCPDestination();
                 this.onClickHeaderHandler({target: getGlobusElement(this.searchGroup.parentElement, GLOBUS_HEADER)});
+            }
+            else if (e.target.matches(`.${FILEMANAGER_OPTION_SHARE}`)) {
+                this.openSharedEndpointUrl(filePathInput.value);
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_DELETE}`)) {
                 this.deleteSelected(globusParentGroup).then(r => {this.retrieveDirectoryContents(filePathInput, fileList); console.log(r)}).catch(e => console.log(e));
@@ -455,13 +537,15 @@ export class GlobusFileManager extends Widget {
         let infoDiv: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_SEARCH_INFO);
         let searchGroup: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_SEARCH_GROUP);
 
-        if (searchGroup.style.display === 'flex') {
-            searchGroup.style.display = 'none';
-            infoDiv.style.display = 'block';
-        }
-        else {
-            searchGroup.style.display = 'flex';
-            infoDiv.style.display = 'none';
+        if (searchGroup && infoDiv) {
+            if (searchGroup.style.display === 'flex') {
+                searchGroup.style.display = 'none';
+                infoDiv.style.display = 'block';
+            }
+            else {
+                searchGroup.style.display = 'flex';
+                infoDiv.style.display = 'none';
+            }
         }
 
         e.target.classList.toggle(GLOBUS_ACTIVE);
@@ -469,6 +553,17 @@ export class GlobusFileManager extends Widget {
 
     private onClickGlobusGroupHandler(e: any) {
         this.parentGroup$.next(e.currentTarget);
+    }
+
+    private openSharedEndpointUrl(hostPath: string) {
+        // debugger;
+        let hostEndpointId = this.currentEndpoint.id;
+        let createSharedUrl: string = FILEMANAGER_CREATE_SHARE_URL;
+        createSharedUrl = createSharedUrl.replace('<host_endpoint_id>', hostEndpointId);
+        hostPath = encodeURIComponent(hostPath);
+        createSharedUrl = createSharedUrl.replace('<host_path>', hostPath);
+
+        window.open(createSharedUrl, 'popUp', 'height=800,width=1000,resizable,scrollbars')
     }
 
     private async startTransfer(e: any) {
@@ -497,7 +592,6 @@ export class GlobusFileManager extends Widget {
         for (let i = 0; i < selectedElements.length; i++) {
             let file = (selectedElements[i] as HTMLLIElement);
             let fileData: GlobusFileItem = $.data(file, 'data');
-            console.log(fileData);
             let transferItem: GlobusTransferItem = {
                 'DATA_TYPE': 'transfer_item',
                 'source_path': `${sourcePathInput.value}${fileData.name}`,
@@ -532,7 +626,6 @@ export class GlobusFileManager extends Widget {
             ...options
         };
 
-        console.log(taskTransfer);
         submitTask(taskTransfer).then(data => {
             transferResult.textContent = data.message;
             transferResult.classList.add(GLOBUS_SUCCESS)
@@ -698,7 +791,6 @@ export class GlobusFileManager extends Widget {
         this.parentGroup$.next(this.destinationGroup);
     }
 
-    // TODO break up into classes
     private createHTMLElements() {
         /* ------------- <endpointSearch> ------------- */
 
@@ -794,9 +886,9 @@ export class GlobusFileManager extends Widget {
         let fileList: HTMLUListElement = document.createElement('ul');
         fileList.className = `${GLOBUS_LIST} ${FILEMANAGER_FILE_LIST} ${GLOBUS_BORDER}`;
 
-        // let shareOption = document.createElement('li'); TODO uncomment when supported
-        // shareOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_SHARE}`;
-        // shareOption.textContent = 'Share';
+        let shareOption = document.createElement('li'); 
+        shareOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_SHARE}`;
+        shareOption.textContent = 'Share';
 
         let transferOption = document.createElement('li');
         transferOption.className = `${GLOBUS_LIST_ITEM} ${FILEMANAGER_MENU_OPTION} ${FILEMANAGER_OPTION_TRANSFER}`;
@@ -816,7 +908,7 @@ export class GlobusFileManager extends Widget {
 
         let dirOptions: HTMLUListElement = document.createElement('ul');
         dirOptions.className = `${GLOBUS_LIST} ${FILEMANAGER_DIR_OPTIONS} ${GLOBUS_BORDER}`;
-        // dirOptions.appendChild(shareOption);
+        dirOptions.appendChild(shareOption);
         dirOptions.appendChild(transferOption);
         dirOptions.appendChild(newFolderOption);
         dirOptions.appendChild(renameOption);
@@ -1028,17 +1120,32 @@ export class GlobusFileManager extends Widget {
                     let endpointList: HTMLUListElement = getGlobusElement(globusParentGroup, FILEMANAGER_ENDPOINT_LIST) as HTMLUListElement;
                     let endpointInput: HTMLInputElement = getGlobusElement(globusParentGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
                     let filePathInput: HTMLInputElement = getGlobusElement(globusParentGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
-
-                    if (endpointList.style.display === 'none') {
-                        infoDiv.textContent = `${endpointInput.value}: ${filePathInput.value}`;
-                        if (groupHeader.textContent === 'Source') {
-                            infoDiv.textContent += `\n${selectedItems.length} file(s) selected`;
+                    
+                    if (endpointList) {
+                        if (endpointList.style.display === 'none') {
+                            infoDiv.textContent = `${endpointInput.value}: ${filePathInput.value}`;
+                            if (groupHeader.textContent === 'Source') {
+                                infoDiv.textContent += `\n${selectedItems.length} file(s) selected`;
+                            }
                         }
                     }
                     else {
                         infoDiv.textContent = 'No endpoint selected'
                     }
                 }
+                
+                let optionShare: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_SHARE); 
+                if (optionShare) {
+                    switch (selectedItems.length) {
+                        case 0:
+                            optionShare.classList.remove(GLOBUS_DISABLED);
+                            break;
+                        default:
+                            optionShare.classList.add(GLOBUS_DISABLED);
+                            break;
+                    }
+                } 
+
 
                 let optionDelete: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_DELETE);
                 if (optionDelete) {
@@ -1058,22 +1165,6 @@ export class GlobusFileManager extends Widget {
                         optionNewFolder.classList.remove(GLOBUS_DISABLED);
                 }
 
-                // let optionShare: HTMLElement = getGlobusElement(globusParentGroup, FILEMANAGER_OPTION_SHARE); TODO uncomment when supported
-                // if (optionShare) {
-                //     switch (selectedItems.length) {
-                //         case 0:
-                //             optionShare.classList.remove(GLOBUS_DISABLED);
-                //             break;
-                //         case 1:
-                //             (selectedItems.item(0) as HTMLLIElement).type === 'dir' ?
-                //                 optionShare.classList.remove(GLOBUS_DISABLED) :
-                //                 optionShare.classList.add(GLOBUS_DISABLED);
-                //             break;
-                //         default:
-                //             optionShare.classList.add(GLOBUS_DISABLED);
-                //             break;
-                //     }
-                // }
             },
             e => {
                 console.log(e)
