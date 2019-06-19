@@ -6,8 +6,7 @@ import {
     listDirectoryContents,
     requestSubmissionId,
     submitOperation,
-    submitTask,
-    sharedEndpiontRequest
+    submitTask
 } from "../api/transfer";
 import {
     GlobusDeleteItem,
@@ -65,10 +64,6 @@ const FILEMANAGER_DIR_GROUP = 'jp-FileManager-dirGroup';
 const FILEMANAGER_DIR_OPTIONS = 'jp-FileManager-dirOptions';
 const FILEMANAGER_DIR_MENU = 'jp-FileManager-dirMenu';
 const FILEMANAGER_FILE_PATH_INPUT = 'jp-FileManager-filePathInput';
-const FILEMANAGER_DISPLAY_NAME_INPUT = 'jp-FileManager-displayNameInput';
-const FILEMANAGER_DESCRIPTION_INPUT = 'jp-FileManager-descriptionInput';
-const FILEMANAGER_KEYWORDS_INPUT = 'jp-FileManager-keywordsInput';
-const FILEMANAGER_CREATE_SHARE_BTN = 'jp-FileManager-createShareBtn';
 const FILEMANAGER_FILE_LIST = 'jp-FileManager-fileList';
 const FILEMANAGER_MENU_SELECT = 'jp-FileManager-menuSelect';
 const FILEMANAGER_MENU_UP_FOLDER = 'jp-FileManager-menuUpFolder';
@@ -104,6 +99,8 @@ const ITEM_TYPE: any = {
     'file': FILEMANAGER_FILE_TYPE
 };
 
+const FILEMANAGER_CREATE_SHARE_URL = 'https://app.globus.org/file-manager/collections/<host_endpoint_id>/shares/create?back=file-manager&hostPath=<host_path>';
+
 /**
  * Widget for hosting the Globus File Manager.
  */
@@ -113,11 +110,9 @@ export class GlobusFileManager extends Widget {
     private sourceGroup: HTMLDivElement;
     private destinationGroup: HTMLDivElement;
     private transferGroup: HTMLFormElement;
-    private shareGroup: HTMLFormElement;
     private parentGroup$ = new BehaviorSubject<HTMLElement>(null);
     private timeout = null;
     private currentEndpoint: any;
-    private shareClicked: boolean = false;
 
     constructor() {
         super();
@@ -520,10 +515,7 @@ export class GlobusFileManager extends Widget {
                 this.onClickHeaderHandler({target: getGlobusElement(this.searchGroup.parentElement, GLOBUS_HEADER)});
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_SHARE}`)) {
-                this.shareClicked = true;
-                this.parentGroup$.next(this.shareGroup);
-                this.shareGroup.style.display = 'flex';
-                this.originalGroup.style.display = 'none';
+                this.openSharedEndpointUrl(filePathInput.value);
             }
             else if (e.target.matches(`.${FILEMANAGER_OPTION_DELETE}`)) {
                 this.deleteSelected(globusParentGroup).then(r => {this.retrieveDirectoryContents(filePathInput, fileList); console.log(r)}).catch(e => console.log(e));
@@ -563,42 +555,15 @@ export class GlobusFileManager extends Widget {
         this.parentGroup$.next(e.currentTarget);
     }
 
-    private async createSharedEndpoint(e: any) {
-        let hostInfo: HTMLDivElement = getGlobusElement(this.shareGroup, FILEMANAGER_SEARCH_INFO) as HTMLDivElement;
+    private openSharedEndpointUrl(hostPath: string) {
+        // debugger;
+        let hostEndpointId = this.currentEndpoint.id;
+        let createSharedUrl: string = FILEMANAGER_CREATE_SHARE_URL;
+        createSharedUrl = createSharedUrl.replace('<host_endpoint_id>', hostEndpointId);
+        hostPath = encodeURIComponent(hostPath);
+        createSharedUrl = createSharedUrl.replace('<host_path>', hostPath);
 
-        let hostPath = '/~/';
-
-        if (hostInfo) {
-            hostPath = hostInfo.textContent.split(":")[1].trim();
-        }
-
-        // display name, description, keywords
-        let displayNameInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_DISPLAY_NAME_INPUT) as HTMLInputElement;
-        let descriptionInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_DESCRIPTION_INPUT) as HTMLInputElement;
-        let keywordsInput: HTMLInputElement = getGlobusElement(this.shareGroup, FILEMANAGER_KEYWORDS_INPUT) as HTMLInputElement;
-
-        let taskShare: any = {
-            DATA_TYPE: 'shared_endpoint',
-            host_endpoint: this.currentEndpoint.id,
-            host_path: hostPath,
-            display_name: displayNameInput.value
-        };
-
-        if (descriptionInput.value.length > 0) {
-            taskShare['description'] = descriptionInput.value;
-        }
-        if (keywordsInput.value.length > 0) {
-            taskShare['keywords'] = keywordsInput.value;
-        }
-
-        console.log(taskShare);
-        sharedEndpiontRequest(taskShare).then(data => {
-            console.log("no error");
-            console.log(data);
-        }).catch(e => {
-            console.log("error occurred");
-            console.log(e);
-        });
+        window.open(createSharedUrl, 'popUp', 'height=800,width=500,resizable,scrollbars')
     }
 
     private async startTransfer(e: any) {
@@ -986,44 +951,6 @@ export class GlobusFileManager extends Widget {
 
         /* ------------- </originalGroup> ------------- */
 
-        /* ------------- <shareGroup> ------------- */
-        /* host info */
-        let hostInfo: HTMLDivElement = document.createElement('div');
-        hostInfo.className = `${FILEMANAGER_SEARCH_INFO}`;
-
-        /* display, description, and keywords */
-        let displayNameInput: HTMLInputElement = document.createElement('input');
-        displayNameInput.className = `${GLOBUS_INPUT} ${FILEMANAGER_DISPLAY_NAME_INPUT} ${GLOBUS_BORDER}`;
-        displayNameInput.title = 'Display name for the share endpoint (required)';
-        displayNameInput.placeholder = 'Enter display name here';
-        displayNameInput.required = true;
-
-        let descriptionInput: HTMLInputElement = document.createElement('input');
-        descriptionInput.className = `${GLOBUS_INPUT} ${FILEMANAGER_DESCRIPTION_INPUT} ${GLOBUS_BORDER}`;
-        descriptionInput.title = 'Description for identifying your share endpoint';
-        descriptionInput.placeholder = 'Enter description here (optional)';
-
-        let keywordsInput: HTMLInputElement = document.createElement('input');
-        keywordsInput.className = `${GLOBUS_INPUT} ${FILEMANAGER_KEYWORDS_INPUT} ${GLOBUS_BORDER}`;
-        keywordsInput.title = 'List of relevant keywords (e.g., file share, attached storage)';
-        keywordsInput.placeholder = 'Enter keywords here (optional)';
-
-        let createSharedEndpointBtn = document.createElement('div');
-        createSharedEndpointBtn.textContent = 'Create Share';
-        createSharedEndpointBtn.className = `${GLOBUS_BUTTON} ${FILEMANAGER_CREATE_SHARE_BTN}`;
-        createSharedEndpointBtn.addEventListener('click', this.createSharedEndpoint.bind(this));
-
-        this.shareGroup = document.createElement('form');
-        this.shareGroup.className = GLOBUS_PARENT_GROUP;
-        this.shareGroup.appendChild(hostInfo);
-        this.shareGroup.appendChild(displayNameInput);
-        this.shareGroup.appendChild(descriptionInput);
-        this.shareGroup.appendChild(keywordsInput);
-        this.shareGroup.appendChild(createSharedEndpointBtn);
-        this.shareGroup.style.display = 'none';
-
-        /* ------------- </shareGroup> ------------- */
-
 
         /* ------------- <sourceGroup> ------------- */
         /* Source screen. Hidden */
@@ -1177,7 +1104,6 @@ export class GlobusFileManager extends Widget {
         this.node.appendChild(this.sourceGroup);
         this.node.appendChild(this.destinationGroup);
         this.node.appendChild(this.transferGroup);
-        this.node.appendChild(this.shareGroup);
 
         this.parentGroup$ = new BehaviorSubject(this.originalGroup);
         this.parentGroup$.asObservable().subscribe(globusParentGroup => {
@@ -1203,15 +1129,7 @@ export class GlobusFileManager extends Widget {
                             }
                         }
                     }
-                    else if (this.shareClicked) {
-                        let endpointInput: HTMLInputElement = getGlobusElement(this.searchGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
-                        let filePathInput: HTMLInputElement = getGlobusElement(this.searchGroup, FILEMANAGER_FILE_PATH_INPUT) as HTMLInputElement;
-                        
-                        infoDiv.textContent = `${endpointInput.value}: ${filePathInput.value}`;
-                        infoDiv.style.borderWidth = '0 px';
-                    }
                     else {
-                        console.log(this.currentEndpoint);
                         infoDiv.textContent = 'No endpoint selected'
                     }
                 }
@@ -1221,11 +1139,6 @@ export class GlobusFileManager extends Widget {
                     switch (selectedItems.length) {
                         case 0:
                             optionShare.classList.remove(GLOBUS_DISABLED);
-                            break;
-                        case 1:
-                            if ((selectedItems.item(0) as HTMLLIElement).type === 'dir') {
-                                optionShare.classList.remove(GLOBUS_DISABLED);
-                            }
                             break;
                         default:
                             optionShare.classList.add(GLOBUS_DISABLED);
@@ -1259,30 +1172,6 @@ export class GlobusFileManager extends Widget {
             () => {
                 console.log('Completed')
             });
-    }
-
-    shareEndpoint() {
-        // debugger
-        
-        removeChildren(this.node);
-        this.createHTMLElements();
-        let endpointInput: HTMLInputElement = getGlobusElement(this.originalGroup, FILEMANAGER_ENDPOINT_INPUT) as HTMLInputElement;
-        
-        let endpointList: HTMLUListElement = getGlobusElement(this.originalGroup, FILEMANAGER_ENDPOINT_LIST) as HTMLUListElement;
-
-        let optionShare: HTMLElement = getGlobusElement(this.originalGroup, FILEMANAGER_OPTION_SHARE);
-        
-        this.retrieveEndpoints(endpointInput, endpointList).then(() => {
-            this.endpointClicked({currentTarget: endpointList.firstChild}).then(() => {
-                this.onClickMenuOptionHandler({target: optionShare});
-                this.parentGroup$.next(this.shareGroup);
-            });
-        });
-
-        // let endpointName = endpointInput.value;
-
-        // this.onClickMenuOptionHandler({target: optionShare});
-
     }
 
     transferFile(files: {endpointId: string, path: string, fileNames: string[]}) {
