@@ -4,34 +4,15 @@
 
 Jupyterlab Extension that incorporates Globus functionality.
 
-## Setup & Installation
-Please see the following table for the file that best fits your purpose.
+## Setup & Developer Guides
+To avoid confusion, the setup instructions and developer information have been moved to the **docs** folder. Please see the following list for the file that best fits your purpose.
 
-| File                                      | Description               |
-| ----------------------------------------- | ------------------------- |
-| [Binder](docs/setups/binder_setup.md)     | For using a Binder repo   |
-| [Local](docs/setups/local_setup.md)       | For using a local version |
-| [Development](docs/setups/develop.md)     | For developers            |
+* [Binder Setup](docs/setups/binder_setup.md) - setup instructions for the Binder repo version
+    * Recommended for practical use and users familiar with the extension.
+* [Local Setup](docs/setups/local_setup.md) - setup instructions for the local version
+    * Recommended for first-time users and for developers
+* [Development Relevant Info](docs/develop/) - contains information about this extension that is meant for anyone wanting to further develop this extension
 
 ## Notes
 * The Globus Connect Personal feature has been temporarily deleted due to compatibility issues. A later version will support it. Instead of using the convenient Globus Connect Personal file browser from the Globus extension, use the default JupyterLab file browser.
 * At this time, the published version of this extension is an older version that no longer works.
-
-## Development
-
-For a development install (requires npm version 4 or later), do the following in the repository directory:
-
-```bash
-npm install
-npm run build
-jupyter labextension link .
-```
-
-To rebuild the package and the JupyterLab app:
-
-```bash
-npm run build
-jupyter lab build
-```
-
-## Binder Repo Setup

@@ -6,7 +6,7 @@ import {GlobusResponse} from "./models";
 // const CLIENT_ID = '7c9085aa-3bcf-4a5b-a7b8-77e41daa4d1a';
 // const CLIENT_ID = '21498f95-b107-4c9a-a9c3-7bcc2183445f';
 const CLIENT_ID = 'a53a92fb-c4e0-4aa6-9e12-bbf939180305';
-const REDIRECT_URI = window.location.href;
+const REDIRECT_URI = 'https://hub.mybinder.org/hub/login';
 const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
 const GLOBUS_AUTH_URL = 'https://auth.globus.org/v2/oauth2/authorize';

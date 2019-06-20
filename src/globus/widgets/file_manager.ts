@@ -556,7 +556,6 @@ export class GlobusFileManager extends Widget {
     }
 
     private openSharedEndpointUrl(hostPath: string) {
-        // debugger;
         let hostEndpointId = this.currentEndpoint.id;
         let createSharedUrl: string = FILEMANAGER_CREATE_SHARE_URL;
         createSharedUrl = createSharedUrl.replace('<host_endpoint_id>', hostEndpointId);
