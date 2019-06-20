@@ -33,7 +33,10 @@ The approach described above is a good place to start, but is not the best appro
     * You have not previously run `npm install`.
     * You have added new dependencies that need to be installed.
     * The project dependencies have changed since you last ran `npm install`.
-3. If this is your first time using the extension follow parts 2-4 from step 2 in the Quick Start.
+3. If this is your first time using the extension then run the following commands:
+    1. `npm run build`
+    2. `jupyter labextension install .` (make sure to include the '.' at the end so that the local version is installed)
+    3. `jupyter lab build`
 4. Run `npm run watch`
     * This is especially useful in identifying errors or other issues that jupyter might not mention.
     * When you go on to the next step, make sure that this command keeps running.
