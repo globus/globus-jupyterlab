@@ -17,7 +17,7 @@ RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
 WORKDIR ${HOME}
-RUN npm install
+RUN npm ci
 RUN npm run build 
 RUN jupyter labextension install . 
 RUN jupyter lab build

@@ -15,4 +15,4 @@ To avoid confusion, the setup instructions and developer information have been m
 
 ## Notes
 * The Globus Connect Personal feature has been temporarily disabled due to compatibility issues. A later version will support it. Instead of using the convenient Globus Connect Personal file browser from the Globus extension, use the default JupyterLab file browser.
-* At this time, the published version of this extension is an older version that no longer works.
+* At this time, the [published version](https://www.npmjs.com/package/jupyterlab_globus) of this extension is an older version that no longer works.
