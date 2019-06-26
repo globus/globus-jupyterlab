@@ -1,7 +1,7 @@
 import {Widget, PanelLayout} from '@phosphor/widgets';
 import {oauth2SignIn, globusAuthorized, initializeGlobusClient} from "./api/client";
 import {GlobusWidgetManager} from "./widget_manager";
-import {GLOBUS_BUTTON} from "../utils";
+import {GLOBUS_BUTTON, GLOBUS_INPUT, GLOBUS_BORDER} from "../utils";
 
 /**
  * CSS classes
@@ -80,10 +80,29 @@ export class GlobusLogin extends Widget {
         signInButton.addEventListener('click', () => this.signIn());
 
         this.node.appendChild(signInButton);
+
+        // Add auth-code input and submit button
+        let authCodeInput: HTMLInputElement = document.createElement('input');
+        authCodeInput.type = 'text';
+        authCodeInput.className = `${GLOBUS_INPUT} ${GLOBUS_BORDER}`;
+        authCodeInput.placeholder = 'Paste your auth token here';
+        // debugger;
+        let submitTokenButton = document.createElement('button');
+        submitTokenButton.textContent = 'SUBMIT TOKEN';
+        submitTokenButton.className = `${GLOBUS_BUTTON}`;
+        submitTokenButton.addEventListener('click', () => this.signIn(authCodeInput.value));
+
+        this.node.appendChild(authCodeInput);
+        this.node.appendChild(submitTokenButton);
     }
 
-    private signIn(): void {
-        oauth2SignIn();
+    private signIn(token=null): void {
+        // debugger;
+        if (token) {
+            oauth2SignIn(token);
+        } else {
+            oauth2SignIn();
+        }
     }
 
     /*
