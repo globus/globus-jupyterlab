@@ -73,30 +73,66 @@ export class GlobusLogin extends Widget {
         // Add the logo
         const logo = document.createElement('div');
         logo.className = GLOBUS_LOGO;
-        this.node.appendChild(logo);
-
+        
+        // Add text for auth code
+        let authText = document.createElement('p');
+        authText.textContent = 'Please use the new tab to get an authorization code and paste it in the box below';
+        authText.style.textAlign = 'center';
+        authText.style.display = 'none';
+        
         // Add the login button.
         let signInButton = document.createElement('button');
         signInButton.title = 'Log into your Globus account';
         signInButton.textContent = 'SIGN IN';
         signInButton.className = `${GLOBUS_BUTTON}`;
-        signInButton.addEventListener('click', () => this.signIn());
-
-        this.node.appendChild(signInButton);
-
+        
         // Add auth-code input and submit button
         let authCodeInput: HTMLInputElement = document.createElement('input');
         authCodeInput.type = 'text';
         authCodeInput.className = `${GLOBUS_INPUT} ${GLOBUS_BORDER}`;
         authCodeInput.placeholder = 'Paste your auth code here';
-        // debugger;
-        let submitTokenButton = document.createElement('button');
-        submitTokenButton.textContent = 'SUBMIT TOKEN';
-        submitTokenButton.className = `${GLOBUS_BUTTON}`;
-        submitTokenButton.addEventListener('click', () => getTokens(authCodeInput.value, this.verifier));
+        authCodeInput.style.display = 'none';
+        
+        let submitAuthCodeButton = document.createElement('button');
+        submitAuthCodeButton.textContent = 'SUBMIT TOKEN';
+        submitAuthCodeButton.className = `${GLOBUS_BUTTON}`;
+        submitAuthCodeButton.style.display = 'none';
+        
+        let cancelButton = document.createElement('button');
+        cancelButton.textContent = 'CANCEL';
+        cancelButton.className = `${GLOBUS_BUTTON}`; 
+        cancelButton.style.background = '#340d0d';
+        cancelButton.style.display = 'none';
 
+        // Add Event Listeners
+        signInButton.addEventListener('click', () => {
+            this.signIn();
+            signInButton.style.display = 'none';
+            authText.style.display = 'block';
+            authCodeInput.style.display = 'block';
+            submitAuthCodeButton.style.display = 'block';
+            cancelButton.style.display = 'block';
+        });
+        submitAuthCodeButton.addEventListener('click', () => {
+            getTokens(authCodeInput.value, this.verifier);
+            signInButton.style.display = 'block';
+            authText.style.display = 'none';
+        });
+        cancelButton.addEventListener('click', () => {
+            signInButton.style.display = 'block';
+            authText.style.display = 'none';
+            authCodeInput.style.display = 'none';
+            submitAuthCodeButton.style.display = 'none';
+            cancelButton.style.display = 'none';
+        });
+        
+        this.node.appendChild(logo);
+        this.node.appendChild(authText);
+        this.node.appendChild(signInButton);
         this.node.appendChild(authCodeInput);
-        this.node.appendChild(submitTokenButton);
+        this.node.appendChild(submitAuthCodeButton);
+        this.node.appendChild(cancelButton);
+        
     }
 
     private signIn(): void {
