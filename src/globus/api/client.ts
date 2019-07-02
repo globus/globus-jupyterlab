@@ -12,7 +12,7 @@ const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
 const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
 const GLOBUS_AUTH_URL = 'https://auth.globus.org/v2/oauth2/authorize';
-const GLOBUS_AUTH_TOKEN = 'https://auth.globus.org/v2/oauth2/token';
+const GLOBUS_TOKEN_URL = 'https://auth.globus.org/v2/oauth2/token';
 
 // TODO Symlink support
 // TODO Share support
@@ -39,45 +39,15 @@ export function initializeGlobusClient(data: any) {
 /**
  * 0Auth2SignIn protocol. Retrieves a 0Auth2Token shown to the user in the popup window
  */
-export function oauth2SignIn(token=null) {
-    if (token) {
-        console.log('token');
-    }
+export function oauth2SignIn():any {
     // Generates verifier and challenge to follow 0Auth2 protocol
     let verifier = generateVerifier();
     let challenge = generateCodeChallenge(verifier);
-
+    
     // Globus's OAuth 2.0 endpoint for requesting an access token
     let oauth2Endpoint = GLOBUS_AUTH_URL;
 
-    // Create <form> element to submit parameters to OAuth 2.0 endpoint.
-    let form: HTMLFormElement = document.createElement('form');
-    form.method = 'GET'; // Send as a GET request.
-    form.action = oauth2Endpoint;
-    form.target = 'popUp';
-
-    // Shows the authorization flow in a popup window
-    let popup = window.open('', 'popUp', 'height=800,width=500,resizable,scrollbars');
-
-    // Checks every second for the authorization to be completed
-    let timer = setInterval(async () => {
-        try {
-            // If this line succeeds, it means that we are back in our domain and we have a valid AuthToken
-            let url = new URL(popup.location.href);
-
-            popup.close();
-
-            await exchangeOAuth2Token(url.searchParams.get('code'), verifier)
-                .then(data => {
-                    clearInterval(timer);
-                    globusAuthorized.resolve(data);
-                })
-                .catch(e => console.log(e));
-        }
-        catch (e) {}
-    }, 1000);
-
-    // Parameters to pass to OAuth 2.0 endpoint.
+    // Authorization Request parameters
     let params: any = {
         'client_id': CLIENT_ID,
         'redirect_uri': REDIRECT_URI,
@@ -88,6 +58,15 @@ export function oauth2SignIn(token=null) {
         'code_challenge_method': 'S256',
         'access_type': 'offline'
     };
+    
+    // Create <form> element to submit parameters to OAuth 2.0 endpoint.
+    let form: HTMLFormElement = document.createElement('form');
+    form.method = 'GET'; // Send as a GET request.
+    form.action = oauth2Endpoint;
+    form.target = '_blank';
+
+    // Shows the authorization flow in a popup window
+    window.open('', '_blank', 'height=800,width=500,resizable,scrollbars');
 
     // Add form parameters as hidden input values.
     for (let p in params) {
@@ -101,6 +80,25 @@ export function oauth2SignIn(token=null) {
     // Add form to page and submit it to open the OAuth 2.0 endpoint.
     document.body.appendChild(form);
     form.submit();
+
+    return verifier;
+}
+
+export function getTokens(authCode: string, verifier: any) {
+    // Globus's OAuth 2.0 endpoint for requesting an access token
+    let oauth2Endpoint = GLOBUS_TOKEN_URL;
+
+    // Create <form> element to submit parameters to OAuth 2.0 endpoint.
+    let form: HTMLFormElement = document.createElement('form');
+    form.method = 'GET'; // Send as a GET request.
+    form.action = oauth2Endpoint;
+    form.target = window.location.href;
+
+    exchangeOAuth2Token(authCode, verifier.toString())
+        .then(data => {
+            globusAuthorized.resolve(data);
+        })
+        .catch(e => console.log(e));
 }
 
 /**
@@ -108,7 +106,7 @@ export function oauth2SignIn(token=null) {
  */
 export async function exchangeOAuth2Token(token: string, verifier: string) {
     // Globus's OAuth 2.0 endpoint for requesting an access token
-    let oauth2Endpoint = GLOBUS_AUTH_TOKEN;
+    let oauth2Endpoint = GLOBUS_TOKEN_URL;
 
     // Parameters to pass to OAuth 2.0 endpoint.
     let params: any = {
