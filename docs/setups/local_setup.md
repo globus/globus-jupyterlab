@@ -1,29 +1,20 @@
 # Local Setup
 
-## Prerequisites
-
-* JupyterLab (version 0.35.3 or later)
-* Node (version 10 or later) and NPM (version 4 or later)
-* Create your own Native App registration or use an existing one (to register an app visit the [Globus Developer Pages](https://developers.globus.org)). The app must fit the following criteria:
-    * If you are registering a new app, make sure to check the "Will be used by a native application" checkbox
-    * Redirect URL: `https://auth.globus.org/v2/web/auth-code`, `https://localhost:8888`
-    * Scopes: `urn:globus:auth:scope:transfer.api.globus.org:all`, `urn:globus:auth:scope:search.api.globus.org:all`, `openid`, `profile`, `email`
-* Fork this repository. This is needed so that you can use your Client ID (otherwise the extension will not work properly).
 
 ## Installation
 
 ### Quick Start
 The following describes the series of steps needed to install and run this extension for the first time.
 
-1. In [client.ts](src/globus/api/client.ts):
-    1. Replace the UUID for `CLIENT_ID` with your app's Client ID
-    2. Make sure that the `REDIRECT_URI` is set to `window.location.href` (without quotes)
-2. Run the following commands (make sure you are in the root project directory):
+1. Run the following commands (make sure you are in the root project directory):
     1. `npm install`
     2. `npm run build`
     3. `jupyter labextension install .` (make sure to include the '.' at the end so that the local version is installed)
     4. `jupyter lab build`
     5. `jupyter lab`
+
+### Optional
+If you want to use your own NativeApp then in [client.ts](src/globus/api/client.ts), replace the UUID for `CLIENT_ID` with your app's Client ID.
 
 ### For Developers
 The approach described above is a good place to start, but is not the best approach if you are planning to frequently modify the code. The following steps describe one possible approach that is better suited for development (and debugging) purposes. To avoid repetition, it assummes that the previously mentioned changes to [client.ts](src/globus/api/client.ts) have already been made (see step 1 in the Quick Start section). 
