@@ -85,7 +85,6 @@ export class GlobusLogin extends Widget {
         signInButton.title = 'Log into your Globus account';
         signInButton.textContent = 'SIGN IN';
         signInButton.className = `${GLOBUS_BUTTON}`;
-        // signInButton.formTarget = '_blank';
         
         // Add auth-code input and submit button
         let authCodeInput: HTMLInputElement = document.createElement('input');
