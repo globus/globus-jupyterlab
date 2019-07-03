@@ -63,9 +63,9 @@ export function oauth2SignIn():any {
     let form: HTMLFormElement = document.createElement('form');
     form.method = 'GET'; // Send as a GET request.
     form.action = oauth2Endpoint;
-    form.target = '_blank';
+    form.target = window.location.href;
 
-    // Shows the authorization flow in a popup window
+    // Shows the authorization flow in a new tab
     window.open('', '_blank', 'height=800,width=500,resizable,scrollbars');
 
     // Add form parameters as hidden input values.
