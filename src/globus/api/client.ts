@@ -84,7 +84,7 @@ export function oauth2SignIn():any {
     return verifier;
 }
 
-export function getTokens(authCode: string, verifier: any) {
+export async function getTokens(authCode: string, verifier: any): Promise<any> {
     // Globus's OAuth 2.0 endpoint for requesting an access token
     let oauth2Endpoint = GLOBUS_TOKEN_URL;
 
@@ -94,11 +94,27 @@ export function getTokens(authCode: string, verifier: any) {
     form.action = oauth2Endpoint;
     form.target = window.location.href;
 
-    exchangeOAuth2Token(authCode, verifier.toString())
-        .then(data => {
-            globusAuthorized.resolve(data);
-        })
-        .catch(e => console.log(e));
+    // fetch(url, options).then(async response => {
+    //     if (response.status >= 400) {
+    //         reject(await response.json());
+    //     }
+    //     else {
+    //         resolve(await response.json());
+    //     }
+    // });
+
+    return new Promise<GlobusResponse>((resolve, reject) => {
+        exchangeOAuth2Token(authCode, verifier.toString())
+            .then(data => {
+                globusAuthorized.resolve(data);
+                resolve();
+            })
+            .catch(e => {
+                console.log(e);
+                reject();
+            });
+    });
+
 }
 
 /**

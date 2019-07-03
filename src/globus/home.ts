@@ -104,6 +104,12 @@ export class GlobusLogin extends Widget {
         cancelButton.style.background = '#340d0d';
         cancelButton.style.display = 'none';
 
+        let errorMessage = document.createElement('p');
+        errorMessage.textContent = 'An error occurred, please try again or click the Cancel button to get a new authorization code.';
+        errorMessage.style.color = 'red';
+        errorMessage.style.textAlign = 'center';
+        errorMessage.style.display = 'none';
+
         // Add Event Listeners
         signInButton.addEventListener('click', () => {
             this.signIn();
@@ -114,9 +120,19 @@ export class GlobusLogin extends Widget {
             cancelButton.style.display = 'block';
         });
         submitAuthCodeButton.addEventListener('click', () => {
-            getTokens(authCodeInput.value, this.verifier);
-            signInButton.style.display = 'block';
-            authText.style.display = 'none';
+            getTokens(authCodeInput.value, this.verifier)
+                .then(data => {
+                    signInButton.style.display = 'block';
+                    authText.style.display = 'none';
+                    authCodeInput.style.display = 'none';
+                    submitAuthCodeButton.style.display = 'none';
+                    cancelButton.style.display = 'none';
+                    errorMessage.style.display = 'none';
+                })
+                .catch(e => {
+                    errorMessage.style.display = 'block';
+                });
+        
         });
         cancelButton.addEventListener('click', () => {
             signInButton.style.display = 'block';
@@ -124,6 +140,7 @@ export class GlobusLogin extends Widget {
             authCodeInput.style.display = 'none';
             submitAuthCodeButton.style.display = 'none';
             cancelButton.style.display = 'none';
+            errorMessage.style.display = 'none';
         });
         
         this.node.appendChild(logo);
@@ -132,6 +149,7 @@ export class GlobusLogin extends Widget {
         this.node.appendChild(authCodeInput);
         this.node.appendChild(submitAuthCodeButton);
         this.node.appendChild(cancelButton);
+        this.node.appendChild(errorMessage);
         
     }
 
