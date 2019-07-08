@@ -1,7 +1,8 @@
 import {Widget, PanelLayout} from '@phosphor/widgets';
-import {oauth2SignIn, getTokens, globusAuthorized, initializeGlobusClient} from "./api/client";
+import CryptoJS = require('crypto-js');
+import {getTokens, globusAuthorized, initializeGlobusClient} from "./api/client";
 import {GlobusWidgetManager} from "./widget_manager";
-import {GLOBUS_BUTTON, GLOBUS_INPUT, GLOBUS_BORDER} from "../utils";
+import {queryParams, GLOBUS_BUTTON, GLOBUS_INPUT, GLOBUS_BORDER} from "../utils";
 
 /**
  * CSS classes
@@ -10,6 +11,10 @@ const GLOBUS_HOME = 'jp-Globus-home';
 const GLOBUS_TAB_LOGO = 'jp-Globus-tablogo';
 const GLOBUS_LOGIN_SCREEN = 'jp-Globus-loginScreen';
 const GLOBUS_LOGO = 'jp-Globus-logo';
+
+const CLIENT_ID = 'e54de045-d346-42ef-9fbc-5d466f4a00c6';
+const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
+const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
 export const SIGN_OUT = 'globus-signOut';
 
@@ -81,7 +86,10 @@ export class GlobusLogin extends Widget {
         authText.style.display = 'none';
         
         // Add the login button.
-        let signInButton = document.createElement('button');
+        let signInButton = document.createElement('a');
+        signInButton.setAttribute('href', this.getAuthUrl());
+        signInButton.setAttribute('target', '_blank');
+        signInButton.setAttribute('appearance', 'button');
         signInButton.title = 'Log into your Globus account';
         signInButton.textContent = 'SIGN IN';
         signInButton.className = `${GLOBUS_BUTTON}`;
@@ -112,7 +120,7 @@ export class GlobusLogin extends Widget {
 
         // Add Event Listeners
         signInButton.addEventListener('click', () => {
-            this.signIn();
+            // this.signIn();
             signInButton.style.display = 'none';
             authText.style.display = 'block';
             authCodeInput.style.display = 'block';
@@ -153,8 +161,42 @@ export class GlobusLogin extends Widget {
         
     }
 
-    private signIn(): void {
-        this.verifier = oauth2SignIn();
+    private getAuthUrl(): string {
+        let authUrl = 'https://auth.globus.org/v2/oauth2/authorize?';
+
+        // Generates verifier and challenge to follow 0Auth2 protocol
+        this.generateVerifier();
+        let challenge = this.generateCodeChallenge(this.verifier);
+
+        // Authorization Request parameters
+        let params: any = {
+            'client_id': CLIENT_ID,
+            'redirect_uri': REDIRECT_URI,
+            'scope': SCOPES,
+            'state': '_default',
+            'response_type': 'code',
+            'code_challenge': challenge,
+            'code_challenge_method': 'S256',
+            'access_type': 'offline'
+        };
+
+        authUrl += queryParams(params);
+
+        console.log(authUrl);
+
+        return authUrl; 
+    }
+
+    private generateVerifier() {
+        this.verifier = CryptoJS.lib.WordArray.random(32).toString();
+    }
+    
+    private generateCodeChallenge(verifier: string) {
+        return CryptoJS.SHA256(verifier)
+            .toString(CryptoJS.enc.Base64)
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=/g, '');
     }
 
     /*

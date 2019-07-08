@@ -1,5 +1,4 @@
 import {PromiseDelegate} from '@phosphor/coreutils';
-import CryptoJS = require('crypto-js');
 import {queryParams} from "../../utils";
 import {GlobusResponse} from "./models";
 
@@ -9,9 +8,7 @@ import {GlobusResponse} from "./models";
 // const REDIRECT_URI = window.location.href;
 const CLIENT_ID = 'e54de045-d346-42ef-9fbc-5d466f4a00c6';
 const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
-const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
-const GLOBUS_AUTH_URL = 'https://auth.globus.org/v2/oauth2/authorize';
 const GLOBUS_TOKEN_URL = 'https://auth.globus.org/v2/oauth2/token';
 
 // TODO Symlink support
@@ -35,55 +32,6 @@ export function initializeGlobusClient(data: any) {
     Private.tokens.data = data;
 }
 
-// TODO : Protect tokens, Cross-Site Request Forgery protection using "state" urlParam
-/**
- * 0Auth2SignIn protocol. Retrieves a 0Auth2Token shown to the user in the popup window
- */
-export function oauth2SignIn():any {
-    // Generates verifier and challenge to follow 0Auth2 protocol
-    let verifier = generateVerifier();
-    let challenge = generateCodeChallenge(verifier);
-    
-    // Globus's OAuth 2.0 endpoint for requesting an access token
-    let oauth2Endpoint = GLOBUS_AUTH_URL;
-
-    // Authorization Request parameters
-    let params: any = {
-        'client_id': CLIENT_ID,
-        'redirect_uri': REDIRECT_URI,
-        'scope': SCOPES,
-        'state': '_default',
-        'response_type': 'code',
-        'code_challenge': challenge,
-        'code_challenge_method': 'S256',
-        'access_type': 'offline'
-    };
-    
-    // Create <form> element to submit parameters to OAuth 2.0 endpoint.
-    let form: HTMLFormElement = document.createElement('form');
-    form.method = 'GET'; // Send as a GET request.
-    form.action = oauth2Endpoint;
-    form.target = window.location.href;
-
-    // Shows the authorization flow in a new tab
-    window.open('', '_blank', 'height=800,width=500,resizable,scrollbars');
-
-    // Add form parameters as hidden input values.
-    for (let p in params) {
-        let input: HTMLInputElement = document.createElement('input');
-        input.type = 'hidden';
-        input.name = p;
-        input.value = params[p];
-        form.appendChild(input);
-    }
-
-    // Add form to page and submit it to open the OAuth 2.0 endpoint.
-    document.body.appendChild(form);
-    form.submit();
-
-    return verifier;
-}
-
 export async function getTokens(authCode: string, verifier: any): Promise<any> {
     // Globus's OAuth 2.0 endpoint for requesting an access token
     let oauth2Endpoint = GLOBUS_TOKEN_URL;
@@ -93,15 +41,6 @@ export async function getTokens(authCode: string, verifier: any): Promise<any> {
     form.method = 'GET'; // Send as a GET request.
     form.action = oauth2Endpoint;
     form.target = window.location.href;
-
-    // fetch(url, options).then(async response => {
-    //     if (response.status >= 400) {
-    //         reject(await response.json());
-    //     }
-    //     else {
-    //         resolve(await response.json());
-    //     }
-    // });
 
     return new Promise<GlobusResponse>((resolve, reject) => {
         exchangeOAuth2Token(authCode, verifier.toString())
@@ -160,18 +99,6 @@ export function signOut() {
     // Invalidate the globusAuthorized promise and set up a new one.
     sessionStorage.removeItem('data');
     globusAuthorized = new PromiseDelegate<void>();
-}
-
-function generateVerifier() {
-    return CryptoJS.lib.WordArray.random(32).toString();
-}
-
-function generateCodeChallenge(verifier: string) {
-    return CryptoJS.SHA256(verifier)
-        .toString(CryptoJS.enc.Base64)
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=/g, '');
 }
 
 /**
