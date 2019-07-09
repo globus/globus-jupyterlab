@@ -75,17 +75,17 @@ export class GlobusLogin extends Widget {
         super();
         this.addClass(GLOBUS_LOGIN_SCREEN);
 
-        // Add the logo
+        // Create the logo
         const logo = document.createElement('div');
         logo.className = GLOBUS_LOGO;
         
-        // Add text for auth code
+        // Create the text for explaining the auth code
         let authText = document.createElement('p');
         authText.textContent = 'Please use the new tab to get an authorization code and paste it in the box below';
         authText.style.textAlign = 'center';
         authText.style.display = 'none';
         
-        // Add the login button.
+        // Create the login button (<a> HTML tag with button appearance).
         let signInButton = document.createElement('a');
         signInButton.setAttribute('href', this.getAuthUrl());
         signInButton.setAttribute('target', '_blank');
@@ -94,7 +94,7 @@ export class GlobusLogin extends Widget {
         signInButton.textContent = 'SIGN IN';
         signInButton.className = `${GLOBUS_BUTTON}`;
         
-        // Add auth-code input and submit button
+        // Create the auth-code input and submit button
         let authCodeInput: HTMLInputElement = document.createElement('input');
         authCodeInput.type = 'text';
         authCodeInput.className = `${GLOBUS_INPUT} ${GLOBUS_BORDER}`;
@@ -106,12 +106,14 @@ export class GlobusLogin extends Widget {
         submitAuthCodeButton.className = `${GLOBUS_BUTTON}`;
         submitAuthCodeButton.style.display = 'none';
         
+        // Create the cancel button (returns user to main login)
         let cancelButton = document.createElement('button');
         cancelButton.textContent = 'CANCEL';
         cancelButton.className = `${GLOBUS_BUTTON}`; 
         cancelButton.style.background = '#340d0d';
         cancelButton.style.display = 'none';
 
+        // Create error message to display if login fails
         let errorMessage = document.createElement('p');
         errorMessage.textContent = 'An error occurred, please try again or click the Cancel button to get a new authorization code.';
         errorMessage.style.color = 'red';
@@ -120,7 +122,6 @@ export class GlobusLogin extends Widget {
 
         // Add Event Listeners
         signInButton.addEventListener('click', () => {
-            // this.signIn();
             signInButton.style.display = 'none';
             authText.style.display = 'block';
             authCodeInput.style.display = 'block';
@@ -151,6 +152,7 @@ export class GlobusLogin extends Widget {
             errorMessage.style.display = 'none';
         });
         
+        // Add the elements
         this.node.appendChild(logo);
         this.node.appendChild(authText);
         this.node.appendChild(signInButton);
@@ -161,7 +163,11 @@ export class GlobusLogin extends Widget {
         
     }
 
+    /**
+     * Generates the Auth URL and returns it (as a string). 
+     */
     private getAuthUrl(): string {
+        // Define the basic auth URL
         let authUrl = 'https://auth.globus.org/v2/oauth2/authorize?';
 
         // Generates verifier and challenge to follow 0Auth2 protocol
@@ -180,9 +186,8 @@ export class GlobusLogin extends Widget {
             'access_type': 'offline'
         };
 
+        // Encode the Authorization Request parameters and add them to the URL
         authUrl += queryParams(params);
-
-        console.log(authUrl);
 
         return authUrl; 
     }

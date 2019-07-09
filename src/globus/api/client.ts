@@ -2,10 +2,6 @@ import {PromiseDelegate} from '@phosphor/coreutils';
 import {queryParams} from "../../utils";
 import {GlobusResponse} from "./models";
 
-// const CLIENT_ID = '7c9085aa-3bcf-4a5b-a7b8-77e41daa4d1a';
-// const REDIRECT_URI = 'https://hub.mybinder.org/hub/login';
-// const CLIENT_ID = 'a53a92fb-c4e0-4aa6-9e12-bbf939180305';
-// const REDIRECT_URI = window.location.href;
 const CLIENT_ID = 'e54de045-d346-42ef-9fbc-5d466f4a00c6';
 const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
 
@@ -28,10 +24,20 @@ export const ERROR_CODES: any = {
 
 export let globusAuthorized = new PromiseDelegate<void>();
 
+/**
+ * Initializes the Globus client
+ * @param {any} data 
+ */
 export function initializeGlobusClient(data: any) {
     Private.tokens.data = data;
 }
 
+/**
+ * Gets the access tokens by using the provided authorization code
+ * @param {string} authCode 
+ * @param {string} verifier 
+ * @returns {Promise}
+ */
 export async function getTokens(authCode: string, verifier: any): Promise<any> {
     // Globus's OAuth 2.0 endpoint for requesting an access token
     let oauth2Endpoint = GLOBUS_TOKEN_URL;
@@ -58,6 +64,8 @@ export async function getTokens(authCode: string, verifier: any): Promise<any> {
 
 /**
  * Exchanges a 0Auth2Token for Globus access tokens
+ * @param {string} token
+ * @param {string} verifier
  */
 export async function exchangeOAuth2Token(token: string, verifier: string) {
     // Globus's OAuth 2.0 endpoint for requesting an access token
@@ -91,12 +99,14 @@ export async function exchangeOAuth2Token(token: string, verifier: string) {
         })
     );
 
-    // Wait for fetch to be done and then return
+    // Wait for fetch to be done and then return token(s)
     return await fetchAccessToken;
 }
 
+/**
+ * Invalidates the globusAuthorized promise and sets up a new one.
+ */
 export function signOut() {
-    // Invalidate the globusAuthorized promise and set up a new one.
     sessionStorage.removeItem('data');
     globusAuthorized = new PromiseDelegate<void>();
 }
