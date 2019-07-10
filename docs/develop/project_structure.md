@@ -6,7 +6,7 @@ The descriptions below are brief and are only meant to provide an overview of th
 ### API Directory (src/globus/api/)
 Main directory for defining the API. Contains the following files:
 * [Client](../../../src/globus/api/client.ts)
-    * Implements various functions and is mostly responsible for handling user authentication.
+    * Implements various functions and is mostly responsible for retrieving access tokens and loging the user out of Globus.
 * [Models](../../../src/globus/api/models.ts)
     * Defines the various, Globus-specific, interfaces used throughout the project.
 * [Search](../../../src/globus/api/search.ts)
