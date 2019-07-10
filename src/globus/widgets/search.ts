@@ -114,7 +114,6 @@ export class GlobusSearch extends Widget {
 
         return new Promise<void>((resolve) => {
             index.search(query, params).then(data => {
-                console.log(data);
                 if (data.gmeta.length > 0) {
                     this.displayResults(index, data, resultList);
                 }

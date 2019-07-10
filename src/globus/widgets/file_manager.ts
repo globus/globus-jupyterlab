@@ -561,8 +561,7 @@ export class GlobusFileManager extends Widget {
         createSharedUrl = createSharedUrl.replace('<host_endpoint_id>', hostEndpointId);
         hostPath = encodeURIComponent(hostPath);
         createSharedUrl = createSharedUrl.replace('<host_path>', hostPath);
-
-        window.open(createSharedUrl, 'popUp', 'height=800,width=1000,resizable,scrollbars')
+        window.open(createSharedUrl, '_blank');
     }
 
     private async startTransfer(e: any) {
