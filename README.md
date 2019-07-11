@@ -1,6 +1,6 @@
-# jupyterlab_globus
+# globus_jupyterlab
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gneezyn/jupyterlab_globus/master?urlpath=lab)
+<!--- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gneezyn/jupyterlab_globus/master?urlpath=lab) --->
 
 Jupyterlab Extension that incorporates Globus functionality.
 
