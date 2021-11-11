@@ -1,4 +1,4 @@
-import {Widget} from '@phosphor/widgets';
+import {Widget} from '@lumino/widgets';
 import {searchIndexAdvanced, searchQueryParams} from "../api/search";
 import {
     displayError,

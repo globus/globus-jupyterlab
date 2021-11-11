@@ -1,5 +1,5 @@
 import {FileBrowser, IFileBrowserFactory} from "@jupyterlab/filebrowser";
-import {Widget, PanelLayout} from '@phosphor/widgets';
+import {Widget, PanelLayout} from '@lumino/widgets';
 import {Drive, ServerConnection} from '@jupyterlab/services';
 // import {} from 'node';
 import {IDocumentManager} from '@jupyterlab/docmanager';

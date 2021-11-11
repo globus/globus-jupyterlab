@@ -1,4 +1,4 @@
-import {Widget} from '@phosphor/widgets';
+import {Widget} from '@lumino/widgets';
 import {
     createDescriptionElement,
     displayError,
@@ -20,7 +20,7 @@ import {
 } from "../../utils";
 import {taskSearch} from "../api/transfer";
 import {GlobusTaskItem, GlobusTaskList} from "../api/models";
-import * as moment from 'moment';
+import moment from "moment"
 import * as $ from 'jquery';
 
 /**
