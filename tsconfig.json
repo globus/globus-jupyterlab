@@ -2,6 +2,7 @@
   "compilerOptions": {
     "declaration": true,
     "noImplicitAny": false,
+    "esModuleInterop": true,
     "noEmitOnError": true,
     "noUnusedLocals": true,
     "module": "commonjs",

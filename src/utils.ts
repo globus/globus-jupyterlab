@@ -1,6 +1,6 @@
 import {ERROR_CODES} from "./globus/api/client";
 import {GlobusFileItem} from "./globus/api/models";
-import * as moment from "moment";
+import moment from "moment"
 import * as $ from 'jquery';
 
 export const GLOBUS_PARENT_GROUP = 'jp-Globus-group';

@@ -1,4 +1,4 @@
-import {Widget, PanelLayout} from '@phosphor/widgets';
+import {Widget, PanelLayout} from '@lumino/widgets';
 import CryptoJS = require('crypto-js');
 import {getTokens, globusAuthorized, initializeGlobusClient} from "./api/client";
 import {GlobusWidgetManager} from "./widget_manager";

@@ -1,4 +1,4 @@
-import {Widget, PanelLayout} from '@phosphor/widgets';
+import {Widget, PanelLayout} from '@lumino/widgets';
 import {Toolbar, ToolbarButton} from "@jupyterlab/apputils";
 import {signOut} from "./api/client";
 import {GlobusHome, SIGN_OUT} from "./home";
@@ -6,7 +6,7 @@ import {FILE_MANAGER, GlobusFileManager} from "./widgets/file_manager";
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {IDocumentManager} from '@jupyterlab/docmanager';
 import {GlobusActivity} from "./widgets/activity";
-import {JupyterLab} from "@jupyterlab/application";
+import {JupyterFrontEnd} from "@jupyterlab/application";
 import {GLOBUS_HEADER} from "../utils";
 import {GlobusSearch} from "./widgets/search";
 
@@ -50,10 +50,10 @@ export class GlobusWidgetManager extends Widget {
      */
     readonly factory: IFileBrowserFactory;
     readonly manager: IDocumentManager;
-    readonly app: JupyterLab;
+    readonly app: JupyterFrontEnd;
 
 
-    constructor(app: JupyterLab, manager: IDocumentManager, factory: IFileBrowserFactory) {
+    constructor(app: JupyterFrontEnd, manager: IDocumentManager, factory: IFileBrowserFactory) {
         super();
         this.id = 'globus-manager';
         this.addClass(GLOBUS_WIDGET_MANAGER);

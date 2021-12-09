@@ -1,4 +1,4 @@
-import {Widget} from '@phosphor/widgets';
+import {Widget} from '@lumino/widgets';
 import { BehaviorSubject } from 'rxjs';
 import {
     activateEndpoint,
@@ -50,7 +50,7 @@ import {
     displayError,
     sortList, isEndpointId, GLOBUS_FETCH_ERROR
 } from "../../utils";
-import * as moment from 'moment';
+import moment from "moment"
 import * as $ from 'jquery';
 
 /**

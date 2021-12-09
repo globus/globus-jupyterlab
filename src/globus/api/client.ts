@@ -1,4 +1,4 @@
-import {PromiseDelegate} from '@phosphor/coreutils';
+import {PromiseDelegate} from '@lumino/coreutils';
 import {queryParams} from "../../utils";
 import {GlobusResponse} from "./models";
 
@@ -52,7 +52,7 @@ export async function getTokens(authCode: string, verifier: any): Promise<any> {
         exchangeOAuth2Token(authCode, verifier.toString())
             .then(data => {
                 globusAuthorized.resolve(data);
-                resolve();
+                resolve(data);
             })
             .catch(e => {
                 console.log(e);
