@@ -107,13 +107,19 @@ export class GlobusConnectPersonal extends Widget {
     }
 
     private findGCPEndpoint(localPath: string | undefined) {
-        if (localPath.indexOf(this.app.info.directories.serverRoot) === 0) {
-            localPath = localPath.slice(this.app.info.directories.serverRoot.length);
-            return localPath;
-        }
-        else {
-            return null;
-        }
+    // Find the users local GCP endpoint UUID
+    // this.app.info changed since jupyterlab v3 meaning this no longer works.
+    // Additionally, I'm not sure why serverRoot would contain the UUID, so this
+    // is likely suspect anyway.
+    // TODO: Fix and update this code with an explanation or remove it.
+//         if (localPath.indexOf(this.app.info.directories.serverRoot) === 0) {
+//             localPath = localPath.slice(this.app.info.directories.serverRoot.length);
+//             return localPath;
+//         }
+//         else {
+//             return null;
+//         }
+      return null
     }
 
     private setGCPEndpointId() {
@@ -159,16 +165,21 @@ export class GlobusConnectPersonal extends Widget {
     }
 
     private findAlternatePath(path: string) {
-        let split1 = path.split('/');
-        let split2 = this.app.info.directories.serverRoot.split('/');
-
-        let i = 0;
-        let newPath = '';
-        while (i < split1.length && i < split2.length && split1[i] == split2[i]) {
-            newPath += `${split1[i]}/`;
-            i += 1;
-        }
-
-        return newPath ? newPath : `${split1[0]}/`;
+    //This seems to find an alternate path based no the users notebook, but it
+    // isn't clear why or how. It stopped working since Jupyterlab v3 moved the
+    // "app.info" object below
+    // TODO: Fix and update this code with an explanation or remove it.
+//         let split1 = path.split('/');
+//         let split2 = this.app.info.directories.serverRoot.split('/');
+//
+//         let i = 0;
+//         let newPath = '';
+//         while (i < split1.length && i < split2.length && split1[i] == split2[i]) {
+//             newPath += `${split1[i]}/`;
+//             i += 1;
+//         }
+//
+//         return newPath ? newPath : `${split1[0]}/`;
+    return path
     }
 }
