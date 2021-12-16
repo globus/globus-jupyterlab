@@ -12,7 +12,7 @@ const GLOBUS_TAB_LOGO = 'jp-Globus-tablogo';
 const GLOBUS_LOGIN_SCREEN = 'jp-Globus-loginScreen';
 const GLOBUS_LOGO = 'jp-Globus-logo';
 
-const CLIENT_ID = 'e54de045-d346-42ef-9fbc-5d466f4a00c6';
+const CLIENT_ID = '64d2d5b3-b77e-4e04-86d9-e3f143f563f7';
 const REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code';
 const SCOPES = 'openid email profile urn:globus:auth:scope:transfer.api.globus.org:all urn:globus:auth:scope:search.api.globus.org:all';
 
