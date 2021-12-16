@@ -10,7 +10,6 @@
     "target": "es6",
     "outDir": "./lib",
     "lib": ["es6", "es2018.promise", "dom"],
-    "types": []
   },
   "include": ["src/*"]
 }
