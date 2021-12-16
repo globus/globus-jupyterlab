@@ -605,12 +605,17 @@ export class GlobusFileManager extends Widget {
             if (element.type === 'checkbox') {
                 data[element.name] = element.checked;
             }
-            else {
-                data[element.name] = element.value;
+            else if (element.name === 'sync_level')  {
+                data[element.name] = parseInt(element.value);
             }
             return data;
         }, options);
 
+        // It's possible for an empty input to create an 'empty' string object.
+        // Remove it so it doesn't get propagated as an option to transfer.
+        if ("" in options) {
+          delete options[""];
+        }
         let submissionId: GlobusSubmissionId = await requestSubmissionId();
 
         let taskTransfer: GlobusTransferTask = {
