@@ -20,6 +20,7 @@
     --jp-Globus-lightGray: #eee;
     --jp-Globus-darkGray: #777;
 
+    --jp-Globus-image-logo-notext: url(../assets/images/globus_notext.svg);
     --jp-Globus-image-logo: url(../assets/images/globus.svg);
     --jp-Globus-image-logo-dark: url(../assets/images/globus_dark.svg);
 

@@ -21,6 +21,7 @@
     ],
     "files": [
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+        "schema/**/*.json",
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
     ],
     "main": "lib/index.js",
@@ -59,6 +60,7 @@
         "crypto-js": "^4.1.1",
         "jquery": "^3.6.0",
         "json-formatter-js": "^2.3.4",
+        "path": "^0.12.7",
         "rxjs": "^7.4.0"
     },
     "devDependencies": {
@@ -85,7 +87,8 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "globus_jupyterlab/labextension"
+        "outputDir": "globus_jupyterlab/labextension",
+        "schemaDir": "schema"
     },
     "jupyter-releaser": {
         "hooks": {

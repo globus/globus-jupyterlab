@@ -1,5 +1,6 @@
 @import 'stylesheets/variables.css';
 @import 'stylesheets/utils.css';
+@import 'stylesheets/context_menu.css';
 @import 'stylesheets/home.css';
 @import 'stylesheets/widget_manager.css';
 @import 'stylesheets/widgets/globus_connect_personal.css';

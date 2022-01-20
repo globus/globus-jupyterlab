@@ -1,0 +1,8 @@
+.jp-Globus-logo-small {
+    background-size: 60%;
+    width: 5px;
+    height: 5px;
+    background-image: var(--jp-Globus-image-logo-notext);
+    padding-left: 10px;
+    background-repeat: no-repeat;
+}

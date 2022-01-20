@@ -4,6 +4,7 @@ import {GlobusHome} from "./globus/home";
 import {IDocumentManager} from '@jupyterlab/docmanager';
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {GlobusWidgetManager} from "./globus/widget_manager";
+import {GlobusContextMenu} from "./globus/context_menu";
 
 /**
  * Globus plugin
@@ -26,9 +27,13 @@ function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, restore
 
 
     let widgetManager: GlobusWidgetManager = new GlobusWidgetManager(app, manager, factory);
+    // Note: This path is hardcoded as a prototype. Previously, the serverRoot could be determined
+    // from the app. This changed in the last version, and now MUST be fetched from a server plugin.
+    let contextMenu = new GlobusContextMenu('/Users/nick/globus/globus_jupyterlab', factory)
     let home: GlobusHome = new GlobusHome(widgetManager);
     restorer.add(home, 'globus-home');
     app.shell.add(home, 'left');
+    app.commands.addCommand('globus-jupyterlab/context-menu:open', contextMenu.options);
 }
 
 /**
