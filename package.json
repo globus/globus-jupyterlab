@@ -79,7 +79,7 @@
         "style/*.css",
         "style/index.js"
     ],
-    "styleModule": "style/index.js",
+    "style": "style/index.css",
     "publishConfig": {
         "access": "public"
     },
