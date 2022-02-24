@@ -1,0 +1,15 @@
+{
+    "title": "Globus Transfer",
+    "description": "A widget to enable Globus inside JupyterLab",
+    "jupyter.lab.menus": {
+      "context": [
+        {
+          "command": "globus-jupyterlab/context-menu:open",
+          "selector": ".jp-DirListing-item",
+          "rank": 0
+        }
+      ]
+    },
+    "additionalProperties": false,
+    "type": "object"
+}
