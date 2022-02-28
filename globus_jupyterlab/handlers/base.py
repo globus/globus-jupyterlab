@@ -1,0 +1,15 @@
+from notebook.base.handlers import APIHandler
+
+
+class RedirectWebHandler(APIHandler):
+    """Redirect Web Handlers are intended for redirecting outside of the Jupyterlab
+    app. This can be used for both the OAuth web flow, or alternativly helper pages."""
+
+    def set_default_headers(self, *args, **kwargs):
+        """This is needed for redirect back to JupyterLab from an outside source.
+        Typically, this is shady and will cause a security warning from Jupyter Server, but
+        for intentional usage we need to tell Jupyterlab to ignore the source from a third
+        party server."""
+        # We should look into this to see if we can get more specific, such as by setting
+        # auth.globus.org, or app.globus.org. 
+        self.set_header("Content-Security-Policy", "*")
