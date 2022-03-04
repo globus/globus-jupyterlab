@@ -5,6 +5,7 @@ import {IDocumentManager} from '@jupyterlab/docmanager';
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {GlobusWidgetManager} from "./globus/widget_manager";
 
+import { requestAPI } from './handler';
 /**
  * Globus plugin
  */
@@ -15,7 +16,7 @@ export const globus: JupyterFrontEndPlugin<void> = {
     activate: activateGlobus
 };
 
-function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, restorer: ILayoutRestorer, factory: IFileBrowserFactory) {
+async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, restorer: ILayoutRestorer, factory: IFileBrowserFactory) {
     // Writes and executes a command inside of the default terminal in JupyterLab.
     // console.log(app.info);
     // app.serviceManager.terminals.startNew().then(session => {
@@ -29,6 +30,16 @@ function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, restore
     let home: GlobusHome = new GlobusHome(widgetManager);
     restorer.add(home, 'globus-home');
     app.shell.add(home, 'left');
+
+    console.log('JupyterLab extension server-extension-example is activated!');
+
+    // GET request
+    try {
+      const data = await requestAPI<any>('config');
+      console.log('Fetching basic data about the notebook server environment:', data);
+    } catch (reason) {
+      console.error(`Error on GET /globus_jupyterlab/config.\n${reason}`);
+    }
 }
 
 /**

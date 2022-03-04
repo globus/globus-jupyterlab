@@ -43,6 +43,11 @@ version = (
     .replace("-rc.", "rc")
 )
 
+requirements = [
+        "jupyter_server>=1.6,<2",
+        "globus_sdk>=3>4",
+]
+
 setup_args = dict(
     name=name,
     version=version,
@@ -55,8 +60,10 @@ setup_args = dict(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    install_requires=[
-        "jupyter_server>=1.6,<2"
+    install_requires=requirements,
+    tests_require=requirements + [
+        'pytest',
+        'pytest-tornado',
     ],
     zip_safe=False,
     include_package_data=True,

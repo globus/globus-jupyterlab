@@ -1,4 +1,7 @@
 import os
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 from notebook.utils import url_path_join
 
@@ -6,16 +9,26 @@ from tornado.web import StaticFileHandler
 from globus_jupyterlab.handlers import login, config
 
 
+log = logging.getLogger(__name__)
+
+HANDLER_MODULES = (login, config)
+
+
+def get_handlers(modules, base_url, url_path) -> list:
+    handlers = []
+    for module in modules:
+        for url, api_handler in module.default_handlers:
+            mounted_url = url_path_join(base_url, url_path, url)
+            log.info(f'Server Extension mounted {mounted_url}')
+            handlers.append((mounted_url, api_handler))
+    return handlers
+
+
 def setup_handlers(web_app, url_path):
     host_pattern = ".*$"
     base_url = web_app.settings["base_url"]
-    handlers = (login, config)
 
-    # Prepend the base_url so that it works in a JupyterHub setting
-    for handler_module in handlers:
-        for url, api_handler in handler_module.default_handlers:
-            handlers.append((url_path_join(base_url, url_path, url), api_handler))
-
+    handlers = get_handlers(HANDLER_MODULES, base_url, url_path)
     web_app.add_handlers(host_pattern, handlers)
 
     # Prepend the base_url so that it works in a JupyterHub setting
