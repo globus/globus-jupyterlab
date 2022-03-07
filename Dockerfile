@@ -1,4 +1,5 @@
-FROM jupyter/base-notebook:lab-3.2.6
+FROM jupyter/base-notebook:abdb27a6dfbb
+
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ENV USER ${NB_USER}
@@ -16,7 +17,7 @@ RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
 WORKDIR ${HOME}
-RUN python -m pip install --no-cache-dir jupyterlab jupyter-packaging
-RUN jupyter labextension develop . --overwrite
-RUN jlpm install
-RUN jlpm run build
+RUN npm ci
+RUN npm run build 
+RUN jupyter labextension install . 
+RUN jupyter lab build
