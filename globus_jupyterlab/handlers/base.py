@@ -1,7 +1,13 @@
 from notebook.base.handlers import APIHandler
+from globus_jupyterlab.globus_config import GlobusConfig
 
 
-class RedirectWebHandler(APIHandler):
+class BaseAPIHandler(APIHandler):
+    gconfig = GlobusConfig()
+
+
+
+class RedirectWebHandler(BaseAPIHandler):
     """Redirect Web Handlers are intended for redirecting outside of the Jupyterlab
     app. This can be used for both the OAuth web flow, or alternativly helper pages."""
 
