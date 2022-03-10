@@ -1,10 +1,9 @@
 import tornado
 
-from notebook.base.handlers import APIHandler
-from globus_jupyterlab.handlers.base import RedirectWebHandler
+from globus_jupyterlab.handlers.base import BaseAPIHandler, RedirectWebHandler
 
 
-class Login(APIHandler):
+class Login(BaseAPIHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
@@ -15,7 +14,7 @@ class Login(APIHandler):
         pass
 
 
-class Logout(APIHandler):
+class AuthCallback(RedirectWebHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
@@ -25,7 +24,7 @@ class Logout(APIHandler):
         pass
 
 
-class AuthCallback(RedirectWebHandler):
+class Logout(BaseAPIHandler):
 
     @tornado.web.authenticated
     def get(self, *args, **kwargs):

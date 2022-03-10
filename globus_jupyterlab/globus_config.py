@@ -9,6 +9,12 @@ log = logging.getLogger(__name__)
 
 
 class GlobusConfig():
+    """
+    Track all Globus Related information related to the Globus Jupyterlab
+    server extension. This includes things like checking for a local
+    Globus Connect Personal on a user's machine, or fetching the hub
+    api token if it is available.
+    """
 
     def get_hub_token(self) -> str:
         return os.getenv('JUPYTERHUB_API_TOKEN', '')
