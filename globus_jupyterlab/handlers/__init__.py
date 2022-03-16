@@ -6,7 +6,7 @@ from typing import List, Tuple
 from notebook.utils import url_path_join
 from notebook.base.handlers import APIHandler
 from jupyter_server.serverapp import ServerWebApplication
-from tornado.web import StaticFileHandler
+from tornado.web import StaticFileHandler, url
 from globus_jupyterlab.handlers import login, config
 
 
@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 HANDLER_MODULES = (login, config)
 
 
-def get_handlers(modules: List[ModuleType], base_url: str, url_path: str) -> List[Tuple[str, APIHandler]]:
+def get_handlers(modules: List[ModuleType],
+                 base_url: str, url_path: str) -> List[Tuple[str, APIHandler, dict, str]]:
     """
     Fetch handlers from a list of modules. This style is taken from Jupyterhub,
     which declares `default_handlers` on each of its handler modules and adds
@@ -27,10 +28,11 @@ def get_handlers(modules: List[ModuleType], base_url: str, url_path: str) -> Lis
     """
     handlers = []
     for module in modules:
-        for url, api_handler in module.default_handlers:
-            mounted_url = url_path_join(base_url, url_path, url)
+        for handler_url, api_handler, kwargs, name in module.default_handlers:
+            log.debug((handler_url, api_handler, kwargs, name))
+            mounted_url = url_path_join(base_url, url_path, handler_url)
             log.info(f'Server Extension mounted {mounted_url}')
-            handlers.append((mounted_url, api_handler))
+            handlers.append(url(mounted_url, api_handler, name=name, **kwargs))
     return handlers
 
 

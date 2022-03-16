@@ -29,12 +29,11 @@ class Logout(BaseAPIHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         """
-        Accept a redirect from Globus Auth, and process the 'auth_code' in the query params.
+        Revoke all local Gloubs tokens
         """
-        # self.finish()
         pass
 
 
-default_handlers = [('/login', Login),
-                    ('/logout', Logout),
-                    ('/oauth_callback', AuthCallback)]
+default_handlers = [('/login', Login, dict(), 'login'),
+                    ('/logout', Logout, dict(), 'logout'),
+                    ('/oauth_callback', AuthCallback, dict(), 'redirect_uri')]

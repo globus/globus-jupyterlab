@@ -21,4 +21,4 @@ class Config(BaseAPIHandler):
         self.finish(json.dumps(data))
 
 
-default_handlers = [('/config', Config)]
+default_handlers = [('/config', Config, {}, 'config')]
