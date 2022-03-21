@@ -4,6 +4,7 @@ import globus_sdk
 import urllib
 import base64
 import os
+import json
 
 from globus_jupyterlab.handlers.base import BaseAPIHandler, RedirectWebHandler
 
@@ -119,11 +120,16 @@ class AuthCallback(RedirectWebHandler, PKCEFlowManager):
 class Logout(BaseAPIHandler):
 
     @tornado.web.authenticated
-    def get(self, *args, **kwargs):
+    def get(self):
         """
         Revoke all local Gloubs tokens
         """
-        pass
+        success = self.login_manager.logout()
+        data = {
+            'result': 'success' if success else 'failure',
+            'details': 'You have been logged out.' if success else 'You are not logged in!',
+        }
+        self.finish(json.dumps(data))
 
 
 default_handlers = [('/login', Login, dict(), 'login'),
