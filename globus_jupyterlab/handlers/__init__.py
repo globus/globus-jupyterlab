@@ -7,12 +7,12 @@ from notebook.utils import url_path_join
 from notebook.base.handlers import APIHandler
 from jupyter_server.serverapp import ServerWebApplication
 from tornado.web import StaticFileHandler, url
-from globus_jupyterlab.handlers import login, config
+from globus_jupyterlab.handlers import login, config, api
 
 
 log = logging.getLogger(__name__)
 
-HANDLER_MODULES = (login, config)
+HANDLER_MODULES = (login, config, api)
 
 
 def get_handlers(modules: List[ModuleType],
