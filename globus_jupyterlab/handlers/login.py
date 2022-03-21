@@ -112,10 +112,8 @@ class AuthCallback(RedirectWebHandler, PKCEFlowManager):
         client.oauth2_start_flow(verifier=self.get_stored_verifier(),
                                  redirect_uri=self.get_redirect_uri())
         token_response = client.oauth2_exchange_code_for_tokens(self.get_query_argument('code'))
-
-        # TEMPORARY! Show that the login flow works by displaying a list of the users tokens
-        import json
-        self.finish(json.dumps(token_response.data, indent=2))
+        self.login_manager.store(token_response)
+        self.finish('Thank you for logging in with Globus! You can close this page.')
 
 
 class Logout(BaseAPIHandler):
