@@ -1,13 +1,15 @@
-import { buildIcon } from '@jupyterlab/ui-components';
+import { buildIcon, reactIcon } from '@jupyterlab/ui-components';
 import {ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin} from '@jupyterlab/application';
 import {GlobusHome} from "./globus/home";
 import {IDocumentManager} from '@jupyterlab/docmanager';
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {GlobusWidgetManager} from "./globus/widget_manager";
 
+import { GlobusWidget } from './widget';
 import { requestAPI } from './handler';
 
 import '../style/index.css';
+import { MainAreaWidget } from '@jupyterlab/apputils';
 /**
  * Globus plugin
  */
@@ -78,6 +80,12 @@ async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, r
         } catch (error) {
           console.log(error);
         }
+
+        const content = new GlobusWidget();
+        const widget = new MainAreaWidget<GlobusWidget>({ content })
+        widget.title.label = 'Globus Jupterlab'
+        widget.title.icon = reactIcon;
+        app.shell.add(widget, 'main')
       }
     })
 }
