@@ -1,11 +1,13 @@
+import { buildIcon } from '@jupyterlab/ui-components';
 import {ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin} from '@jupyterlab/application';
-import '../style/index.css';
 import {GlobusHome} from "./globus/home";
 import {IDocumentManager} from '@jupyterlab/docmanager';
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
 import {GlobusWidgetManager} from "./globus/widget_manager";
 
 import { requestAPI } from './handler';
+
+import '../style/index.css';
 /**
  * Globus plugin
  */
@@ -62,6 +64,22 @@ async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, r
     } catch (reason) {
       console.error(`Error on GET /globus_jupyterlab/config.\n${reason}`);
     }
+
+    app.commands.addCommand('globus-jupterlab/context-menu:open', {
+      label: 'Initiate File Transfer with Globus',
+      caption: 'Login with Globus to initiate transfers',
+      icon: buildIcon,
+      execute: async () => {
+        try {
+          const config = await requestAPI<any>('config');
+          const isAuthenticated = config.is_logged_in
+          console.log(config);
+          console.log(isAuthenticated);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    })
 }
 
 async function submitTransfer(transferRequest) {
