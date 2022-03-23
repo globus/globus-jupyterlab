@@ -1,25 +1,75 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-/**
- * React component for a counter.
- *
- * @returns The React component
- */
 
 const FileBrowser = (props: any): JSX.Element => {
-  return <p>Hello, World!</p>;
+  const [fileInfoArray, setFileInfoArray] = useState([])
+  useEffect(() => {
+    getFileInfo();
+  }, [props.files]);
+
+  const getFileInfo = async () => {
+    let fileInfoArrayTemp = []
+    for (let file of props.files) {
+      let response = await fetch(`/api/contents/${file.path}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `token ${props.jupyterToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.ok) {
+        let fileInfo = await response.json();
+        fileInfoArrayTemp.push(fileInfo);
+      }
+    }
+    setFileInfoArray(fileInfoArrayTemp);
+  }
+
+  return (
+    <div>
+      <p>You want to transfer the following {props.transferDirection == 'to_collection' ? 'to' : 'from'} a Globus Collection</p>
+      {fileInfoArray.length && 
+        <div>
+          <hr />
+          {fileInfoArray.map((file) => {
+            console.log(file.content);
+            return (
+              <div key={file.name}> 
+                <span><strong>Type:</strong> {file.type}</span><br />
+                <span><strong>Name:</strong> {file.name}</span><br />
+                <span><strong>Path:</strong> {file.path}</span><br />
+                {file.type !== 'directory' && 
+                  <span><strong>Content:</strong> {file.content}</span>
+                }
+                <hr />
+              </div>
+            )
+          })}
+        </div>
+      }
+    </div>
+  )
 };
 
 export class GlobusWidget extends ReactWidget {
-  constructor() {
+  fileArray: Array<string>;
+  jupyterToken: string;
+  transferDirection: string;
+  constructor(jupyterToken = '', fileArray = [], transferDirection = '') {
     super();
 
+    this.fileArray = fileArray;
+    this.jupyterToken = jupyterToken;
+    this.transferDirection = transferDirection;
     this.addClass('jp-ReactWidget');
   }
 
   render(): JSX.Element {
-    return <FileBrowser />;
+    return (
+      <FileBrowser files={this.fileArray} jupyterToken={this.jupyterToken} transferDirection={this.transferDirection} />
+    );
   }
 }

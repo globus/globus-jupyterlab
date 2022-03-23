@@ -1,21 +1,20 @@
 {
-    "title": "Globus Jupyterlab Transfer",
-    "description": "Transfer to and from Globus Collections",
-    "jupyter.lab.menus": {
-      "context": [
-        {
-          "command": "globus-jupyterlab/context-menu:open",
-          "selector": ".jp-DirListing-item[data-file-type=\"directory\"]",
-          "rank": 0
-        },
-        {
-          "command": "globus-jupyterlab/context-menu:open",
-          "selector": ".jp-DirListing-item[data-file-type=\"text\"]",
-          "rank": 1
-        }
-      ]
-    },
-    "additionalProperties": false,
-    "type": "object"
-  }
-  
+  "title": "Globus Jupyterlab Transfer",
+  "description": "Transfer to and from Globus Collections",
+  "jupyter.lab.menus": {
+    "context": [
+      {
+        "command": "globus-jupyterlab-to-collection/context-menu:open",
+        "selector": ".jp-DirListing-item",
+        "rank": 0
+      },
+      {
+        "command": "globus-jupyterlab-from-collection/context-menu:open",
+        "selector": ".jp-DirListing-item",
+        "rank": 1
+      }
+    ]
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
