@@ -18,5 +18,6 @@ logging.config.dictConfig({
         'tornado.access': {'level': 'WARNING', 'handlers': ['console']},
         'tornado.application': {'level': 'DEBUG', 'handlers': ['console']},
         'tornado.general': {'level': 'WARNING', 'handlers': ['console']},
+        'globus_sdk': {'level': 'INFO', 'handlers': ['console']},
     },
 })

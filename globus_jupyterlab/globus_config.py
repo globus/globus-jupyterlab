@@ -15,6 +15,22 @@ class GlobusConfig():
     Globus Connect Personal on a user's machine, or fetching the hub
     api token if it is available.
     """
+    default_client_id = '64d2d5b3-b77e-4e04-86d9-e3f143f563f7'
+
+    def get_client_id(self) -> str:
+        return os.getenv('GLOBUS_CLIENT_ID', self.default_client_id)
+
+    def get_refresh_tokens(self) -> bool:
+        return os.getenv('GLOBUS_REFRESH_TOKENS', False)
+
+    def get_redirect_uri(self) -> str:
+        return os.getenv('GLOBUS_REDIRECT_URI', None)
+
+    def get_scopes(self) -> str:
+        return os.getenv('GLOBUS_SCOPES', None)
+
+    def get_named_grant(self) -> str:
+        return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')
 
     def get_hub_token(self) -> str:
         return os.getenv('JUPYTERHUB_API_TOKEN', '')

@@ -1,10 +1,13 @@
 from notebook.base.handlers import APIHandler
 from globus_jupyterlab.globus_config import GlobusConfig
+from globus_jupyterlab.login_manager import LoginManager
+
+globus_config = GlobusConfig()
 
 
 class BaseAPIHandler(APIHandler):
-    gconfig = GlobusConfig()
-
+    gconfig = globus_config
+    login_manager = LoginManager(globus_config.get_client_id())
 
 
 class RedirectWebHandler(BaseAPIHandler):
