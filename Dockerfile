@@ -1,23 +1,47 @@
-FROM jupyter/base-notebook:abdb27a6dfbb
+FROM jupyter/base-notebook:latest
+# Built from... https://hub.docker.com/r/jupyter/base-notebook/
+#               https://github.com/jupyter/docker-stacks/blob/HEAD/base-notebook/Dockerfile
+# Built from... Ubuntu 20.04
 
-ARG NB_USER=jovyan
-ARG NB_UID=1000
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
-ENV HOME /home/${NB_USER}
+# VULN_SCAN_TIME=2022-03-18_01:24:56
+
+# The jupyter/docker-stacks images contains jupyterhub and jupyterlab already.
+
+# Example install of git and nbgitpuller.
+# NOTE: git is already available in the jupyter/minimal-notebook image.
 USER root
-RUN id -u ${NB_USER} &>/dev/null || adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends \
+        dnsutils \
+        git \
+        iputils-ping \
+ && rm -rf /var/lib/apt/lists/*
 
-ARG JUPYTER_LAB=yes
-ENV JUPYTER_ENABLE_LAB ${JUPYTER_LAB}
+COPY . /custom_extensions/globus_jupyterlab
+RUN chown -R jovyan /custom_extensions/globus_jupyterlab
 
-COPY . ${HOME}
-USER root
-RUN chown -R ${NB_UID} ${HOME}
-USER ${NB_USER}
+USER $NB_USER
 
-WORKDIR ${HOME}
-RUN npm ci
-RUN npm run build 
-RUN jupyter labextension install . 
-RUN jupyter lab build
+RUN python -m pip install jupyterlab jupyter-packaging 
+RUN python -m pip install globus-sdk pydantic
+
+# Support overriding a package or two through passed docker --build-args.
+# ARG PIP_OVERRIDES="jupyterhub==1.3.0"
+ARG PIP_OVERRIDES=
+RUN if [[ -n "$PIP_OVERRIDES" ]]; then \
+        pip install --no-cache-dir $PIP_OVERRIDES; \
+    fi
+
+
+
+RUN jupyter labextension develop /custom_extensions/globus_jupyterlab --overwrite
+# RUN jlpm run build
+
+# RUN jupyter serverextension enable --py nbgitpuller --sys-prefix
+RUN jupyter serverextension enable globus_jupyterlab
+
+# # Uncomment the line below to make nbgitpuller default to start up in JupyterLab
+# ENV NBGITPULLER_APP=lab
+
+# conda/pip/apt install additional packages here, if desired.
