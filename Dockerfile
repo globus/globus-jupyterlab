@@ -23,21 +23,15 @@ RUN chown -R jovyan /custom_extensions/globus_jupyterlab
 
 USER $NB_USER
 
-RUN python -m pip install jupyterlab jupyter-packaging 
-RUN python -m pip install globus-sdk pydantic
+RUN python -m pip install jupyterlab jupyter-packaging globus-sdk pydantic
 
 # Support overriding a package or two through passed docker --build-args.
-# ARG PIP_OVERRIDES="jupyterhub==1.3.0"
-ARG PIP_OVERRIDES=
+ARG PIP_OVERRIDES="jupyterhub==1.3.0"
 RUN if [[ -n "$PIP_OVERRIDES" ]]; then \
         pip install --no-cache-dir $PIP_OVERRIDES; \
     fi
 
-
-
 RUN jupyter labextension develop /custom_extensions/globus_jupyterlab --overwrite
-# RUN jlpm run build
-
 # RUN jupyter serverextension enable --py nbgitpuller --sys-prefix
 RUN jupyter serverextension enable globus_jupyterlab
 

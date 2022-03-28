@@ -62,4 +62,4 @@ class GlobusConfig():
                 return pickle.loads(base64.b64decode(oauthonticator_env))
             except pickle.UnpicklingError:
                 log.error('Failed to load GLOBUS_DATA', exc_info=True)
-                return dict()
+        return dict()
