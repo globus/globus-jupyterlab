@@ -39,6 +39,13 @@ async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, r
     try {
       const data = await requestAPI<any>('config');
       console.log('Fetching basic data about the notebook server environment:', data);
+
+      const operation_ls = await requestAPI<any>('operation_ls?endpoint=ddb59aef-6d04-11e5-ba46-22000b92c6ec');
+      console.log('Info on collection', operation_ls);
+
+      const endpoint_search = await requestAPI<any>('endpoint_search?filter_fulltext=tutorial');
+      console.log('Endpoint Search: ', endpoint_search);
+
       const transferRequest = {
         //Globus Tutorial Endpoint 1
         'source_endpoint': 'ddb59aef-6d04-11e5-ba46-22000b92c6ec',
