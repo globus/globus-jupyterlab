@@ -7,6 +7,7 @@ import os
 import json
 
 from globus_jupyterlab.handlers.base import BaseAPIHandler, RedirectWebHandler
+from globus_jupyterlab.models import AuthResponseModel
 
 
 class PKCEFlowManager(BaseAPIHandler):
@@ -15,6 +16,8 @@ class PKCEFlowManager(BaseAPIHandler):
     AuthCallback handlers, such as generating/storing/retrieving the PKCE
     verifier and constructing the redirect URL.
     """
+    GLOBUS_AUTH_CODE_REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code'
+
     @staticmethod
     def generate_verifier():
         return base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8").rstrip("=")
@@ -22,13 +25,17 @@ class PKCEFlowManager(BaseAPIHandler):
     def get_redirect_uri(self):
         redirect_uri = self.gconfig.get_redirect_uri()
         if not redirect_uri:
-            self.log.info('No redirect URI configured, determining automatically...')
-            redirect_uri = urllib.parse.urlunparse((
-                self.request.protocol,
-                self.request.host,
-                self.reverse_url('redirect_uri'),
-                '', '', ''
-            ))
+            if self.gconfig.is_hub():
+                redirect_uri = self.GLOBUS_AUTH_CODE_REDIRECT_URI
+            else:
+                self.log.info(
+                    'No redirect URI configured, determining automatically...')
+                redirect_uri = urllib.parse.urlunparse((
+                    self.request.protocol,
+                    self.request.host,
+                    self.reverse_url('redirect_uri'),
+                    '', '', ''
+                ))
         self.log.debug(f'Using redirect URI: {redirect_uri}')
         return redirect_uri
 
@@ -40,6 +47,20 @@ class PKCEFlowManager(BaseAPIHandler):
 
     def store_verifier(self, verifier: str) -> None:
         self.set_secure_cookie('verifier', verifier, expires_days=None)
+
+    def complete_auth_flow(self, code: str):
+        client = self.get_client()
+        client.oauth2_start_flow(verifier=self.get_stored_verifier(),
+                                 redirect_uri=self.get_redirect_uri())
+        try:
+            token_response = client.oauth2_exchange_code_for_tokens(code)
+            self.login_manager.store(token_response)
+            return AuthResponseModel(status_code=token_response.http_status,
+                                     result='success')
+        except globus_sdk.GlobusAPIError as gapie:
+            self.set_status(gapie.http_status)
+            return AuthResponseModel(result='failure', code=gapie.code,
+                                     status_code=gapie.http_status, message=gapie.message)
 
 
 class Login(PKCEFlowManager):
@@ -102,19 +123,39 @@ class Login(PKCEFlowManager):
         self.redirect(authorize_url)
 
 
+class AuthCallbackManual(PKCEFlowManager):
+    """
+    This is a 'manual' callback handler for the last leg of the auth flow.
+
+    The 'manual' comes from the user needing to automatically copy and paste
+    the code into the JupyterLab environment. The code is copied into JupyterLab,
+    then called in this routine to complete the flow. 
+
+    Direct browser access is not allowed, and will raise a warning in the logs.
+    """
+    @tornado.web.authenticated
+    def get(self) -> Future:
+        response = self.complete_auth_flow(self.get_query_argument('code'))
+        self.finish(response.json())
+
+
 class AuthCallback(RedirectWebHandler, PKCEFlowManager):
 
     @tornado.web.authenticated
     def get(self) -> Future:
         """
-        Accept a redirect from Globus Auth, and process the 'auth_code' in the query params.
+        This is an 'automatic' callback handler for the last leg of the auth flow.
+
+        'automatic' means Globus Auth was able to redirect directly to this tornado
+        backend endpoint to complete the flow, without user intervention. This can
+        only be done for static urls, such as http://localhost:xxxx/globus-jupyterlab/oauth_callback 
+
+        Direct browser access is expected for the final auth redirect.
         """
-        client = self.get_client()
-        client.oauth2_start_flow(verifier=self.get_stored_verifier(),
-                                 redirect_uri=self.get_redirect_uri())
-        token_response = client.oauth2_exchange_code_for_tokens(self.get_query_argument('code'))
-        self.login_manager.store(token_response)
-        self.finish('Thank you for logging in with Globus! You can close this page.')
+        response = self.complete_auth_flow(self.get_query_argument('code'))
+        self.finish(
+            f'Thank you for logging in with Globus! You can close this page.\n'
+            f'Status: {response.result}  {response.message}\n')
 
 
 class Logout(BaseAPIHandler):
@@ -134,4 +175,5 @@ class Logout(BaseAPIHandler):
 
 default_handlers = [('/login', Login, dict(), 'login'),
                     ('/logout', Logout, dict(), 'logout'),
-                    ('/oauth_callback', AuthCallback, dict(), 'redirect_uri')]
+                    ('/oauth_callback', AuthCallback, dict(), 'redirect_uri'),
+                    ('/oauth_callback_manual', AuthCallbackManual, dict(), 'redirect_uri_manual')]
