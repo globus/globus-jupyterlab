@@ -42,7 +42,10 @@ class GlobusConfig():
         return globus_sdk.LocalGlobusConnectPersonal().endpoint_id
 
     def get_collection_id_owner(self) -> str:
-        return globus_sdk.LocalGlobusConnectPersonal().get_owner_info().id
+        owner_info = globus_sdk.LocalGlobusConnectPersonal().get_owner_info()
+        if owner_info:
+            return owner_info.id
+        return None
 
     def get_local_globus_collection(self) -> str:
         return (
@@ -62,4 +65,4 @@ class GlobusConfig():
                 return pickle.loads(base64.b64decode(oauthonticator_env))
             except pickle.UnpicklingError:
                 log.error('Failed to load GLOBUS_DATA', exc_info=True)
-                return dict()
+        return dict()
