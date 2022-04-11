@@ -94,8 +94,26 @@ class EndpointSearch(GetMethodTransferAPIEndpoint):
     }
 
 
+class EndpointDetail(BaseAPIHandler):
+    def get(self):
+        response = dict()
+        if self.login_manager.is_logged_in() is not True:
+            self.set_status(401)
+            return self.finish(json.dumps({'error': 'The user is not logged in'}))
+        try:
+            authorizer = self.login_manager.get_authorizer(
+                'transfer.api.globus.org')
+            tc = globus_sdk.TransferClient(authorizer=authorizer)
+            response = tc.get_endpoint(self.get_query_argument('endpoint_id', None))
+            return self.finish(json.dumps(response.data))
+        except globus_sdk.GlobusAPIError as gapie:
+            self.set_status(gapie.http_status)
+            return self.finish(json.dumps({'error': gapie.code, 'details': gapie.message}))
+
+
 default_handlers = [
     ('/submit_transfer', SubmitTransfer, dict(), 'submit_transfer'),
     ('/operation_ls', OperationLS, dict(), 'operation_ls'),
     ('/endpoint_search', EndpointSearch, dict(), 'endpoint_search'),
+    ('/endpoint_detail', EndpointDetail, dict(), 'endpoint_detail'),
 ]
