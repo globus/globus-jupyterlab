@@ -7,6 +7,9 @@ import EndpointSearch from './components/EndpointSearch';
 
 import { ConfigAtom } from './components/GlobusObjects';
 
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const App = (props: any): JSX.Element => {
   // Local state values
   const [selectedJupyterItems, setSelectedJupyterItems] = useState({ isEmpty: true });
