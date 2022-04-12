@@ -2,8 +2,10 @@ import os
 import logging
 import pickle
 import base64
+from typing import List
 
 import globus_sdk
+from globus_sdk.scopes import TransferScopes
 
 log = logging.getLogger(__name__)
 
@@ -26,8 +28,12 @@ class GlobusConfig():
     def get_redirect_uri(self) -> str:
         return os.getenv('GLOBUS_REDIRECT_URI', None)
 
-    def get_scopes(self) -> str:
-        return os.getenv('GLOBUS_SCOPES', None)
+    def get_transfer_submission_scope(self) -> str:
+        custom_scope = os.getenv('GLOBUS_TRANSFER_SUBMISSION_SCOPE', None)
+        return custom_scope or TransferScopes.all
+
+    def get_transfer_submission_url(self) -> str:
+        return os.getenv('GLOBUS_TRANSFER_SUBMISSION_URL', None)
 
     def get_named_grant(self) -> str:
         return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')

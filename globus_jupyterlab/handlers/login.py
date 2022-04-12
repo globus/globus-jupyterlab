@@ -63,6 +63,18 @@ class PKCEFlowManager(BaseAPIHandler):
                                      status_code=gapie.http_status, message=gapie.message)
 
 
+class GetDependentSubmissionScope(BaseAPIHandler):
+
+    def get(self) -> Future:
+        gcs_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(self.get_query_argument('collection'))
+        submission_scope = self.gconfig.get_transfer_submission_scope()
+        response = {
+            'base_submission_service_scope': submission_scope,
+            'gcs_scope': gcs_scope.data_access,
+            'full_scope': f'{submission_scope}[{gcs_scope.data_access}]'
+        }
+        self.finish(json.dumps(response))
+
 class Login(PKCEFlowManager):
     """
     Login with Globus Auth
@@ -82,7 +94,7 @@ class Login(PKCEFlowManager):
     * session_requried_single_domain -- Require a domain? Ex: 'uchicago.edu'
     * session_message -- Custom message when forcing required identitiy
     * session_required_identities -- Globus user UUID required for login
-    * session_required_mfa -- Is MDF required?
+    * session_required_mfa -- Is multi-factor-auth required?
     * prompt -- See docs.
 
     For more info, see the following:
@@ -108,7 +120,7 @@ class Login(PKCEFlowManager):
         client.oauth2_start_flow(
             redirect_uri=self.get_redirect_uri(),
             verifier=verifier,
-            requested_scopes=self.get_query_argument('requested_scopes', self.gconfig.get_scopes()),
+            requested_scopes=self.get_query_argument('requested_scopes', self.gconfig.get_transfer_submission_scope()),
             refresh_tokens=self.gconfig.get_refresh_tokens(),
             prefill_named_grant=self.gconfig.get_named_grant(),
         )
@@ -176,4 +188,5 @@ class Logout(BaseAPIHandler):
 default_handlers = [('/login', Login, dict(), 'login'),
                     ('/logout', Logout, dict(), 'logout'),
                     ('/oauth_callback', AuthCallback, dict(), 'redirect_uri'),
-                    ('/oauth_callback_manual', AuthCallbackManual, dict(), 'redirect_uri_manual')]
+                    ('/oauth_callback_manual', AuthCallbackManual, dict(), 'redirect_uri_manual'),
+                    ('/get_dependent_submission_scope', GetDependentSubmissionScope, dict(), 'get_dependent_submission_scope')]
