@@ -34,7 +34,7 @@ const Endpoint = (props) => {
 
   const getEndpoint = async (endpointID) => {
     try {
-      let response = await fetch(`/globus-jupyterlab/endpoint_detail?endpoint_id=${endpointID}`, {
+      let response = await fetch(`/globus-jupyterlab/endpoint_detail?endpoint=${endpointID}`, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -73,6 +73,11 @@ const Endpoint = (props) => {
       }
       setEndpointList(listItems);
     } catch (error) {
+      /* Note: This probably isn't a great UX to simply pop up a login page, but it
+      does demonstrate the base functionality for picking endpoints */
+      if ('login_url' in error) {
+        window.open(error.login_url, 'Globus Login', 'height=600,width=800').focus();
+      }
       setAPIError(error);
     }
     setLoading(false);

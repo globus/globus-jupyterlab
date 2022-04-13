@@ -18,6 +18,9 @@ class GlobusConfig():
     api token if it is available.
     """
     default_client_id = '64d2d5b3-b77e-4e04-86d9-e3f143f563f7'
+    base_scopes = [
+        TransferScopes.all
+    ]
 
     def get_client_id(self) -> str:
         return os.getenv('GLOBUS_CLIENT_ID', self.default_client_id)
@@ -28,9 +31,15 @@ class GlobusConfig():
     def get_redirect_uri(self) -> str:
         return os.getenv('GLOBUS_REDIRECT_URI', None)
 
+    def get_scopes(self) -> List[str]:
+        scopes = self.base_scopes.copy()
+        custom_transfer_scope = self.get_transfer_submission_scope()
+        if custom_transfer_scope:
+            scopes.append(custom_transfer_scope)
+        return scopes
+
     def get_transfer_submission_scope(self) -> str:
-        custom_scope = os.getenv('GLOBUS_TRANSFER_SUBMISSION_SCOPE', None)
-        return custom_scope or TransferScopes.all
+        return os.getenv('GLOBUS_TRANSFER_SUBMISSION_SCOPE', None)
 
     def get_transfer_submission_url(self) -> str:
         return os.getenv('GLOBUS_TRANSFER_SUBMISSION_URL', None)
