@@ -34,16 +34,20 @@ class GCSAuthMixin(BaseAPIHandler):
         return ' '.join(requested_scopes)
 
 
-class GetMethodTransferAPIEndpoint(BaseAPIHandler):
+class GlobusSDKWrapper(BaseAPIHandler):
 
     globus_sdk_method = None
     mandatory_args = []
     optional_args = {}
 
+
     def get_requested_scopes(self):
         return ' '.join(self.gconfig.get_scopes())
 
-    def get(self):
+    def get_globus_sdk_args(self):
+        return [], {}
+
+    def sdk_wrapper_call(self):
         response = dict()
         if self.login_manager.is_logged_in() is not True:
             self.set_status(401)
@@ -52,7 +56,7 @@ class GetMethodTransferAPIEndpoint(BaseAPIHandler):
             authorizer = self.login_manager.get_authorizer('transfer.api.globus.org')
             tc = globus_sdk.TransferClient(authorizer=authorizer)
             method = getattr(tc, self.globus_sdk_method)
-            args, kwargs = self.get_args()
+            args, kwargs = self.get_globus_sdk_args()
             response = method(*args, **kwargs)
             return self.finish(json.dumps(response.data))
         except globus_sdk.GlobusAPIError as gapie:
@@ -64,11 +68,44 @@ class GetMethodTransferAPIEndpoint(BaseAPIHandler):
                 response['login_url'] = f'{login_url}?{params}'
             return self.finish(json.dumps(response))
 
-    def get_args(self):
+
+
+class GetMethodTransferAPIEndpoint(GlobusSDKWrapper):
+
+    def get_globus_sdk_args(self):
         args = [self.get_query_argument(arg) for arg in self.mandatory_args]
         kwargs = {arg: self.get_query_argument(arg, default)
                   for arg, default in self.optional_args.items()}
         return args, kwargs
+
+    def get(self):
+        self.sdk_wrapper_call()
+
+
+class POSTMethodTransferAPIEndpoint(GlobusSDKWrapper):
+
+    def get_globus_sdk_args(self):
+        post_data = json.loads(self.request.body)
+        try:
+            args = [post_data.pop(arg) for arg in self.mandatory_args]
+        except KeyError:
+            msg = f'Minimum args not specified: {", ".join(self.mandatory_args)}'
+            raise ValueError(msg) from None
+        return args, post_data
+
+    def post(self):
+        try:
+            self.sdk_wrapper_call()
+        except ValueError as ve:
+            self.set_status(400)
+            self.finish(json.dumps({'code': 'InvalidInput', 'message': str(ve)}))
+
+
+class EndpointAutoactivate(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
+    """An API Endpoint doing a Globus LS"""
+    globus_sdk_method = 'endpoint_autoactivate'
+    mandatory_args = ['endpoint_id']
+    optional_args = {}
 
 
 class SubmitTransfer(BaseAPIHandler):
@@ -139,4 +176,5 @@ default_handlers = [
     ('/operation_ls', OperationLS, dict(), 'operation_ls'),
     ('/endpoint_search', EndpointSearch, dict(), 'endpoint_search'),
     ('/endpoint_detail', EndpointDetail, dict(), 'endpoint_detail'),
+    ('/endpoint_autoactivate', EndpointAutoactivate, dict(), 'endpoint_autoactivate')
 ]
