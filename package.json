@@ -7,16 +7,18 @@
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/gneezyn/globus_jupyterlab",
+    "homepage": "https://github.com/globus/globus-jupyterlab",
     "bugs": {
-        "url": "https://github.com/gneezyn/globus_jupyterlab/issues"
+        "url": "https://github.com/globus/globus-jupyterlab/issues"
     },
     "license": "BSD-3-Clause",
     "author": {
-        "name": "Juan David Garrido",
-        "email": ""
+        "name": "The Globus Team"
     },
     "contributors": [
+        "Nickolaus Saint",
+        "Steve Turoscy",
+        "Juan David Garrido",
         "Netta Gneezy"
     ],
     "files": [
@@ -27,7 +29,7 @@
     "types": "lib/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "https://github.com/gneezyn/globus_jupyterlab.git"
+        "url": "https://github.com/globus/globus_jupyterlab.git"
     },
     "scripts": {
         "build": "jlpm run build:lib && jlpm run build:labextension:dev",
