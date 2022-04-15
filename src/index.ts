@@ -105,6 +105,12 @@ async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, r
       const endpoint_search = await requestAPI<any>('endpoint_search?filter_fulltext=tutorial');
       console.log('Endpoint Search: ', endpoint_search);
 
+      const endpoint_autoactivate = await requestAPI<any>('endpoint_autoactivate', {
+        body: JSON.stringify({'endpoint_id': 'ddb59aef-6d04-11e5-ba46-22000b92c6ec'}),
+        method: 'POST',
+      });
+      console.log(endpoint_autoactivate);
+
       const transferRequest = {
         //Globus Tutorial Endpoint 1
         'source_endpoint': 'ddb59aef-6d04-11e5-ba46-22000b92c6ec',

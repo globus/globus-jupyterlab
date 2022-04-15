@@ -2,8 +2,10 @@ import os
 import logging
 import pickle
 import base64
+from typing import List
 
 import globus_sdk
+from globus_sdk.scopes import TransferScopes
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +18,9 @@ class GlobusConfig():
     api token if it is available.
     """
     default_client_id = '64d2d5b3-b77e-4e04-86d9-e3f143f563f7'
+    base_scopes = [
+        TransferScopes.all
+    ]
 
     def get_client_id(self) -> str:
         return os.getenv('GLOBUS_CLIENT_ID', self.default_client_id)
@@ -26,8 +31,18 @@ class GlobusConfig():
     def get_redirect_uri(self) -> str:
         return os.getenv('GLOBUS_REDIRECT_URI', None)
 
-    def get_scopes(self) -> str:
-        return os.getenv('GLOBUS_SCOPES', None)
+    def get_scopes(self) -> List[str]:
+        scopes = self.base_scopes.copy()
+        custom_transfer_scope = self.get_transfer_submission_scope()
+        if custom_transfer_scope:
+            scopes.append(custom_transfer_scope)
+        return scopes
+
+    def get_transfer_submission_scope(self) -> str:
+        return os.getenv('GLOBUS_TRANSFER_SUBMISSION_SCOPE', None)
+
+    def get_transfer_submission_url(self) -> str:
+        return os.getenv('GLOBUS_TRANSFER_SUBMISSION_URL', None)
 
     def get_named_grant(self) -> str:
         return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')
@@ -56,6 +71,13 @@ class GlobusConfig():
 
     def get_collection_base_path(self) -> str:
         return os.getcwd()
+
+    def is_hub(self) -> bool:
+        """Returns True if JupyterLab is running in a 'hub' environment, false otherwise"""
+        # There may be a better way to ensure this is a hub environment. It may be possible
+        # that the server admin is running without users and hub tokens are disabled, and this
+        # could possibly return a false negative, although that should be unlikely.
+        return os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token()
 
     def get_oauthenticator_data(self) -> dict:
             # Fetch any info set by the Globus Juptyterhub OAuthenticator
