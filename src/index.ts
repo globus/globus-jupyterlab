@@ -1,9 +1,6 @@
 import { buildIcon, reactIcon } from '@jupyterlab/ui-components';
-import {ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin} from '@jupyterlab/application';
-import {GlobusHome} from "./globus/home";
-import {IDocumentManager} from '@jupyterlab/docmanager';
+import {JupyterFrontEnd, JupyterFrontEndPlugin} from '@jupyterlab/application';
 import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
-import {GlobusWidgetManager} from "./globus/widget_manager";
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { PageConfig } from '@jupyterlab/coreutils';
 
@@ -71,11 +68,11 @@ const addJupyterCommands = (app: JupyterFrontEnd, factory: IFileBrowserFactory, 
 export const globus: JupyterFrontEndPlugin<void> = {
     id: '@jupyterlab/globus_jupyterlab',
     autoStart: true,
-    requires: [IDocumentManager, ILayoutRestorer, IFileBrowserFactory],
+    requires: [IFileBrowserFactory],
     activate: activateGlobus
 };
 
-async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, restorer: ILayoutRestorer, factory: IFileBrowserFactory) {
+async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory) {
     // Writes and executes a command inside of the default terminal in JupyterLab.
     // console.log(app.info);
     // app.serviceManager.terminals.startNew().then(session => {
@@ -83,12 +80,6 @@ async function activateGlobus(app: JupyterFrontEnd, manager: IDocumentManager, r
     //     session.send({ type: 'stdin', content: [request]});
     // });
     console.log('Globus Jupyterlab Extension Activated!');
-
-
-    let widgetManager: GlobusWidgetManager = new GlobusWidgetManager(app, manager, factory);
-    let home: GlobusHome = new GlobusHome(widgetManager);
-    restorer.add(home, 'globus-home');
-    app.shell.add(home, 'left');
 
     console.log('JupyterLab extension server-extension-example is activated!');
 
