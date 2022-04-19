@@ -10,5 +10,3 @@ With pip installed, you can do the following:
 .. code-block:: bash
 
    pip install globus-jupyterlab
-
-   

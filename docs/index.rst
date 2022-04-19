@@ -21,6 +21,7 @@ in a hub environment (Link, zero 2 JupyterHub).
    installation
    gcp
    jupyterhub
+   customized_transfer
    settings
 
 
