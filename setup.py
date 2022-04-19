@@ -48,6 +48,7 @@ version = (
 requirements = [
         "jupyter_server>=1.6,<2",
         "globus_sdk>=3>4",
+        "pydantic>=1.9",
 ]
 
 setup_args = dict(
