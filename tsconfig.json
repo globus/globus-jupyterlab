@@ -1,16 +1,24 @@
 {
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "composite": false,
     "declaration": true,
-    "noImplicitAny": false,
     "esModuleInterop": true,
+    "incremental": true,
     "jsx": "react",
-    "noEmitOnError": true,
-    "noUnusedLocals": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es6",
-    "outDir": "./lib",
-    "lib": ["es6", "es2018.promise", "dom"],
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "preserveWatchOutput": true,
+    "resolveJsonModule": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": false,
+    "strictNullChecks": false,
+    "target": "es2017",
+    "types": []
   },
-  "include": ["src/*"]
+  "include": ["src/*", "tsconfig.spec.json"]
 }

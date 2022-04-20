@@ -20,7 +20,7 @@ ensured_targets = [
     str(lab_path / "static/style.js")
 ]
 
-labext_name = "@globus/jupyterlab"
+labext_name = "globus_jupyterlab"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path.relative_to(HERE)), "**"),
@@ -48,6 +48,7 @@ version = (
 requirements = [
         "jupyter_server>=1.6,<2",
         "globus_sdk>=3>4",
+        "pydantic>=1.9",
 ]
 
 setup_args = dict(
@@ -55,7 +56,6 @@ setup_args = dict(
     version=version,
     url=pkg_json["homepage"],
     author=pkg_json["author"]["name"],
-    author_email=pkg_json["author"]["email"],
     description=pkg_json["description"],
     license=pkg_json["license"],
     license_file="LICENSE",
