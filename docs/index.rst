@@ -12,7 +12,7 @@ starting transfers just a few clicks away!
 
 The extension is installable via pip and is suitable for both local environments such
 as a workmachine or laptop, or alternatively on top of a Single User Server when running
-in a hub environment (Link, zero 2 JupyterHub). 
+in a hub environment like `Zero-to-Jupyterhub <https://zero-to-jupyterhub.readthedocs.io/en/latest/>`_
 
 .. toctree::
    :maxdepth: 2
@@ -21,8 +21,7 @@ in a hub environment (Link, zero 2 JupyterHub).
    installation
    gcp
    jupyterhub
-   customized_transfer
-   settings
+   config
 
 
 
