@@ -4,6 +4,7 @@ import urllib
 import tornado
 import globus_sdk
 import pydantic
+import requests
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.models import TransferModel
 
@@ -116,29 +117,61 @@ class SubmitTransfer(BaseAPIHandler):
         """
         Attempt to submit a transfer with tokens previously loaded by a user.
         """
+        self.log.error('RECEIVED POST REQUEST!')
         response = dict()
         if self.login_manager.is_logged_in() is not True:
             self.set_status(401)
             return self.finish(json.dumps({'error': 'The user is not logged in'}))
         try:
             post_data = json.loads(self.request.body)
+            self.log.debug('Checking transfer document')
             tm = TransferModel(**post_data)
+            if self.gconfig.get_transfer_submission_url():
+                response = self.submit_custom_transfer(tm)
+            else:
+                response = self.submit_normal_transfer(tm)
 
-            authorizer = self.login_manager.get_authorizer(
-                'transfer.api.globus.org')
-            tc = globus_sdk.TransferClient(authorizer=authorizer)
-
-            td = globus_sdk.TransferData(
-                tc, tm.source_endpoint, tm.destination_endpoint)
-            for transfer_item in tm.transfer_items:
-                td.add_item(transfer_item.source_path,
-                            transfer_item.destination_path,
-                            recursive=transfer_item.recursive)
-            response = tc.submit_transfer(td)
             return self.finish(json.dumps(response.data))
         except pydantic.ValidationError as ve:
             self.set_status(400)
+            self.log.debug('Transfer doc failed validation', exc_info=True)
             return self.finish(json.dumps({'error': 'Invalid Input', 'details': ve.json()}))
+
+    def submit_custom_transfer(self, transfer_data: TransferModel):
+        url = self.gconfig.get_transfer_submission_url()
+        scope = self.gconfig.get_transfer_submission_scope()
+        try:
+            token = self.login_manager.get_token_by_scope(scope)
+            headers = {'Authorization': f'Bearer {token}'}
+            document = {
+                'globus_token': None,
+                'transfer': transfer_data.dict()
+            }
+            self.log.info(f'Submitting transfer request to custom location {url}')
+            result = requests.post(url, headers=headers, json=document)
+            result.raise_for_status()
+            self.set_status(result.status_code)
+            data = result.json()
+            if 'task_id' not in data:
+                self.log.error(f'Response from {url} did not return a task ID!')
+            data['task_id'] = None
+            self.finish(json.dumps({'error': 'Unauthorized', 'details': ve.json()}))
+        except ValueError as ve:
+            self.log.debug('Unable to load token', exc_info=True)
+            return self.finish(json.dumps({'error': 'Unauthorized', 'details': ve.json()}))
+
+    def submit_normal_transfer(self, transfer_data: TransferModel):
+        authorizer = self.login_manager.get_authorizer(
+            'transfer.api.globus.org')
+        tc = globus_sdk.TransferClient(authorizer=authorizer)
+
+        td = globus_sdk.TransferData(
+            tc, transfer_data.source_endpoint, transfer_data.destination_endpoint)
+        for transfer_item in transfer_data.DATA:
+            td.add_item(transfer_item.source_path,
+                        transfer_item.destination_path,
+                        recursive=transfer_item.recursive)
+        return tc.submit_transfer(td)
 
 
 class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):

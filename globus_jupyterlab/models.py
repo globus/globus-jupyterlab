@@ -11,7 +11,7 @@ class TransferItemsModel(BaseModel):
 class TransferModel(BaseModel):
     source_endpoint: str
     destination_endpoint: str
-    transfer_items: List[TransferItemsModel]
+    DATA: List[TransferItemsModel]
 
 
 class StatusEnum(str, Enum):

@@ -120,7 +120,7 @@ class Login(PKCEFlowManager):
         client.oauth2_start_flow(
             redirect_uri=self.get_redirect_uri(),
             verifier=verifier,
-            requested_scopes=self.get_query_argument('requested_scopes', self.gconfig.get_transfer_submission_scope()),
+            requested_scopes=self.get_query_argument('requested_scopes', self.gconfig.get_scopes()),
             refresh_tokens=self.gconfig.get_refresh_tokens(),
             prefill_named_grant=self.gconfig.get_named_grant(),
         )

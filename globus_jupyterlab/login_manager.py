@@ -25,6 +25,12 @@ class LoginManager:
     def is_logged_in(self) -> bool:
         return bool(self.storage.get_by_resource_server())
 
+    def get_token_by_scope(self, scope: str) -> str:
+        for token_data in self.storage.get_by_resource_server().values():
+            if token_data['scope'] == scope:
+                return token_data['access_token']
+        raise ValueError(f'No valid token data for scope {scope}')
+
     def get_authorizer(self, resource_server: str) -> Union[globus_sdk.AccessTokenAuthorizer,
                                                             globus_sdk.RefreshTokenAuthorizer]:
         tokens = self.storage.get_token_data(resource_server)
