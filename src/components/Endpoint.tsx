@@ -153,7 +153,7 @@ const Endpoint = (props) => {
       destination_endpoint: destinationEndpoint,
       DATA: transferItems,
     };
-
+    console.log(transferRequest)
     try {
       const reply = await requestAPI<any>('submit_transfer', {
         body: JSON.stringify(transferRequest),
@@ -162,7 +162,7 @@ const Endpoint = (props) => {
       console.log(reply);
     } catch (reason) {
       console.error(
-        `Error on POST /jlab-ext-example/hello ${transferRequest}.\n${reason}`
+        `Error on POST /globus-jupyterlab/submit_transfer ${transferRequest}.\n${reason}`
       );
     }
   };
