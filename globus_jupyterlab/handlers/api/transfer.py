@@ -4,6 +4,8 @@ import urllib
 import tornado
 import globus_sdk
 import pydantic
+import requests
+from globus_jupyterlab.exc import TokenStorageError
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.models import TransferModel
 
@@ -108,7 +110,7 @@ class EndpointAutoactivate(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     optional_args = {}
 
 
-class SubmitTransfer(BaseAPIHandler):
+class SubmitTransfer(GCSAuthMixin, BaseAPIHandler):
     """An API Endpoint for submitting Globus Transfers."""
 
     @tornado.web.authenticated
@@ -122,23 +124,73 @@ class SubmitTransfer(BaseAPIHandler):
             return self.finish(json.dumps({'error': 'The user is not logged in'}))
         try:
             post_data = json.loads(self.request.body)
+            self.log.debug('Checking transfer document')
             tm = TransferModel(**post_data)
+            if self.gconfig.get_transfer_submission_url():
+                response = self.submit_custom_transfer(tm)
+            else:
+                response = self.submit_normal_transfer(tm)
 
-            authorizer = self.login_manager.get_authorizer(
-                'transfer.api.globus.org')
-            tc = globus_sdk.TransferClient(authorizer=authorizer)
-
-            td = globus_sdk.TransferData(
-                tc, tm.source_endpoint, tm.destination_endpoint)
-            for transfer_item in tm.transfer_items:
-                td.add_item(transfer_item.source_path,
-                            transfer_item.destination_path,
-                            recursive=transfer_item.recursive)
-            response = tc.submit_transfer(td)
-            return self.finish(json.dumps(response.data))
+            return self.finish(json.dumps(response))
         except pydantic.ValidationError as ve:
             self.set_status(400)
+            self.log.debug('Transfer doc failed validation', exc_info=True)
             return self.finish(json.dumps({'error': 'Invalid Input', 'details': ve.json()}))
+        except globus_sdk.GlobusAPIError as gapie:
+            self.set_status(gapie.http_status)
+            response = {'error': gapie.code, 'details': gapie.message}
+            if gapie.http_status in [401, 403]:
+                login_url = self.reverse_url('login')
+                params = urllib.parse.urlencode({'requested_scopes': self.get_requested_scopes()})
+                response['login_url'] = f'{login_url}?{params}'
+            return self.finish(json.dumps(response))
+
+    def submit_custom_transfer(self, transfer_data: TransferModel):
+        url = self.gconfig.get_transfer_submission_url()
+        scope = self.gconfig.get_transfer_submission_scope()
+        try:
+            globus_token = self.login_manager.get_token_by_scope(scope)
+            if self.gconfig.get_transfer_submission_is_hub_service() is True:
+                self.log.debug('Using hub token to authorize transfer submission request. This is '
+                               'due to setting GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE')
+                auth_token = self.gconfig.get_hub_token()
+                post_data_token = globus_token
+            else:
+                auth_token = globus_token
+                post_data_token = None
+
+            headers = {'Authorization': f'Bearer {auth_token}'}
+            document = {
+                'globus_token': post_data_token,
+                'transfer': transfer_data.dict()
+            }
+            self.log.info(f'Submitting transfer request to custom location {url} '
+                           'Using Scope {scope}')
+            result = requests.post(url, headers=headers, json=document)
+            result.raise_for_status()
+            self.set_status(result.status_code)
+            data = result.json()
+            if 'task_id' not in data:
+                self.log.error(f'Response from {url} did not return a task ID!')
+            data['task_id'] = None
+            return data
+        except requests.exceptions.HTTPError as http_error:
+            self.set_status(503)
+            self.log.error(f'Request failed with error code: {http_error.response.status_code}', exc_info=True)
+            return {'error': 'Transfer Failed', 'details': str(http_error)}
+
+    def submit_normal_transfer(self, transfer_data: TransferModel):
+        authorizer = self.login_manager.get_authorizer(
+            'transfer.api.globus.org')
+        tc = globus_sdk.TransferClient(authorizer=authorizer)
+
+        td = globus_sdk.TransferData(
+            tc, transfer_data.source_endpoint, transfer_data.destination_endpoint)
+        for transfer_item in transfer_data.DATA:
+            td.add_item(transfer_item.source_path,
+                        transfer_item.destination_path,
+                        recursive=transfer_item.recursive)
+        return tc.submit_transfer(td).data
 
 
 class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):

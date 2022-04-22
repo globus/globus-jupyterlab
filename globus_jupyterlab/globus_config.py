@@ -44,6 +44,30 @@ class GlobusConfig():
     def get_transfer_submission_url(self) -> str:
         return os.getenv('GLOBUS_TRANSFER_SUBMISSION_URL', None)
 
+    def get_transfer_submission_is_hub_service(self) -> str:
+        """
+        Defines how Jupyterlab should authorize with the custom submission service. If
+        the Globus Resource Server is embedded inside a hub service, set this to 'true'
+        in order to use the 'hub' token for authorization with the hub (Hub token will
+        be passed in the header under Authorization). The Globus token will be passed 
+        instead in POST data.
+
+        If false, submission will not use the hub token, and assume the remote service
+        is a normal Globus resource server, and pass the token in the header under
+        the name "Authorization".
+
+        Configurable via evironment variable: GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE
+
+        .. code-block::
+
+        Acceptable values:
+
+        * ‘true’ – use refresh tokens
+        * ‘false’ – do not use refresh tokens
+        """
+        val = os.getenv('GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE', None)
+        return True if val == 'true' else False
+
     def get_named_grant(self) -> str:
         return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')
 
