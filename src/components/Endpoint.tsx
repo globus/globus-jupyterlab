@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { requestAPI } from '../handler';
 
 import { ConfigAtom } from './GlobusObjects';
 
@@ -107,7 +108,7 @@ const Endpoint = (props) => {
     setTransferDirection(event.currentTarget.value);
   };
 
-  const handleTransferRequest = (event) => {
+  const handleTransferRequest = async (event) => {
     event.preventDefault();
     var transferItems = [];
 
@@ -148,11 +149,22 @@ const Endpoint = (props) => {
     }
 
     let transferRequest = {
-      sourceEndpoint: sourceEndpoint,
-      destinationEndpoint: destinationEndpoint,
-      transfer_items: transferItems,
+      source_endpoint: sourceEndpoint,
+      destination_endpoint: destinationEndpoint,
+      DATA: transferItems,
     };
-    console.log(transferRequest);
+    console.log(transferRequest)
+    try {
+      const reply = await requestAPI<any>('submit_transfer', {
+        body: JSON.stringify(transferRequest),
+        method: 'POST',
+      });
+      console.log(reply);
+    } catch (reason) {
+      console.error(
+        `Error on POST /globus-jupyterlab/submit_transfer ${transferRequest}.\n${reason}`
+      );
+    }
   };
 
   if (apiError) {

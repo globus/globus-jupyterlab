@@ -1,0 +1,15 @@
+{
+  "title": "Globus Jupyterlab Transfer",
+  "description": "Transfer to and from Globus Collections",
+  "jupyter.lab.menus": {
+    "context": [
+      {
+        "command": "globus-jupyterlab-transfer/context-menu:open",
+        "selector": ".jp-DirListing-item",
+        "rank": 0
+      }
+    ]
+  },
+  "additionalProperties": false,
+  "type": "object"
+}
