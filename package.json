@@ -1,6 +1,6 @@
 {
     "name": "globus_jupyterlab",
-    "version": "1.0.0-alpha.1",
+    "version": "1.0.0-alpha.2",
     "description": "JupyterLab extension that incorporates Globus functionality",
     "keywords": [
         "jupyter",
