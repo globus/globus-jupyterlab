@@ -89,7 +89,7 @@ class GlobusConfig():
             )
         return custom_scope
 
-      def get_transfer_submission_is_hub_service(self) -> str:
+    def get_transfer_submission_is_hub_service(self) -> str:
         """
         Defines how Jupyterlab should authorize with the custom submission service. If
         the Globus Resource Server is embedded inside a hub service, set this to 'true'
