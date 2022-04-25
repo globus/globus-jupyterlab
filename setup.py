@@ -45,11 +45,14 @@ version = (
     .replace("-rc.", "rc")
 )
 
-requirements = [
-        "jupyter_server>=1.6,<2",
-        "globus_sdk>=3>4",
-        "pydantic>=1.9",
-]
+install_requires = []
+with open('requirements.txt') as reqs:
+    for line in reqs.readlines():
+        req = line.strip()
+        if not req or req.startswith('#'):
+            continue
+        install_requires.append(req)
+
 
 setup_args = dict(
     name=name,
@@ -62,8 +65,8 @@ setup_args = dict(
     long_description=long_description,
     long_description_content_type="text/x-rst",
     packages=setuptools.find_packages(),
-    install_requires=requirements,
-    tests_require=requirements + [
+    install_requires=install_requires,
+    tests_require=install_requires + [
         'pytest',
         'pytest-tornado',
     ],
