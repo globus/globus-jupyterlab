@@ -7,7 +7,6 @@ node_modules/
 .idea/
 *.tsbuildinfo
 .DS_Store
-*.lock
 __pycache__
 
 # Ensure embedme does not run ont node_modules README.md files.
@@ -17,5 +16,3 @@ labextension
 **/test-results/
 
 package-lock.json
-yarn.lock
-
