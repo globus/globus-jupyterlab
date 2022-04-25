@@ -1,5 +1,4 @@
 Globus Connect Personal
 =======================
 
-Globus Jupyterlab will automatically detect a local GCP install and requires
-no intervention. 
+Users can transfer to or from any accessible Globus endpoint or collection.  As a convenience, Globus JupyterLab will automatically detect a local, running Globus Connect Personal endpoint.  Globus Connect Personal may be downloaded from the Globus web application.  https://app.globus.org/file-manager/gcp
