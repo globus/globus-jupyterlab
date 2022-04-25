@@ -25,7 +25,7 @@ Install with the following:
 
     pip install globus-jupyterlab
 
-For information on usage, see the `Read-The-Docs <https://globus-jupyterlab.readthedocs.io/en/docs/#>`_.
+For information on usage, see the `Read-The-Docs <https://globus-jupyterlab.readthedocs.io/en/main/#>`_.
 
 Developing
 ----------
