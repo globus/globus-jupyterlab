@@ -1,5 +1,6 @@
 include LICENSE
 include README.md
+include requirements.txt
 include pyproject.toml
 include jupyter-config/globus_jupyterlab.json
 
