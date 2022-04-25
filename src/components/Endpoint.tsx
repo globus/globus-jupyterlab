@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { requestAPI } from '../handler';
 import { useHistory, useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { requestAPI } from '../handler';
 
 import { ConfigAtom } from './GlobusObjects';
 
