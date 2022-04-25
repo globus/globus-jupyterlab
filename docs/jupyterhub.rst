@@ -23,7 +23,7 @@ a transfer such as setting ACLs.
 
    export GLOBUS_TRANSFER_SUBMISSION_URL='https://myservice/submit-transfer'
    export GLOBUS_TRANSFER_SUBMISSION_SCOPE='my_custom_globus_scope'
-   export GLOBUS_TRANSFER_SUBMISSION_URL_USES_HUB_AUTH=true
+   export GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE=true
 
 With these settings configured, Jupyterlab will behave slightly differently during runtime.
 The configured scope above will be requested on first login in addition to the original transfer
