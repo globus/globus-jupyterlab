@@ -172,7 +172,7 @@ const Endpoint = (props) => {
     let transferRequest = {
       source_endpoint: sourceEndpoint,
       destination_endpoint: destinationEndpoint,
-      transfer_items: transferItems,
+      DATA: transferItems,
     };
 
     try {
