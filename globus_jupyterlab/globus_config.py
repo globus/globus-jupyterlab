@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 class GlobusConfig():
     """
-    Track all Globus Related information related to the Globus Jupyterlab
+    Track all Globus Related information related to the Globus JupyterLab
     server extension. Many settings can be re-configured via environment
     variables where JupyterLab is being run. For example: 
 
@@ -28,7 +28,7 @@ class GlobusConfig():
 
     def get_refresh_tokens(self) -> bool:
         """
-        Should Jupyterlab use Refresh tokens? Default is False. When True,
+        Should JupyterLab use Refresh tokens? Default is False. When True,
         JupyterLab will automatically refresh access tokens, eliminating the
         need for additional user authentications to refresh tokens.
 
@@ -91,7 +91,7 @@ class GlobusConfig():
 
     def get_transfer_submission_is_hub_service(self) -> str:
         """
-        Defines how Jupyterlab should authorize with the custom submission service. If
+        Defines how JupyterLab should authorize with the custom submission service. If
         the Globus Resource Server is embedded inside a hub service, set this to 'true'
         in order to use the 'hub' token for authorization with the hub (Hub token will
         be passed in the header under Authorization). The Globus token will be passed 
@@ -128,7 +128,7 @@ class GlobusConfig():
 
     def get_client_id(self) -> str:
         """
-        Defines the Client ID Globus Jupyterlab will use. This can be swapped
+        Defines the Client ID Globus JupyterLab will use. This can be swapped
         out with a custom Globus Native App client ID if desired.
 
         Do not use a JupyterHub Client ID or other non-native app credentials,
@@ -149,7 +149,7 @@ class GlobusConfig():
         redirect url for manually copy-pasting a code to finish login.
 
         In a non-"hub" environment, the redirect URL is automatically determined
-        based on the Globus Jupyterlab callback handler. Usually:
+        based on the Globus JupyterLab callback handler. Usually:
         http://localhost:8888/lab/globus-jupyterlab/oauth_callback
         The 'auth code' is automatically copied for the user during login.
 
