@@ -1,9 +1,14 @@
 JupyterHub
 ==========
 
-For the most part, running JupyterLab in a hub environment is the same as running
-locally on a workstation. However, GCS Collections cannot automatically be determined
-like they can on Globus Connect Personal. Custom collections will need to be speficied
+For the most part, running JupyterLab in a Hub environment is the same as running JupyterLab
+locally on a workstation. 
+
+Users can transfer to or from any accessible Globus endpoint or collection. As a convenience, 
+Globus JupyterLab will automatically detect a local, running Globus Connect Personal endpoint. 
+Globus Connect Personal may be downloaded from the Globus web application. https://app.globus.org/file-manager/gcp
+
+Globus Connect Server collections cannot be determined automatically.  These collections will need to be speficied
 manually.
 
 .. code-block:: bash
@@ -14,10 +19,10 @@ manually.
 Customized Transfer Submissions
 -------------------------------
 
-By default, JupyterLab will talk directly to Globus Transfer for submitting transfers.
-This behavior is customizable if desired, such that JupyterLab can submit to a third-party
-Globus Resource Server instead. This is useful when work needs to be done before or after
-a transfer such as setting ACLs. 
+By default, JupyterLab submits transfer requests directly to Globus Transfer.
+This behavior is customizable such that JupyterLab submits to a third-party
+Globus Resource Server instead. This is useful when a third-party app needs to
+submit the transfer request to Globus Transfer. 
 
 .. code-block:: bash
 
@@ -25,9 +30,8 @@ a transfer such as setting ACLs.
    export GLOBUS_TRANSFER_SUBMISSION_SCOPE='my_custom_globus_scope'
    export GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE=true
 
-With these settings configured, Jupyterlab will behave slightly differently during runtime.
-The configured scope above will be requested on first login in addition to the original transfer
-scope. When a user requests a transfer, the custom ``URL`` above will be used instead of transfer,
+With these settings configured, Jupyterlab will request the configured scope above on first login, in addition to the original transfer
+scope. When a user requests a transfer, the request will be submitted to the custom ``URL`` above instead of to Globus Transfer,
 with the following request:
 
 .. code-block:: javascript
