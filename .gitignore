@@ -16,3 +16,6 @@ static
 labextension
 **/test-results/
 
+package-lock.json
+yarn.lock
+
