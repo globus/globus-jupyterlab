@@ -34,7 +34,7 @@ data_files_spec = [
 
 
 
-long_description = (HERE / "README.md").read_text()
+long_description = (HERE / "README.rst").read_text()
 
 # Get the package info from package.json
 pkg_json = json.loads((HERE / "package.json").read_bytes())
@@ -60,7 +60,7 @@ setup_args = dict(
     license=pkg_json["license"],
     license_file="LICENSE",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     packages=setuptools.find_packages(),
     install_requires=requirements,
     tests_require=requirements + [
