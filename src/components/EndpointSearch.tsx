@@ -17,27 +17,30 @@ const EndpointSearch = (props) => {
     setEndpointValue(event.target.value);
   };
 
-  const handleSearchEndpointClick = async (event) => {
-    setAPIError(null);
-    setEndpoints({ DATA: [] });
-    setLoading(true);
-    try {
-      let response = await fetch(`/globus-jupyterlab/endpoint_search?filter_fulltext=${endpointValue}`, {
-        headers: {
-          Allow: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      let endpoints = await response.json();
-      if ('error' in endpoints) {
-        throw endpoints;
+  const handleSearchEndpoints = async (event) => {
+    let keyCode = event.keyCode;
+    if (keyCode == 13) {
+      setAPIError(null);
+      setEndpoints({ DATA: [] });
+      setLoading(true);
+      try {
+        let response = await fetch(`/globus-jupyterlab/endpoint_search?filter_fulltext=${endpointValue}`, {
+          headers: {
+            Allow: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        let endpoints = await response.json();
+        if ('error' in endpoints) {
+          throw endpoints;
+        }
+        setEndpoints(endpoints);
+        setLoading(false);
+        history.push('/endpoints');
+      } catch (error: any) {
+        setLoading(false);
+        setAPIError(error);
       }
-      setEndpoints(endpoints);
-      setLoading(false);
-      history.push('/endpoints');
-    } catch (error: any) {
-      setLoading(false);
-      setAPIError(error);
     }
   };
 
@@ -58,15 +61,12 @@ const EndpointSearch = (props) => {
           <input
             id='endpoint-input'
             className='form-control'
+            placeholder='Start typing and press enter to search'
             type='text'
             value={endpointValue}
             onChange={handleEndpointValueChange}
+            onKeyDown={handleSearchEndpoints}
           />
-        </div>
-        <div className='col'>
-          <button className='btn btn-primary' onClick={handleSearchEndpointClick}>
-            Search Collections
-          </button>
         </div>
       </div>
 

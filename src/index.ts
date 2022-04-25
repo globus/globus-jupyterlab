@@ -1,21 +1,21 @@
-import { buildIcon, reactIcon } from '@jupyterlab/ui-components';
-import {JupyterFrontEnd, JupyterFrontEndPlugin} from '@jupyterlab/application';
-import {IFileBrowserFactory} from "@jupyterlab/filebrowser";
+import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
+import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
 import { MainAreaWidget } from '@jupyterlab/apputils';
 import { PageConfig } from '@jupyterlab/coreutils';
+import { reactIcon } from '@jupyterlab/ui-components';
 
+import { GlobusIcon } from './utilities';
 import { GlobusWidget } from './widget';
 import { requestAPI } from './handler';
 
 import '../style/index.css';
-
 
 const addJupyterCommands = (app: JupyterFrontEnd, factory: IFileBrowserFactory, commands: Array<any>) => {
   for (let command of commands) {
     app.commands.addCommand(command.command, {
       label: command.label,
       caption: command.caption,
-      icon: buildIcon,
+      icon: GlobusIcon,
       execute: async () => {
         var files = factory.tracker.currentWidget.selectedItems();
         var jupyterToken = PageConfig.getToken();

@@ -11,6 +11,7 @@ const Endpoints = (props) => {
             {props.endpoints['DATA'].map((endpoint) => {
               return (
                 <Link
+                  key={endpoint.id}
                   to={`/endpoints/${endpoint.id}`}
                   className='list-group-item list-group-item-action flex-column align-items-start'>
                   <h5 className='mb-1'>

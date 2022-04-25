@@ -27,3 +27,5 @@
     background-image: var(--jp-Globus-image-logo-dark);
     background-repeat: no-repeat;
 }
+
+.jp-ReactWidget { overflow: scroll !important; }

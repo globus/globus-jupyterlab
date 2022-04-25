@@ -145,9 +145,7 @@ class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):
     """An API Endpoint doing a Globus LS"""
     globus_sdk_method = 'operation_ls'
     mandatory_args = ['endpoint']
-    optional_args = {
-        'path': None
-    }
+    optional_args = {'path': None}
 
 
 class EndpointSearch(GCSAuthMixin, GetMethodTransferAPIEndpoint):
