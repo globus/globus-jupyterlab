@@ -55,7 +55,7 @@ const addJupyterCommands = (app: JupyterFrontEnd, factory: IFileBrowserFactory, 
               clearInterval(authInterval);
             }
           }, 500);
-          window.open('/globus-jupyterlab/login', '_blank');
+          window.open('/globus-jupyterlab/login', 'Globus Login', 'height=600,width=800').focus();
         }
       },
     });
