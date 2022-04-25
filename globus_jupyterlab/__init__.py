@@ -1,13 +1,19 @@
 import json
+import logging
 from pathlib import Path
 
 from .handlers import setup_handlers
 from ._version import __version__
 
+log = logging.getLogger()
+
 HERE = Path(__file__).parent.resolve()
 
-with (HERE / "labextension" / "package.json").open() as fid:
-    data = json.load(fid)
+try:
+    with (HERE / "labextension" / "package.json").open() as fid:
+        data = json.load(fid)
+except FileNotFoundError:
+    log.critical(f"Could not resolve package.json!", exc_info=True)
 
 
 def _jupyter_labextension_paths():
@@ -28,7 +34,7 @@ def _load_jupyter_server_extension(server_app):
     url_path = "globus-jupyterlab"
     setup_handlers(server_app.web_app, url_path)
     server_app.log.info(
-        f"Registered jlab_ext_example extension at URL path /{url_path}"
+        f"Registered globus-jupyterlab extension at URL path /{url_path}"
     )
 
 # For backward compatibility with the classical notebook
