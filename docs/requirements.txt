@@ -1,0 +1,7 @@
+sphinx
+sphinx-rtd-theme
+
+jupyter-server
+globus-sdk
+pydantic
+notebook
