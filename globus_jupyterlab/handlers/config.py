@@ -12,11 +12,14 @@ class Config(BaseAPIHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         
+        copy_required = self.gconfig.get_redirect_uri() == self.gconfig.globus_auth_code_redirect_url
         data = {
+            # TODO: Make these configurable
             'collection_id': self.gconfig.get_local_globus_collection(),
             'collection_base_path': self.gconfig.get_collection_base_path(),
             'is_gcp': self.gconfig.is_gcp(),
             'is_hub': self.gconfig.is_hub(),
+            'is_manual_copy_code_required': copy_required,
             'is_logged_in': self.login_manager.is_logged_in(),
             'collection_id_owner': self.gconfig.get_collection_id_owner(),
         }

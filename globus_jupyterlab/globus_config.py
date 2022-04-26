@@ -25,6 +25,7 @@ class GlobusConfig():
     base_scopes = [
         TransferScopes.all
     ]
+    globus_auth_code_redirect_url = 'https://auth.globus.org/v2/web/auth-code'
 
     def get_refresh_tokens(self) -> bool:
         """
@@ -162,7 +163,10 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_REDIRECT_URIS
         """
-        return os.getenv('GLOBUS_REDIRECT_URI', None)
+        redirect = os.getenv('GLOBUS_REDIRECT_URI', None)
+        if redirect is None and self.is_hub():
+            redirect = self.globus_auth_code_redirect_url
+        return redirect
 
     def is_gcp(self) -> str:
         return bool(self.get_gcp_collection())
