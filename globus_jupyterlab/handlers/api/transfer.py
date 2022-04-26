@@ -35,6 +35,11 @@ class GCSAuthMixin(BaseAPIHandler):
 
         return ' '.join(requested_scopes)
 
+    def get_login_url(self):
+        login_url = self.reverse_url('login')
+        params = urllib.parse.urlencode({'requested_scopes': self.get_requested_scopes()})
+        return f'{login_url}?{params}'
+
 
 class GlobusSDKWrapper(BaseAPIHandler):
 
@@ -65,9 +70,7 @@ class GlobusSDKWrapper(BaseAPIHandler):
             self.set_status(gapie.http_status)
             response = {'error': gapie.code, 'details': gapie.message}
             if gapie.http_status in [401, 403]:
-                login_url = self.reverse_url('login')
-                params = urllib.parse.urlencode({'requested_scopes': self.get_requested_scopes()})
-                response['login_url'] = f'{login_url}?{params}'
+                response['login_url'] = self.get_login_url()
             return self.finish(json.dumps(response))
 
 
@@ -140,9 +143,7 @@ class SubmitTransfer(GCSAuthMixin, BaseAPIHandler):
             self.set_status(gapie.http_status)
             response = {'error': gapie.code, 'details': gapie.message}
             if gapie.http_status in [401, 403]:
-                login_url = self.reverse_url('login')
-                params = urllib.parse.urlencode({'requested_scopes': self.get_requested_scopes()})
-                response['login_url'] = f'{login_url}?{params}'
+                response['login_url'] = self.get_login_url()
             return self.finish(json.dumps(response))
 
     def submit_custom_transfer(self, transfer_data: TransferModel):
