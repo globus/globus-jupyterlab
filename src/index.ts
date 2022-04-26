@@ -4,7 +4,7 @@ import { MainAreaWidget } from '@jupyterlab/apputils';
 import { PageConfig } from '@jupyterlab/coreutils';
 import { reactIcon } from '@jupyterlab/ui-components';
 
-import { GlobusIcon } from './utilities';
+import { getBaseURL, GlobusIcon } from './utilities';
 import { GlobusWidget } from './widget';
 import { requestAPI } from './handler';
 
@@ -55,7 +55,7 @@ const addJupyterCommands = (app: JupyterFrontEnd, factory: IFileBrowserFactory, 
               clearInterval(authInterval);
             }
           }, 500);
-          window.open('/globus-jupyterlab/login', 'Globus Login', 'height=600,width=800').focus();
+          window.open(getBaseURL('globus-jupyterlab/login'), 'Globus Login', 'height=600,width=800').focus();
         }
       },
     });

@@ -1,4 +1,16 @@
 import { LabIcon } from '@jupyterlab/ui-components';
+import { ServerConnection } from '@jupyterlab/services';
+import { URLExt } from '@jupyterlab/coreutils';
+
+export const getBaseURL = (subPath='') => {
+  const settings = ServerConnection.makeSettings();
+  const requestUrl = URLExt.join(
+    settings.baseUrl,
+    subPath,
+  );
+
+  return requestUrl;
+}
 
 export const GlobusIcon = new LabIcon({
     name: 'globusIcon',

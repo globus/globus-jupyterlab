@@ -1,3 +1,4 @@
+import { getBaseURL } from './utilities';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +34,7 @@ const App = (props: any): JSX.Element => {
 
     for (let file of props.jupyterItems) {
       try {
-        let response = await fetch(`/api/contents/${file.path}`, {
+        let response = await fetch(getBaseURL(`api/contents/${file.path}`), {
           headers: {
             Accept: 'application/json',
             Authorization: `token ${props.jupyterToken}`,
