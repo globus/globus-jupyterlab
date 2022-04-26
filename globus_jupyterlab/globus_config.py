@@ -191,7 +191,7 @@ class GlobusConfig():
         # There may be a better way to ensure this is a hub environment. It may be possible
         # that the server admin is running without users and hub tokens are disabled, and this
         # could possibly return a false negative, although that should be unlikely.
-        return os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token()
+        return bool(os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token())
 
     def get_oauthenticator_data(self) -> dict:
             # Fetch any info set by the Globus Juptyterhub OAuthenticator
