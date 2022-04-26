@@ -2,6 +2,7 @@ from typing import List
 from enum import Enum
 from pydantic import BaseModel
 
+
 class TransferItemsModel(BaseModel):
     source_path: str
     destination_path: str
@@ -15,12 +16,12 @@ class TransferModel(BaseModel):
 
 
 class StatusEnum(str, Enum):
-    success = 'success'
-    failure = 'failure'
+    success = "success"
+    failure = "failure"
 
 
 class AuthResponseModel(BaseModel):
     result: StatusEnum = StatusEnum.success
     status_code: int = 200
-    code: str = 'Success'
-    message: str = 'The action completed successfully'
+    code: str = "Success"
+    message: str = "The action completed successfully"

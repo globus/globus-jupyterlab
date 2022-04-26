@@ -10,7 +10,7 @@ from globus_sdk.scopes import TransferScopes
 log = logging.getLogger(__name__)
 
 
-class GlobusConfig():
+class GlobusConfig:
     """
     Track all Globus Related information related to the Globus JupyterLab
     server extension. Many settings can be re-configured via environment
@@ -21,11 +21,10 @@ class GlobusConfig():
         $ export GLOBUS_REFRESH_TOKENS=true
         $ jupyter lab
     """
-    default_client_id = '64d2d5b3-b77e-4e04-86d9-e3f143f563f7'
-    base_scopes = [
-        TransferScopes.all
-    ]
-    globus_auth_code_redirect_url = 'https://auth.globus.org/v2/web/auth-code'
+
+    default_client_id = "64d2d5b3-b77e-4e04-86d9-e3f143f563f7"
+    base_scopes = [TransferScopes.all]
+    globus_auth_code_redirect_url = "https://auth.globus.org/v2/web/auth-code"
 
     def get_refresh_tokens(self) -> bool:
         """
@@ -40,9 +39,9 @@ class GlobusConfig():
           * 'true' -- use refresh tokens
           * 'false' -- do not use refresh tokens
         """
-        refresh_tokens = os.getenv('GLOBUS_REFRESH_TOKENS', False)
-        return True if refresh_tokens == 'true' else False
-    
+        refresh_tokens = os.getenv("GLOBUS_REFRESH_TOKENS", False)
+        return True if refresh_tokens == "true" else False
+
     def get_named_grant(self) -> str:
         """
         Set a custom Named Grant when a user logs into Globus. Changes the pre-filled
@@ -50,7 +49,7 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_NAMED_GRANT
         """
-        return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')
+        return os.getenv("GLOBUS_NAMED_GRANT", "Globus JupyterLab")
 
     def get_scopes(self) -> List[str]:
         scopes = self.base_scopes.copy()
@@ -70,7 +69,7 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_TRANSFER_SUBMISSION_URL
         """
-        return os.getenv('GLOBUS_TRANSFER_SUBMISSION_URL', None)
+        return os.getenv("GLOBUS_TRANSFER_SUBMISSION_URL", None)
 
     def get_transfer_submission_scope(self) -> str:
         """
@@ -82,11 +81,11 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_TRANSFER_SUBMISSION_SCOPE
         """
-        custom_scope = os.getenv('GLOBUS_TRANSFER_SUBMISSION_SCOPE', None)
+        custom_scope = os.getenv("GLOBUS_TRANSFER_SUBMISSION_SCOPE", None)
         if custom_scope and not self.get_transfer_submission_url():
             raise ValueError(
-                'GLOBUS_TRANSFER_SUBMISSION_URL set without a custom scope! Set '
-                'a custom scope with GLOBUS_TRANSFER_SUBMISSION_SCOPE'
+                "GLOBUS_TRANSFER_SUBMISSION_URL set without a custom scope! Set "
+                "a custom scope with GLOBUS_TRANSFER_SUBMISSION_SCOPE"
             )
         return custom_scope
 
@@ -111,11 +110,11 @@ class GlobusConfig():
         * ‘true’ – use refresh tokens
         * ‘false’ – do not use refresh tokens
         """
-        val = os.getenv('GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE', None)
-        return True if val == 'true' else False
+        val = os.getenv("GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", None)
+        return True if val == "true" else False
 
     def get_named_grant(self) -> str:
-        return os.getenv('GLOBUS_NAMED_GRANT', 'Globus JupyterLab')
+        return os.getenv("GLOBUS_NAMED_GRANT", "Globus JupyterLab")
 
     def get_hub_token(self) -> str:
         """
@@ -125,7 +124,7 @@ class GlobusConfig():
 
         Searches for value named: JUPYTERHUB_API_TOKEN
         """
-        return os.getenv('JUPYTERHUB_API_TOKEN', '')
+        return os.getenv("JUPYTERHUB_API_TOKEN", "")
 
     def get_client_id(self) -> str:
         """
@@ -138,7 +137,7 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_CLIENT_ID
         """
-        return os.getenv('GLOBUS_CLIENT_ID', self.default_client_id)
+        return os.getenv("GLOBUS_CLIENT_ID", self.default_client_id)
 
     def get_redirect_uri(self) -> str:
         """
@@ -163,7 +162,7 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_REDIRECT_URIS
         """
-        redirect = os.getenv('GLOBUS_REDIRECT_URI', None)
+        redirect = os.getenv("GLOBUS_REDIRECT_URI", None)
         if redirect is None and self.is_hub():
             redirect = self.globus_auth_code_redirect_url
         return redirect
@@ -182,9 +181,9 @@ class GlobusConfig():
 
     def get_local_globus_collection(self) -> str:
         return (
-            self.get_gcp_collection() or
-            self.get_oauthenticator_data().get('endpoint_id') or
-            None
+            self.get_gcp_collection()
+            or self.get_oauthenticator_data().get("endpoint_id")
+            or None
         )
 
     def get_collection_base_path(self) -> str:
@@ -195,14 +194,14 @@ class GlobusConfig():
         # There may be a better way to ensure this is a hub environment. It may be possible
         # that the server admin is running without users and hub tokens are disabled, and this
         # could possibly return a false negative, although that should be unlikely.
-        return bool(os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token())
+        return bool(os.getenv("JUPYTERHUB_USER", None) and self.get_hub_token())
 
     def get_oauthenticator_data(self) -> dict:
-            # Fetch any info set by the Globus Juptyterhub OAuthenticator
-        oauthonticator_env = os.getenv('GLOBUS_DATA')
+        # Fetch any info set by the Globus Juptyterhub OAuthenticator
+        oauthonticator_env = os.getenv("GLOBUS_DATA")
         if oauthonticator_env:
             try:
                 return pickle.loads(base64.b64decode(oauthonticator_env))
             except pickle.UnpicklingError:
-                log.error('Failed to load GLOBUS_DATA', exc_info=True)
+                log.error("Failed to load GLOBUS_DATA", exc_info=True)
         return dict()

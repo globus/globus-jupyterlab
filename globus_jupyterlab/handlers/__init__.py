@@ -15,8 +15,9 @@ log = logging.getLogger(__name__)
 HANDLER_MODULES = (login, config, api)
 
 
-def get_handlers(modules: List[ModuleType],
-                 base_url: str, url_path: str) -> List[Tuple[str, APIHandler, dict, str]]:
+def get_handlers(
+    modules: List[ModuleType], base_url: str, url_path: str
+) -> List[Tuple[str, APIHandler, dict, str]]:
     """
     Fetch handlers from a list of modules. This style is taken from Jupyterhub,
     which declares `default_handlers` on each of its handler modules and adds
@@ -31,7 +32,7 @@ def get_handlers(modules: List[ModuleType],
         for handler_url, api_handler, kwargs, name in module.default_handlers:
             log.debug((handler_url, api_handler, kwargs, name))
             mounted_url = url_path_join(base_url, url_path, handler_url)
-            log.info(f'Server Extension mounted {mounted_url}')
+            log.info(f"Server Extension mounted {mounted_url}")
             handlers.append(url(mounted_url, api_handler, name=name, **kwargs))
     return handlers
 

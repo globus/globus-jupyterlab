@@ -20,5 +20,5 @@ class RedirectWebHandler(BaseAPIHandler):
         for intentional usage we need to tell Jupyterlab to ignore the source from a third
         party server."""
         # We should look into this to see if we can get more specific, such as by setting
-        # auth.globus.org, or app.globus.org. 
+        # auth.globus.org, or app.globus.org.
         self.set_header("Content-Security-Policy", "*")
