@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 class GlobusConfig():
     """
-    Track all Globus Related information related to the Globus Jupyterlab
+    Track all Globus Related information related to the Globus JupyterLab
     server extension. Many settings can be re-configured via environment
     variables where JupyterLab is being run. For example: 
 
@@ -25,10 +25,11 @@ class GlobusConfig():
     base_scopes = [
         TransferScopes.all
     ]
+    globus_auth_code_redirect_url = 'https://auth.globus.org/v2/web/auth-code'
 
     def get_refresh_tokens(self) -> bool:
         """
-        Should Jupyterlab use Refresh tokens? Default is False. When True,
+        Should JupyterLab use Refresh tokens? Default is False. When True,
         JupyterLab will automatically refresh access tokens, eliminating the
         need for additional user authentications to refresh tokens.
 
@@ -91,7 +92,7 @@ class GlobusConfig():
 
     def get_transfer_submission_is_hub_service(self) -> str:
         """
-        Defines how Jupyterlab should authorize with the custom submission service. If
+        Defines how JupyterLab should authorize with the custom submission service. If
         the Globus Resource Server is embedded inside a hub service, set this to 'true'
         in order to use the 'hub' token for authorization with the hub (Hub token will
         be passed in the header under Authorization). The Globus token will be passed 
@@ -128,7 +129,7 @@ class GlobusConfig():
 
     def get_client_id(self) -> str:
         """
-        Defines the Client ID Globus Jupyterlab will use. This can be swapped
+        Defines the Client ID Globus JupyterLab will use. This can be swapped
         out with a custom Globus Native App client ID if desired.
 
         Do not use a JupyterHub Client ID or other non-native app credentials,
@@ -149,7 +150,7 @@ class GlobusConfig():
         redirect url for manually copy-pasting a code to finish login.
 
         In a non-"hub" environment, the redirect URL is automatically determined
-        based on the Globus Jupyterlab callback handler. Usually:
+        based on the Globus JupyterLab callback handler. Usually:
         http://localhost:8888/lab/globus-jupyterlab/oauth_callback
         The 'auth code' is automatically copied for the user during login.
 
@@ -162,7 +163,10 @@ class GlobusConfig():
 
         Configurable via evironment variable: GLOBUS_REDIRECT_URIS
         """
-        return os.getenv('GLOBUS_REDIRECT_URI', None)
+        redirect = os.getenv('GLOBUS_REDIRECT_URI', None)
+        if redirect is None and self.is_hub():
+            redirect = self.globus_auth_code_redirect_url
+        return redirect
 
     def is_gcp(self) -> str:
         return bool(self.get_gcp_collection())
@@ -191,7 +195,7 @@ class GlobusConfig():
         # There may be a better way to ensure this is a hub environment. It may be possible
         # that the server admin is running without users and hub tokens are disabled, and this
         # could possibly return a false negative, although that should be unlikely.
-        return os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token()
+        return bool(os.getenv('JUPYTERHUB_USER', None) and self.get_hub_token())
 
     def get_oauthenticator_data(self) -> dict:
             # Fetch any info set by the Globus Juptyterhub OAuthenticator

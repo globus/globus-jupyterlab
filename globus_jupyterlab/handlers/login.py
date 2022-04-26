@@ -16,8 +16,6 @@ class PKCEFlowManager(BaseAPIHandler):
     AuthCallback handlers, such as generating/storing/retrieving the PKCE
     verifier and constructing the redirect URL.
     """
-    GLOBUS_AUTH_CODE_REDIRECT_URI = 'https://auth.globus.org/v2/web/auth-code'
-
     @staticmethod
     def generate_verifier():
         return base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8").rstrip("=")
@@ -25,17 +23,14 @@ class PKCEFlowManager(BaseAPIHandler):
     def get_redirect_uri(self):
         redirect_uri = self.gconfig.get_redirect_uri()
         if not redirect_uri:
-            if self.gconfig.is_hub():
-                redirect_uri = self.GLOBUS_AUTH_CODE_REDIRECT_URI
-            else:
-                self.log.info(
-                    'No redirect URI configured, determining automatically...')
-                redirect_uri = urllib.parse.urlunparse((
-                    self.request.protocol,
-                    self.request.host,
-                    self.reverse_url('redirect_uri'),
-                    '', '', ''
-                ))
+            self.log.info(
+                'No redirect URI configured, determining automatically...')
+            redirect_uri = urllib.parse.urlunparse((
+                self.request.protocol,
+                self.request.host,
+                self.reverse_url('redirect_uri'),
+                '', '', ''
+            ))
         self.log.debug(f'Using redirect URI: {redirect_uri}')
         return redirect_uri
 
