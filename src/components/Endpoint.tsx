@@ -21,7 +21,7 @@ const Endpoint = (props) => {
 
   // React Router history and params
   let history = useHistory();
-  let params = useParams();
+  let params: any = useParams();
   let endpointID = params.endpointID;
   let path = params.path;
 
@@ -36,17 +36,7 @@ const Endpoint = (props) => {
 
   const getEndpoint = async (endpointID) => {
     try {
-      let response = await fetch(`/globus-jupyterlab/endpoint_detail?endpoint=${endpointID}`, {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
-      let endpoint = await response.json();
-      if ('error' in endpoint) {
-        throw endpoint;
-      }
+      let endpoint = await requestAPI(`endpoint_detail?endpoint=${endpointID}`);
       setEndpoint(endpoint);
     } catch (error) {
       setAPIError(error);
@@ -58,21 +48,11 @@ const Endpoint = (props) => {
     setEndpointList({ DATA: [], path: null });
     setLoading(true);
     try {
-      let url = `/globus-jupyterlab/operation_ls?endpoint=${endpointID}&show_hidden=0`;
+      let url = `operation_ls?endpoint=${endpointID}&show_hidden=0`;
       if (path) {
         url = `${url}&path=${path}`;
       }
-      const response = await fetch(url, {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const listItems = await response.json();
-      if ('error' in listItems) {
-        throw listItems;
-      }
+      const listItems = await requestAPI<any>(url);
       setEndpointList(listItems);
     } catch (error) {
       /* Note: This probably isn't a great UX to simply pop up a login page, but it
