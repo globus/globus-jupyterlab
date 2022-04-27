@@ -780,11 +780,6 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/history@^4.7.11":
-  "integrity" "sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA=="
-  "resolved" "https://registry.npmjs.org/@types/history/-/history-4.7.11.tgz"
-  "version" "4.7.11"
-
 "@types/jest@^27.4.1":
   "integrity" "sha512-23iPJADSmicDVrWk+HT58LMJtzLAnB2AgIzplQuq/bSrGaxCrlvRFjGbXmamnnk/mAmCdLStiGqggu28ocUyiw=="
   "resolved" "https://registry.npmjs.org/@types/jest/-/jest-27.4.1.tgz"
@@ -824,24 +819,7 @@
 "@types/prop-types@*":
   "version" "15.7.4"
 
-"@types/react-router-dom@^5.3.3":
-  "integrity" "sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw=="
-  "resolved" "https://registry.npmjs.org/@types/react-router-dom/-/react-router-dom-5.3.3.tgz"
-  "version" "5.3.3"
-  dependencies:
-    "@types/history" "^4.7.11"
-    "@types/react" "*"
-    "@types/react-router" "*"
-
-"@types/react-router@*":
-  "integrity" "sha512-YYknwy0D0iOwKQgz9v8nOzt2J6l4gouBmDnWqUUznltOTaon+r8US8ky8HvN0tXvc38U9m6z/t2RsVsnd1zM0g=="
-  "resolved" "https://registry.npmjs.org/@types/react-router/-/react-router-5.1.18.tgz"
-  "version" "5.1.18"
-  dependencies:
-    "@types/history" "^4.7.11"
-    "@types/react" "*"
-
-"@types/react@*", "@types/react@^17.0.0":
+"@types/react@^17.0.0":
   "version" "17.0.38"
   dependencies:
     "@types/prop-types" "*"
