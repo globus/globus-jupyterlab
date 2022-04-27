@@ -21,7 +21,7 @@ const Endpoint = (props) => {
 
   // React Router history and params
   let history = useHistory();
-  let params = useParams();
+  let params: any = useParams();
   let endpointID = params.endpointID;
   let path = params.path;
 
