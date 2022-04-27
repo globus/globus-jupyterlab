@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { requestAPI } from '../handler';
 import { Route, useHistory } from 'react-router-dom';
 
 import Endpoint from './Endpoint';
@@ -24,16 +25,7 @@ const EndpointSearch = (props) => {
       setEndpoints({ DATA: [] });
       setLoading(true);
       try {
-        let response = await fetch(`/globus-jupyterlab/endpoint_search?filter_fulltext=${endpointValue}`, {
-          headers: {
-            Allow: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
-        let endpoints = await response.json();
-        if ('error' in endpoints) {
-          throw endpoints;
-        }
+        let endpoints = await requestAPI<any>(`endpoint_search?filter_fulltext=${endpointValue}`);
         setEndpoints(endpoints);
         setLoading(false);
         history.push('/endpoints');
