@@ -21,6 +21,7 @@ in a JupyterHub environment like `Zero-to-JupyterHub <https://zero-to-jupyterhub
    gcp
    jupyterhub
    config
+   CHANGELOG
 
 
 
