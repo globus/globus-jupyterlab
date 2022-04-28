@@ -170,12 +170,12 @@ const Endpoint = (props) => {
 
   if (apiError) {
     return (
-      <>
-        <button className='btn btn-sm btn-primary mb-4 mt-5' onClick={() => history.goBack()}>
-          Back
-        </button>
-        <p className='fw-bold mt-3 text-danger'>Error: {apiError['error']}. Please try again.</p>
-      </>
+      <div id='api-error' className='alert alert-danger'>
+        <strong>
+          Error {apiError.response.status}: {apiError.response.statusText}.
+        </strong>{' '}
+        Please try again.
+      </div>
     );
   }
 
