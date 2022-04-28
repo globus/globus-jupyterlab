@@ -209,7 +209,11 @@ class GlobusConfig:
         return redirect
 
     def is_gcp(self) -> str:
-        return bool(self.get_gcp_collection())
+        """Returns True if the configured collection is from Globus Connect Personal"""
+        gcp = self.get_gcp_collection()
+        # Ensure the endpoint id is actually GCP. The local collection can be different
+        # if the user manually configured one on the local system
+        return bool(gcp and gcp == self.get_collection_id())
 
     def get_gcp_collection(self) -> str:
         return globus_sdk.LocalGlobusConnectPersonal().endpoint_id
