@@ -14,7 +14,6 @@ const HubLogin = (props) => {
     event.preventDefault();
 
     try {
-      console.log(hubInputCode);
       let response = await requestAPI<any>(`oauth_callback_manual?code=${hubInputCode}`);
       console.log(response);
     } catch (error) {
@@ -22,23 +21,20 @@ const HubLogin = (props) => {
     }
   };
 
-  if (apiError) {
-    return (
-      <>
-        <button className='btn btn-sm btn-primary mb-3 mt-5' onClick={() => window.location.href = '/' }>
-          Back
-        </button>
-        <p className='fw-bold text-danger'>
-          Error {apiError.response.status}: {apiError.response.statusText}. Please try again.
-        </p>
-      </>
-    );
-  }
-
   return (
     <div className='container mt-5'>
       <div className='row'>
         <div className='col-8'>
+
+          {apiError && (
+            <div id='api-error' className='alert alert-danger'>
+              <strong>
+                Error {apiError.response.status}: {apiError.response.statusText}.
+              </strong>{' '}
+              Please try again.
+            </div>
+          )}
+          
           <label htmlFor='code-input' className='form-label'>
             Paste Code and Click Login
           </label>
