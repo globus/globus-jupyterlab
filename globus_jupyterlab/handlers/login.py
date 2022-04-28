@@ -153,7 +153,7 @@ class AuthCallbackManual(PKCEFlowManager):
 
     The 'manual' comes from the user needing to automatically copy and paste
     the code into the JupyterLab environment. The code is copied into JupyterLab,
-    then called in this routine to complete the flow. 
+    then called in this routine to complete the flow.
 
     Direct browser access is not allowed, and will raise a warning in the logs.
     """
@@ -172,7 +172,7 @@ class AuthCallback(RedirectWebHandler, PKCEFlowManager):
 
         'automatic' means Globus Auth was able to redirect directly to this tornado
         backend endpoint to complete the flow, without user intervention. This can
-        only be done for static urls, such as http://localhost:xxxx/globus-jupyterlab/oauth_callback 
+        only be done for static urls, such as http://localhost:xxxx/globus-jupyterlab/oauth_callback
 
         Direct browser access is expected for the final auth redirect.
         """
