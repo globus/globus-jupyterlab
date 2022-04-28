@@ -14,10 +14,10 @@ class GlobusConfig:
     """
     Track all Globus Related information related to the Globus JupyterLab
     server extension. Many settings can be re-configured via environment
-    variables where JupyterLab is being run. For example: 
+    variables where JupyterLab is being run. For example:
 
     .. code-block::
-    
+
         $ export GLOBUS_REFRESH_TOKENS=true
         $ jupyter lab
     """
@@ -33,11 +33,12 @@ class GlobusConfig:
         need for additional user authentications to refresh tokens.
 
         Configurable via evironment variable: GLOBUS_REFRESH_TOKENS
+        Default: false
 
-        Acceptable values:
+        Acceptable env values:
 
-          * 'true' -- use refresh tokens
-          * 'false' -- do not use refresh tokens
+        * 'true' -- use refresh tokens
+        * 'false' -- do not use refresh tokens
         """
         refresh_tokens = os.getenv("GLOBUS_REFRESH_TOKENS", False)
         return True if refresh_tokens == "true" else False
@@ -58,14 +59,56 @@ class GlobusConfig:
             scopes.append(custom_transfer_scope)
         return scopes
 
+    def get_collection_id(self) -> str:
+        """
+        Configure the Globus Collection used by JupyterLab. By default, this will check
+        for collections in the following order:
+
+        * A GLOBUS_COLLECTION_ID environment variable
+        * A local Globus Connect Personal Collection (GCP is installed)
+        * An endpoint ID configured in OAuthenticator
+
+        If a Globus Collection is not found, transfers cannot be submited by JupyterLab.
+
+        Configurable via environment variable: GLOBUS_COLLECTION_ID
+        """
+        env = os.getenv("GLOBUS_COLLECTION_ID", None)
+        gcp = self.get_gcp_collection()
+        oauthenticator = self.get_oauthenticator_data().get("endpoint_id")
+        collection = env or gcp or oauthenticator
+        if not collection:
+            log.warning(
+                "A local Globus collection could not be found! Transfers will "
+                "not be possible!"
+            )
+        return collection
+
+    def get_collection_path(self) -> str:
+        """
+        Configure the base path for the local Globus Collection. By default, this path
+        will assume the environment is a mapped collection or local user environment
+        where ~ corresponds to the local user home directory. The path is pre-pended
+        to all paths for files/dirs selected within JupyterLab prior to transfer.
+
+        .. note::
+
+          Local JupyterLab paths are not cross-checked with paths on a Globus Endpoint
+          prior to tranfer. If there is a mismatch between the base paths for each,
+          transfers will either fail or encounter FileNotFound errors.
+
+        Configurable via environment variable: GLOBUS_COLLECTION_PATH
+        """
+        env = os.getenv("GLOBUS_COLLECTION_PATH", None)
+        return env or os.getcwd()
+
     def get_transfer_submission_url(self) -> str:
         """
         By default, JupyterLab will start transfers on the user's
         behalf using the Globus Transfer API directly. Configure this to instead
         use a custom Globus Resource Server for submitting transfers on the user's
-        behalf. 
+        behalf.
 
-        Note: GLOBUS_TRANSFER_SUBMISSION_SCOPE must also be configured. 
+        Note: GLOBUS_TRANSFER_SUBMISSION_SCOPE must also be configured.
 
         Configurable via evironment variable: GLOBUS_TRANSFER_SUBMISSION_URL
         """
@@ -89,12 +132,12 @@ class GlobusConfig:
             )
         return custom_scope
 
-    def get_transfer_submission_is_hub_service(self) -> str:
+    def get_transfer_submission_is_hub_service(self) -> bool:
         """
         Defines how JupyterLab should authorize with the custom submission service. If
         the Globus Resource Server is embedded inside a hub service, set this to 'true'
         in order to use the 'hub' token for authorization with the hub (Hub token will
-        be passed in the header under Authorization). The Globus token will be passed 
+        be passed in the header under Authorization). The Globus token will be passed
         instead in POST data.
 
         If false, submission will not use the hub token, and assume the remote service
@@ -103,12 +146,10 @@ class GlobusConfig:
 
         Configurable via evironment variable: GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE
 
-        .. code-block::
+        Acceptable env values:
 
-        Acceptable values:
-
-        * ‘true’ – use refresh tokens
-        * ‘false’ – do not use refresh tokens
+        * 'true' - use refresh tokens
+        * 'false' - do not use refresh tokens
         """
         val = os.getenv("GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", None)
         return True if val == "true" else False
@@ -143,7 +184,7 @@ class GlobusConfig:
         """
         This is the OAuth2 redirect URI which Globus Auth uses after
         successful login. By default, this is automatically determined
-        depending on the environment. 
+        depending on the environment.
 
         In a "hub" environment, the user is redirected to the Globus 'auth code'
         redirect url for manually copy-pasting a code to finish login.
@@ -157,7 +198,7 @@ class GlobusConfig:
         hub environments due to Globus Apps (And basically the OAuth2 Spec) requiring
         static callback URLs. Hub URLs are usually dynamic, including the username in
         the URLs (https://myhub.com/user/<username>/lab). Note this limitation when
-        using custom redirect URIs. For this reason in most cases, this should not be 
+        using custom redirect URIs. For this reason in most cases, this should not be
         changed and left to JupyterLab to automatically determine instead.
 
         Configurable via evironment variable: GLOBUS_REDIRECT_URIS
@@ -178,16 +219,6 @@ class GlobusConfig:
         if owner_info:
             return owner_info.id
         return None
-
-    def get_local_globus_collection(self) -> str:
-        return (
-            self.get_gcp_collection()
-            or self.get_oauthenticator_data().get("endpoint_id")
-            or None
-        )
-
-    def get_collection_base_path(self) -> str:
-        return os.getcwd()
 
     def is_hub(self) -> bool:
         """Returns True if JupyterLab is running in a 'hub' environment, false otherwise"""
