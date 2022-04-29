@@ -109,7 +109,7 @@ const Endpoint = (props) => {
 
     if (transferDirection == 'transfer-from-jupyter') {
       if (selectedEndpointItems.length > 1) {
-        setAPIError({ status: '500', statusText: 'Please only select one remote directory to transfer data to' });
+        setAPIError({ response: { status: '500', statusText: 'Please only select one remote directory to transfer data to' } });
       }
 
       // Loop through selectedJupyterItems from props
@@ -143,7 +143,7 @@ const Endpoint = (props) => {
     } else {
       if (props.selectedJupyterItems.directories.length === 0 || props.selectedJupyterItems.directories.length > 1) {
         setLoading(false);
-        setAPIError({ status: '500', statusText: 'Please select one jupyter directory to transfer data to' });
+        setAPIError({ response: { status: '500', statusText: 'Please select one jupyter directory to transfer data to' } });
       }
 
       // Loop through selectedEndpointItems from state
