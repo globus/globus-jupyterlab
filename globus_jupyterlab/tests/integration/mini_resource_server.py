@@ -74,7 +74,10 @@ app = flask.Flask(__name__)
 
 @app.errorhandler(401)
 def custom_401(error):
-    return flask.Response("Introspection Failed, check logs.", 401,)
+    return flask.Response(
+        "Introspection Failed, check logs.",
+        401,
+    )
 
 
 def get_app_client():
@@ -139,7 +142,9 @@ def transfer():
     try:
         data = payload["transfer"]
         transfer_data = globus_sdk.TransferData(
-            transfer_client, data["source_endpoint"], data["destination_endpoint"],
+            transfer_client,
+            data["source_endpoint"],
+            data["destination_endpoint"],
         )
         for item in data["DATA"]:
             # This transfer takes place as the 'user', and will show up in their activity page
