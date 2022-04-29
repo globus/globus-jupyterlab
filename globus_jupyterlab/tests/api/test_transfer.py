@@ -26,6 +26,7 @@ def test_get_api(
     http_client,
     base_url,
     transfer_client,
+    logged_in,
 ):
     setattr(transfer_client, sdk_method, Mock(return_value=SDKResponse()))
     if expected_status >= 400:
@@ -42,7 +43,7 @@ def test_get_api(
 
 
 @pytest.mark.gen_test
-def test_401_login_url(http_client, base_url, transfer_client, sdk_error):
+def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged_in):
     transfer_client.operation_ls.side_effect = sdk_error("401 error!", http_status=401)
     response = yield http_client.fetch(
         base_url + f"/operation_ls?endpoint=foo", raise_error=False
@@ -62,7 +63,7 @@ def test_401_login_url(http_client, base_url, transfer_client, sdk_error):
 
 @pytest.mark.gen_test
 def test_401_login_url_with_custom_submission_scope(
-    http_client, base_url, transfer_client, sdk_error, monkeypatch
+    http_client, base_url, transfer_client, sdk_error, monkeypatch, logged_in
 ):
     monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_URL", "https://myservice.gov")
     monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_SCOPE", "http://myscope")
