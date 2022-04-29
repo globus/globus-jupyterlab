@@ -1,5 +1,6 @@
 sphinx
 sphinx-rtd-theme
+m2r2
 
 jupyter-server
 globus-sdk
