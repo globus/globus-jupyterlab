@@ -32,7 +32,7 @@ def get_handlers(
         for handler_url, api_handler, kwargs, name in module.default_handlers:
             log.debug((handler_url, api_handler, kwargs, name))
             mounted_url = url_path_join(base_url, url_path, handler_url)
-            log.info(f"Server Extension mounted {mounted_url}")
+            log.debug(f"Server Extension mounted {mounted_url}")
             handlers.append(url(mounted_url, api_handler, name=name, **kwargs))
     return handlers
 
