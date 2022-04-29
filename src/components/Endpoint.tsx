@@ -1,10 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { requestAPI } from '../handler';
 import { useHistory, useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 
 import { ConfigAtom } from './GlobusObjects';
+
+const useQuery = () => {
+  const { search } = useLocation();
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+};
 
 const Endpoint = (props) => {
   // Local State
@@ -24,6 +29,7 @@ const Endpoint = (props) => {
   let params: any = useParams();
   let endpointID = params.endpointID;
   let path = params.path;
+  let query = useQuery();
 
   // ComponentDidMount Functions
   useEffect(() => {
@@ -48,9 +54,10 @@ const Endpoint = (props) => {
     setEndpointList({ DATA: [], path: null });
     setLoading(true);
     try {
+      let fullPath = query.get('full-path');
       let url = `operation_ls?endpoint=${endpointID}&show_hidden=0`;
-      if (path) {
-        url = `${url}&path=${path}`;
+      if (fullPath) {
+        url = `${url}&path=${fullPath}`;
       }
       const listItems = await requestAPI<any>(url);
       setEndpointList(listItems);
@@ -102,7 +109,7 @@ const Endpoint = (props) => {
 
     if (transferDirection == 'transfer-from-jupyter') {
       if (selectedEndpointItems.length > 1) {
-        setAPIError({ error: 'Please only select one remote directory to transfer data to' });
+        setAPIError({ status: '500', statusText: 'Please only select one remote directory to transfer data to' });
       }
 
       // Loop through selectedJupyterItems from props
@@ -136,7 +143,7 @@ const Endpoint = (props) => {
     } else {
       if (props.selectedJupyterItems.directories.length === 0 || props.selectedJupyterItems.directories.length > 1) {
         setLoading(false);
-        setAPIError({ error: 'Please select one jupyter directory to transfer data to' });
+        setAPIError({ status: '500', statusText: 'Please select one jupyter directory to transfer data to' });
       }
 
       // Loop through selectedEndpointItems from state
@@ -164,17 +171,21 @@ const Endpoint = (props) => {
       setTransfer(transferResponse);
     } catch (error) {
       setLoading(false);
-      setAPIError({ error: error });
+      setAPIError(error);
     }
   };
 
   if (apiError) {
     return (
-      <div id='api-error' className='alert alert-danger'>
-        <strong>
-          Error {apiError.response.status}: {apiError.response.statusText}.
-        </strong>{' '}
-        Please try again.
+      <div className='row'>
+        <div className='col-8'>
+          <div className='alert alert-danger'>
+            <strong>
+              Error {apiError.response.status}: {apiError.response.statusText}.
+            </strong>{' '}
+            Please try again.
+          </div>
+        </div>
       </div>
     );
   }
@@ -222,7 +233,8 @@ const Endpoint = (props) => {
                         value={JSON.stringify(listItem)}
                         data-list-item-name={listItem['name']}></input>
                       <label>
-                        <Link to={`/endpoints/${endpointID}/items/${listItem['name']}`}>
+                        <Link
+                          to={`/endpoints/${endpointID}/items/${listItem['name']}?full-path=${endpointList['path']}${listItem['name']}`}>
                           <i className='fa-solid fa-folder-open'></i> {listItem['name']}
                         </Link>
                       </label>

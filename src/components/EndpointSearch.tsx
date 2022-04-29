@@ -38,11 +38,15 @@ const EndpointSearch = (props) => {
 
   if (apiError) {
     return (
-      <div id='api-error' className='alert alert-danger'>
-        <strong>
-          Error {apiError.response.status}: {apiError.response.statusText}.
-        </strong>{' '}
-        Please try again.
+      <div className='row'>
+        <div className='col-8'>
+          <div className='alert alert-danger'>
+            <strong>
+              Error {apiError.response.status}: {apiError.response.statusText}.
+            </strong>{' '}
+            Please try again.
+          </div>
+        </div>
       </div>
     );
   }
