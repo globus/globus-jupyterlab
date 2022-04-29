@@ -18,8 +18,8 @@ class Config(BaseAPIHandler):
         )
         data = {
             # TODO: Make these configurable
-            "collection_id": self.gconfig.get_local_globus_collection(),
-            "collection_base_path": self.gconfig.get_collection_base_path(),
+            "collection_id": self.gconfig.get_collection_id(),
+            "collection_base_path": self.gconfig.get_collection_path(),
             "is_gcp": self.gconfig.is_gcp(),
             "is_hub": self.gconfig.is_hub(),
             "is_manual_copy_code_required": copy_required,

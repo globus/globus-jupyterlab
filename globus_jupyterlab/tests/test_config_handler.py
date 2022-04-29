@@ -3,9 +3,9 @@ import pytest
 
 
 @pytest.mark.gen_test
-def test_config_with_gcp_environment(http_client, base_url, mock_gcp):
-    mock_gcp.endpoint_id = "my_gcp_id"
-    mock_gcp.get_owner_info.return_value.id = "owner_uuid"
+def test_config_with_gcp_environment(http_client, base_url, gcp):
+    gcp.endpoint_id = "my_gcp_id"
+    gcp.get_owner_info.return_value.id = "owner_uuid"
     response = yield http_client.fetch(base_url + "/config")
     assert response.code == 200
     data = json.loads(response.body)
@@ -16,10 +16,10 @@ def test_config_with_gcp_environment(http_client, base_url, mock_gcp):
 
 @pytest.mark.gen_test
 def test_config_with_hub_environment(
-    http_client, base_url, mock_gcp, mock_oauthenticator
+    http_client, base_url, gcp, oauthenticator
 ):
-    mock_gcp.endpoint_id = None
-    mock_gcp.get_owner_info.return_value.id = None
+    gcp.endpoint_id = None
+    gcp.get_owner_info.return_value.id = None
 
     response = yield http_client.fetch(base_url + "/config")
     data = json.loads(response.body)
