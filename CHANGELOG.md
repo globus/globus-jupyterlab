@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.2](https://github.com/globus/globus-jupyterlab/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2022-05-02)
+
+
+### Features
+
+* Make Globus Collection ID/path configurable ([ddba2e7](https://github.com/globus/globus-jupyterlab/commit/ddba2e779f2069331bb0441cbf1669af175b379b))
+
+
+### Bug Fixes
+
+* `is_hub()` for the config not returning boolean responses ([4c2eaad](https://github.com/globus/globus-jupyterlab/commit/4c2eaad7194fa9becd17bae0ba80326c52397e3b))
+* is_gcp() possibly returning true with custom configured collection ([b70189d](https://github.com/globus/globus-jupyterlab/commit/b70189d466582ac090f021fbbe56317cb99eb647))
+* server extension hiding manual copy-code step ([b88cf93](https://github.com/globus/globus-jupyterlab/commit/b88cf937bed18ccf006f65773a015d6defa94e8a))
+
 ## 1.0.0-beta.1 (2022-04-25)
 
 ### ⚠ BREAKING CHANGES
