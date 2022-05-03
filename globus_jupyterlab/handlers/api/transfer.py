@@ -212,7 +212,7 @@ class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):
 
     globus_sdk_method = "operation_ls"
     mandatory_args = ["endpoint"]
-    optional_args = {"path": None}
+    optional_args = {"path": None, "show_hidden": False}
 
 
 class EndpointSearch(GCSAuthMixin, GetMethodTransferAPIEndpoint):
