@@ -66,6 +66,12 @@ def sdk_error(monkeypatch) -> globus_sdk.GlobusAPIError:
 
 
 @pytest.fixture
+def native_client(monkeypatch) -> globus_sdk.NativeAppAuthClient:
+    monkeypatch.setattr(globus_sdk, "NativeAppAuthClient", Mock())
+    return globus_sdk.NativeAppAuthClient.return_value
+
+
+@pytest.fixture
 def transfer_client(monkeypatch) -> globus_sdk.TransferClient:
     """Mock the tranfer client, return the class instance"""
     monkeypatch.setattr(globus_sdk, "TransferClient", Mock())
@@ -104,3 +110,9 @@ def token_storage(monkeypatch) -> SimpleJSONFileAdapter:
     monkeypatch.setattr(LoginManager, "storage_class", MockStorage)
     monkeypatch.setattr(pathlib.Path, "unlink", MockStorage.clear_tokens)
     return storage
+
+
+@pytest.fixture(autouse=True)
+def pathlib_unlink(monkeypatch):
+    monkeypatch.setattr(pathlib.Path, "unlink", Mock())
+    return pathlib.Path.unlink

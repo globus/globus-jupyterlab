@@ -88,6 +88,7 @@ class LoginManager:
             client.oauth2_revoke_token(data["access_token"])
             if data.get("refresh_token"):
                 client.oauth2_revoke_token(data["refresh_token"])
+        self.clear_tokens()
         return tokens_revoked
 
     @staticmethod

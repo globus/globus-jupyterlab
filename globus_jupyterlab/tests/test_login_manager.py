@@ -41,16 +41,15 @@ def test_login_manager_clears_tokens_on_failed_refresh(
     assert LoginManager.clear_tokens.called
 
 
-def test_login_manager_clear_tokens(monkeypatch):
-    monkeypatch.setattr(pathlib.Path, "unlink", Mock())
+def test_login_manager_clear_tokens(pathlib_unlink):
     LoginManager("client_id").clear_tokens()
-    assert pathlib.Path.unlink.called
+    assert pathlib_unlink.called
 
 
-def test_login_manager_no_tokens_file(monkeypatch):
-    monkeypatch.setattr(pathlib.Path, "unlink", Mock(side_effect=FileNotFoundError))
+def test_login_manager_no_tokens_file(pathlib_unlink):
+    pathlib_unlink.side_effect = FileNotFoundError
     LoginManager("client_id").clear_tokens()
-    assert pathlib.Path.unlink.called
+    assert pathlib_unlink.called
 
 
 def test_login_manager_store_tokens(monkeypatch):
@@ -59,13 +58,18 @@ def test_login_manager_store_tokens(monkeypatch):
     assert SimpleJSONFileAdapter.store.called
 
 
-def test_login_manager_revoke_tokens(monkeypatch, logged_in, login_refresh):
+def test_login_manager_revoke_tokens(native_client, logged_in, login_refresh):
     # Use refresh to simulate also revoking refresh tokens. It doesn't matter if
     # the access_tokens are expired
-    monkeypatch.setattr(globus_sdk.NativeAppAuthClient, "oauth2_revoke_token", Mock())
-    LoginManager("client_id").logout()
+    # monkeypatch.setattr(globus_sdk.NativeAppAuthClient, "oauth2_revoke_token", Mock())
     num_tokens = len(login_refresh.tokens) * 2
-    assert globus_sdk.NativeAppAuthClient.oauth2_revoke_token.call_count == num_tokens
+    LoginManager("client_id").logout()
+    assert native_client.oauth2_revoke_token.call_count == num_tokens
+
+
+def test_login_manager_logout_clears_tokens(native_client, pathlib_unlink):
+    LoginManager("client_id").logout()
+    assert pathlib_unlink.called
 
 
 def test_login_manager_apply_dependent_scopes():
