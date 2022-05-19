@@ -1,4 +1,6 @@
+import pathlib
 import pytest
+import copy
 from unittest.mock import Mock
 import globus_sdk
 from globus_sdk.tokenstorage import SimpleJSONFileAdapter
@@ -7,23 +9,46 @@ import pickle
 import tornado.web
 
 from globus_jupyterlab.handlers import get_handlers, HANDLER_MODULES
+from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.tests.mocks import MockGlobusAPIError, MOCK_TOKENS
 from globus_jupyterlab.login_manager import LoginManager
 from globus_jupyterlab.globus_config import GlobusConfig
 
-application = tornado.web.Application(get_handlers(HANDLER_MODULES, "/", ""))
-
 
 @pytest.fixture
-def app():
+def app(token_storage, monkeypatch):
+    monkeypatch.setattr(
+        BaseAPIHandler.login_manager, "storage", token_storage("filename")
+    )
+    application = tornado.web.Application(get_handlers(HANDLER_MODULES, "/", ""))
     return application
 
 
 @pytest.fixture
 def logged_in(token_storage) -> SimpleJSONFileAdapter:
     """Simulate a logged in Globus application"""
-    token_storage.get_by_resource_server.return_value = MOCK_TOKENS
-    return SimpleJSONFileAdapter
+    token_storage.tokens = copy.deepcopy(MOCK_TOKENS)
+    return token_storage
+
+
+@pytest.fixture
+def login_expired(logged_in) -> SimpleJSONFileAdapter:
+    for token_data in logged_in.tokens.values():
+        token_data["expires_at_seconds"] = 0
+    return logged_in
+
+
+@pytest.fixture
+def login_refresh(logged_in) -> SimpleJSONFileAdapter:
+    for token_data in logged_in.tokens.values():
+        token_data["refresh_token"] = "mock_refresh_token"
+    return logged_in
+
+
+@pytest.fixture
+def logged_out(token_storage) -> SimpleJSONFileAdapter:
+    token_storage.tokens = {}
+    return token_storage
 
 
 @pytest.fixture
@@ -55,10 +80,27 @@ def oauthenticator(monkeypatch) -> dict:
     return data
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def token_storage(monkeypatch) -> SimpleJSONFileAdapter:
-    monkeypatch.setattr(SimpleJSONFileAdapter, "store", Mock())
-    monkeypatch.setattr(
-        SimpleJSONFileAdapter, "get_by_resource_server", Mock(return_value={})
-    )
-    return SimpleJSONFileAdapter
+    class MockStorage:
+        tokens = {}
+
+        def __init__(self, filename):
+            pass
+
+        def get_by_resource_server(self):
+            return self.tokens
+
+        def get_token_data(self, resource_server):
+            return self.get_by_resource_server()[resource_server]
+
+        def clear_tokens(self):
+            MockStorage.tokens = {}
+
+        on_refresh = Mock()
+        store = Mock()
+
+    storage = MockStorage
+    monkeypatch.setattr(LoginManager, "storage_class", MockStorage)
+    monkeypatch.setattr(pathlib.Path, "unlink", MockStorage.clear_tokens)
+    return storage
