@@ -29,11 +29,10 @@ export async function requestAPI<T>(
     throw new ServerConnection.NetworkError(error);
   }
 
-  const data = await response.json();
-
   if (!response.ok) {
-    throw new ServerConnection.ResponseError(response, data.message);
+    throw new ServerConnection.ResponseError(response);
   }
-
+  
+  const data = await response.json();
   return data;
 }

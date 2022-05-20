@@ -1,6 +1,6 @@
-import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
-import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { MainAreaWidget } from '@jupyterlab/apputils';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import { getBaseURL, GlobusIcon } from './utilities';
@@ -16,7 +16,7 @@ const addJupyterCommands = (app: JupyterFrontEnd, commands: Array<any>) => {
       label: command.label,
       caption: command.caption,
       icon: GlobusIcon,
-      execute: command.execute
+      execute: command.execute,
     });
   }
 };
@@ -42,11 +42,11 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
     /*
       Commands to initiate a Globus Transfer. 
       */
-    let commands = [
+    let extensionCommands = [
       {
         command: 'globus-jupyterlab-transfer/context-menu:open',
         label: 'Initiate Globus Transfer',
-        caption: 'Login with Globus to initiate transfers',
+        caption: 'Login with Globus to Initiate Transfers',
         execute: async () => {
           var files = factory.tracker.currentWidget.selectedItems();
           var jupyterToken = PageConfig.getToken();
@@ -63,11 +63,9 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
             }
           }
 
-          // GET config payload which contains basic auth data
-          const config = await requestAPI<any>('config');
-
           // Start creating the widget, but don't attach unless authenticated
-          const content = new GlobusWidget(config, jupyterToken, jupyterItems);
+          const config = await requestAPI<any>('config');
+          const content = new GlobusWidget(config, factory, jupyterToken, jupyterItems);
           const widget = new MainAreaWidget<GlobusWidget>({ content });
           widget.title.label = label;
           widget.title.icon = GlobusIcon;
@@ -93,12 +91,13 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
             }, 1000);
             window.open(getBaseURL('globus-jupyterlab/login'), 'Globus Login', 'height=600,width=800').focus();
           }
-        }
-      },
+        },
+      }
     ];
-    addJupyterCommands(app, commands);
-  } catch (reason) {
-    console.error(`Error on GET /globus_jupyterlab/config.\n${reason}`);
+
+    addJupyterCommands(app, extensionCommands);
+  } catch (error) {
+    console.error(`Error activating Globus plugin.\n${error}`);
   }
 }
 

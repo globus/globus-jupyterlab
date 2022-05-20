@@ -13,7 +13,8 @@ const Endpoints = (props) => {
                 <Link
                   key={endpoint.id}
                   to={`/endpoints/${endpoint.id}`}
-                  className='list-group-item list-group-item-action flex-column align-items-start'>
+                  className='list-group-item list-group-item-action flex-column align-items-start'
+                  onClick={props.handleEndpointClick}>
                   <h5 className='mb-1'>
                     <i className='fa-solid fa-layer-group'></i>&nbsp;
                     {endpoint.display_name}

@@ -10,6 +10,7 @@ import { ConfigAtom } from './components/GlobusObjects';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 
 const App = (props: any): JSX.Element => {
   // Local state values
@@ -72,10 +73,24 @@ const App = (props: any): JSX.Element => {
     setSelectedJupyterItems(selectedJupyterItemsTemp);
   };
 
+  const handleLogout = (event) => {
+    event.preventDefault();
+    window.open(getBaseURL('globus-jupyterlab/logout'), 'Logout of Globus', 'height=600,width=800').focus();
+    window.location.reload();
+  };
   return (
     <div className='container pt-5'>
+      <div className='row'>
+        <div className='col-8'>
+          <a href='#' onClick={handleLogout}>
+            <i className='fa-solid fa-arrow-right-from-bracket'></i> Logout of Globus
+          </a>
+
+          <hr className='mb-3 mt-3' />
+        </div>
+      </div>
       {!selectedJupyterItems['isEmpty'] ? (
-        <EndpointSearch selectedJupyterItems={selectedJupyterItems} />
+        <EndpointSearch factory={props.factory} selectedJupyterItems={selectedJupyterItems} />
       ) : (
         <p className='fw-bold text-danger'>No files selected</p>
       )}
@@ -85,12 +100,14 @@ const App = (props: any): JSX.Element => {
 
 export class GlobusWidget extends ReactWidget {
   config: Object;
+  factory: IFileBrowserFactory;
   jupyterItems: Array<string>;
   jupyterToken: string;
-  constructor(config = {}, jupyterToken = '', jupyterItems = []) {
+  constructor(config = {}, factory = null, jupyterToken = '', jupyterItems = []) {
     super();
 
     this.config = config;
+    this.factory = factory;
     this.jupyterItems = jupyterItems;
     this.jupyterToken = jupyterToken;
     this.addClass('jp-ReactWidget');
@@ -108,6 +125,7 @@ export class GlobusWidget extends ReactWidget {
                   <App
                     {...props}
                     config={this.config}
+                    factory={this.factory}
                     jupyterItems={this.jupyterItems}
                     jupyterToken={this.jupyterToken}
                   />
