@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.0.0-beta.3](https://github.com/globus/globus-jupyterlab/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2022-05-20)
+## [1.0.0-beta.3](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b2...v1.0.0b3) (2022-05-20)
 
 
 ### Features
@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file. See [standa
 * improper 400 returned by endpoint_search ([ff4d996](https://github.com/globus/globus-jupyterlab/commit/ff4d99666ae9fd9703018a2edcfb1388019930f9))
 * Revert minimum required jupyterlab family to 3.1.0 for compatibility ([46433c4](https://github.com/globus/globus-jupyterlab/commit/46433c4481e90b55a3f3a3b10f48a31eabbfda06))
 
-## [1.0.0-beta.2](https://github.com/globus/globus-jupyterlab/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2022-05-02)
+## [1.0.0-beta.2](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b1...v1.0.0b2) (2022-05-02)
 
 
 ### Features
