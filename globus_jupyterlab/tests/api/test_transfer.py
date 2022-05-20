@@ -85,7 +85,9 @@ def test_401_login_url_with_custom_submission_scope(
     monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_URL", "https://myservice.gov")
     monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_SCOPE", "http://myscope")
 
-    transfer_client.operation_ls.side_effect = sdk_error("401 error!", http_status=401)
+    transfer_client.operation_ls.side_effect = sdk_error(
+        "Need data_access scope!!", http_status=403, code="ConsentRequired"
+    )
     response = yield http_client.fetch(
         base_url + f"/operation_ls?endpoint=foo", raise_error=False
     )
