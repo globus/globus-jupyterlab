@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { requestAPI } from '../handler';
 import { Route, useHistory } from 'react-router-dom';
 
@@ -11,9 +11,14 @@ const EndpointSearch = (props) => {
   const [endpointValue, setEndpointValue] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const endpointSearch = useRef();
   const history = useHistory();
 
-  // Event Handlers
+  const handleEndpointClick = (event) => {
+    // @ts-ignore
+    endpointSearch.current.style.display = 'none';
+  };
+
   const handleEndpointValueChange = (event) => {
     setEndpointValue(event.target.value);
   };
@@ -36,9 +41,14 @@ const EndpointSearch = (props) => {
     }
   };
 
+  const handleShowSearch = () => {
+    // @ts-ignore
+    endpointSearch.current.style.display = 'block';
+  }
+
   if (apiError) {
     return (
-      <div className='row'>
+      <div id='api-row' className='row'>
         <div className='col-8'>
           <div className='alert alert-danger'>
             <strong>
@@ -57,19 +67,21 @@ const EndpointSearch = (props) => {
 
   return (
     <div id='endpoint-search' className='mb-4'>
-      <h5>Search Collections for Transferring</h5>
+      <div ref={endpointSearch}>
+        <h5>Search for Globus Collections</h5>
 
-      <div className='row'>
-        <div className='col-8'>
-          <input
-            id='endpoint-input'
-            className='form-control'
-            placeholder='Start typing and press enter to search'
-            type='text'
-            value={endpointValue}
-            onChange={handleEndpointValueChange}
-            onKeyDown={handleSearchEndpoints}
-          />
+        <div className='row'>
+          <div className='col-8'>
+            <input
+              id='endpoint-input'
+              className='form-control'
+              placeholder='Start typing and press enter to search'
+              type='text'
+              value={endpointValue}
+              onChange={handleEndpointValueChange}
+              onKeyDown={handleSearchEndpoints}
+            />
+          </div>
         </div>
       </div>
 
@@ -77,14 +89,14 @@ const EndpointSearch = (props) => {
         exact
         path='/endpoints'
         render={(props) => {
-          return <Endpoints {...props} endpoints={endpoints} />;
+          return <Endpoints {...props} endpoints={endpoints} handleEndpointClick={handleEndpointClick} />;
         }}
       />
       <Route exact path='/endpoints/:endpointID'>
-        <Endpoint selectedJupyterItems={props.selectedJupyterItems} />
+        <Endpoint {...props} selectedJupyterItems={props.selectedJupyterItems} handleShowSearch={handleShowSearch} />
       </Route>
       <Route path='/endpoints/:endpointID/items/:path'>
-        <Endpoint selectedJupyterItems={props.selectedJupyterItems} />
+        <Endpoint {...props} selectedJupyterItems={props.selectedJupyterItems} handleShowSearch={handleShowSearch} />
       </Route>
     </div>
   );
