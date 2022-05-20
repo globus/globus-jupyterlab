@@ -226,8 +226,8 @@ class EndpointSearch(GCSAuthMixin, GetMethodTransferAPIEndpoint):
         "filter_owner_id": None,
         "filter_host_endpoint": None,
         "filter_non_functional": False,
-        "limit": None,
-        "offset": None,
+        "limit": 10,
+        "offset": 0,
     }
 
 
