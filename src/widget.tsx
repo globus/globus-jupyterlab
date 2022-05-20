@@ -1,4 +1,5 @@
 import { getBaseURL } from './utilities';
+import { requestAPI } from './handler';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect, useState } from 'react';
@@ -73,9 +74,10 @@ const App = (props: any): JSX.Element => {
     setSelectedJupyterItems(selectedJupyterItemsTemp);
   };
 
-  const handleLogout = (event) => {
+  const handleLogout = async (event) => {
     event.preventDefault();
-    window.open(getBaseURL('globus-jupyterlab/logout'), 'Logout of Globus', 'height=600,width=800').focus();
+    await requestAPI<any>('logout');
+    window.open('https://globus.org/logout', 'Logout of Globus', 'height=600,width=800').focus();
     window.location.reload();
   };
   return (
