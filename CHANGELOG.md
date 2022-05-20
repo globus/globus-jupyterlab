@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.3](https://github.com/globus/globus-jupyterlab/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2022-05-20)
+
+
+### Features
+
+* Partial support for using GCS v4 endpoints which need activation ([7722067](https://github.com/globus/globus-jupyterlab/commit/77220677e7a6f169f6df7ae40618f23df01aeb5f))
+* Support GCS v5.4 High Assurance Collections ([4f1e766](https://github.com/globus/globus-jupyterlab/commit/4f1e766f1051bdb00b66c8d9f13bb59f7086d2cf))
+
+
+### Bug Fixes
+
+* Auth improperly reporting logged-in state after tokens expired ([0cb13e2](https://github.com/globus/globus-jupyterlab/commit/0cb13e25cc2b28f18c7a493affacf06d8e245aaa))
+* Filter out non-functional endpoints from endpoint searches ([5624c9a](https://github.com/globus/globus-jupyterlab/commit/5624c9a0f7db4af65f1184fe146fc4cbbecce5e3))
+* Frontend not prompting for login when required ([7e03910](https://github.com/globus/globus-jupyterlab/commit/7e039100c55b08d1a774843883d4f1d87c72b58c))
+* Hide hidden files by default ([28fb701](https://github.com/globus/globus-jupyterlab/commit/28fb7017b768c7d121df46ffde4749d9cd866e1c))
+* improper 400 returned by endpoint_search ([ff4d996](https://github.com/globus/globus-jupyterlab/commit/ff4d99666ae9fd9703018a2edcfb1388019930f9))
+* Revert minimum required jupyterlab family to 3.1.0 for compatibility ([46433c4](https://github.com/globus/globus-jupyterlab/commit/46433c4481e90b55a3f3a3b10f48a31eabbfda06))
+
 ## [1.0.0-beta.2](https://github.com/globus/globus-jupyterlab/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2022-05-02)
 
 
