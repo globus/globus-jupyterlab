@@ -75,6 +75,12 @@ class GCSAuthMixin(AutoAuthURLMixin):
         "check_gcsv54_ha_not_from_allowed_domain",
     ]
 
+    def get_globus_login_url(self, exception: globus_sdk.GlobusAPIError):
+        if self.check_gcsv4_requires_activation(exception):
+            endpoint = self.get_query_argument(self.gcs_query_param, None)
+            return f"https://app.globus.org/file-manager?origin_id={endpoint}"
+        return super().get_globus_login_url(exception)
+
     def check_gcsv4_requires_activation(
         self, exception: globus_sdk.GlobusAPIError
     ) -> bool:
