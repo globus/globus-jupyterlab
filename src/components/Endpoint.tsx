@@ -107,13 +107,13 @@ const Endpoint = (props) => {
       const listItems = await requestAPI<any>(url);
       setEndpointList(listItems);
     } catch (error) {
-      const message = await error.response.json();
+      let error_response = await error.response.json();
       /* Note: This probably isn't a great UX to simply pop up a login page, but it
       does demonstrate the base functionality for picking endpoints */
-      if ('login_url' in error) {
-        window.open(error.login_url, 'Globus Login', 'height=600,width=800').focus();
+      if ('login_url' in error_response) {
+        window.open(error_response.login_url, 'Globus Login', 'height=600,width=800').focus();
       }
-      setAPIError({ ...error, ...message });
+      setAPIError({ ...error, ...error_response });
     }
     setLoading(false);
   };

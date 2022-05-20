@@ -33,6 +33,5 @@ export async function requestAPI<T>(
     throw new ServerConnection.ResponseError(response);
   }
   
-  const data = await response.json();
-  return data;
+  return await response.json();
 }
