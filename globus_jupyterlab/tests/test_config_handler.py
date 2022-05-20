@@ -15,9 +15,7 @@ def test_config_with_gcp_environment(http_client, base_url, gcp):
 
 
 @pytest.mark.gen_test
-def test_config_with_hub_environment(
-    http_client, base_url, gcp, oauthenticator
-):
+def test_config_with_hub_environment(http_client, base_url, gcp, oauthenticator):
     gcp.endpoint_id = None
     gcp.get_owner_info.return_value.id = None
 
