@@ -109,7 +109,7 @@ class Login(PKCEFlowManager):
     """
 
     supported_authorize_params = (
-        "session_requried_single_domain",
+        "session_required_single_domain",
         "session_message",
         "session_required_identities",
         "session_required_mfa",
@@ -142,6 +142,7 @@ class Login(PKCEFlowManager):
             for k in self.supported_authorize_params
             if self.get_query_argument(k, None)
         }
+        self.log.debug(f"Using Authorize Params: {authorize_params}")
         authorize_url = client.oauth2_get_authorize_url(query_params=authorize_params)
         # Redirect the user to Globus Auth
         self.redirect(authorize_url)

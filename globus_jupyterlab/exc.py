@@ -10,6 +10,12 @@ class TransferSubmission(GlobusJupyterlabException):
     pass
 
 
+class LoginException(GlobusJupyterlabException):
+    """There was a problem with the login process"""
+
+    pass
+
+
 class TokenStorageError(GlobusJupyterlabException):
     """A problem loading user Globus tokens"""
 

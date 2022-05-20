@@ -1,25 +1,59 @@
 import json
+import re
+import logging
 import urllib
 import tornado
 import globus_sdk
 import pydantic
 import requests
 from typing import List
-from globus_jupyterlab.exc import TokenStorageError
+from globus_jupyterlab.exc import LoginException
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.models import TransferModel
 
 
 class AutoAuthURLMixin(BaseAPIHandler):
-    def get_requested_scopes(self):
+    login_checks = [
+        "check_login_required",
+    ]
+
+    def is_login_required(self, exception: globus_sdk.GlobusAPIError) -> bool:
+        """
+        Check if the exception requries login. For normal calls to services, this just
+        means a 401, but there are a slew of possible login cases for GCS.
+        """
+        for func_name in self.login_checks:
+            check = getattr(self, func_name)
+            check_result = check(exception)
+            self.log.debug(f"Checking exception was due to {func_name}: {check_result}")
+            if check_result:
+                return True
+        return False
+
+    def check_login_required(self, exception: globus_sdk.GlobusAPIError):
+        return exception.http_status == 401
+
+    def get_requested_scopes(self, exception: globus_sdk.GlobusAPIError) -> List[str]:
         return self.gconfig.get_scopes()
 
-    def get_globus_login_url(self):
+    def get_required_session_domains(
+        self, exception: globus_sdk.GlobusAPIError
+    ) -> List[str]:
+        return []
+
+    def get_globus_login_url(self, exception: globus_sdk.GlobusAPIError) -> str:
         login_url = self.reverse_url("login")
-        params = urllib.parse.urlencode(
-            {"requested_scopes": " ".join(self.get_requested_scopes())}
+        domain = ",".join(self.get_required_session_domains(exception))
+        params = dict(
+            requested_scopes=" ".join(self.get_requested_scopes(exception)),
         )
-        return f"{login_url}?{params}"
+        domains = self.get_required_session_domains(exception)
+        if domains:
+            params["session_required_single_domain"] = domains[0]
+
+        full_login_url = f"{login_url}?{urllib.parse.urlencode(params)}"
+        self.log.debug(f"Generated login url: {full_login_url}")
+        return full_login_url
 
 
 class GCSAuthMixin(AutoAuthURLMixin):
@@ -34,11 +68,55 @@ class GCSAuthMixin(AutoAuthURLMixin):
     that will also be automatically requested."""
 
     gcs_query_param = "endpoint"
+    login_checks = [
+        "check_login_required",
+        "check_gcsv4_requires_activation",
+        "check_gcsv54_consent_data_access",
+        "check_gcsv54_ha_not_from_allowed_domain",
+    ]
 
-    def get_requested_scopes(self):
-        base_scopes = super().get_requested_scopes()
-        collection = self.get_query_argument(self.gcs_query_param, None)
-        if collection is not None:
+    def check_gcsv4_requires_activation(
+        self, exception: globus_sdk.GlobusAPIError
+    ) -> bool:
+        return (
+            exception.http_status == 400
+            and exception.code == "ClientError.ActivationRequired"
+        )
+
+    def check_gcsv54_ha_not_from_allowed_domain(
+        self, exception: globus_sdk.GlobusAPIError
+    ) -> bool:
+        """
+        High Assurance collection, a required session is missing.
+        """
+        if exception.http_status == 502:
+            # TODO We could probably use pydantic to parse these responses into objects for easier
+            # use.
+            resp = self.parse_gridftp_json_response(exception.message)
+            if (
+                resp.get("detail", {}).get("DATA_TYPE")
+                == "not_from_allowed_domain#1.0.0"
+            ):
+                return True
+        return False
+
+    def check_gcsv54_consent_data_access(
+        self, exception: globus_sdk.GlobusAPIError
+    ) -> bool:
+        """
+        Collection is a GCS v5.4 mapped collection and requires a data_access scope
+        """
+        return exception.http_status == 403 and exception.code == "ConsentRequired"
+
+    def get_requested_scopes(self, exception: globus_sdk.GlobusAPIError):
+        base_scopes = super().get_requested_scopes(exception)
+        if self.check_gcsv54_consent_data_access(exception):
+            collection = self.get_query_argument(self.gcs_query_param, None)
+            if not collection:
+                # This is a bug in Globus Jupyterlab, where the collection cannot be determined.
+                raise LoginException(
+                    "Could not determine the GCS collection which needs data_access."
+                )
             dependent_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(collection)
             requested_scopes = [
                 self.login_manager.apply_dependent_scopes(
@@ -47,19 +125,35 @@ class GCSAuthMixin(AutoAuthURLMixin):
                 for base in base_scopes
             ]
         else:
-            self.log.warning(
-                f"Could not automatically determine the collection, no dependent scopes will be added!"
-            )
             requested_scopes = base_scopes
-
         self.log.debug(
             f"Generated Login URL with the following requested_scopes: {requested_scopes}"
         )
-
         return requested_scopes
 
+    def get_required_session_domains(self, exception: globus_sdk.GlobusAPIError):
+        if self.check_gcsv54_ha_not_from_allowed_domain(exception):
+            domains = self.parse_gridftp_json_response(exception.message)["detail"][
+                "allowed_domains"
+            ]
+            self.log.info(f"GCS EP Requires domains: {domains}")
+            return domains
+        return []
 
-class GlobusSDKWrapper(BaseAPIHandler):
+    def parse_gridftp_json_response(self, response) -> dict:
+        try:
+            match = re.search(r"530-GridFTP-JSON-Result: (.+)\\r\\n530 End", response)
+            if match:
+                return json.loads(match.groups()[0])
+        except json.decoder.JSONDecodeError:
+            # We got an error back from GridFTP, but it didn't match the expected format. This should
+            # never happen and means the GridFTP has changed, and this package should be updated.
+            self.log.error(
+                "Found GridFTP error but failed to parse it. This is an error and needs to be fixed."
+            )
+
+
+class GlobusSDKWrapper(AutoAuthURLMixin):
 
     globus_sdk_method = None
     mandatory_args = []
@@ -83,8 +177,18 @@ class GlobusSDKWrapper(BaseAPIHandler):
         except globus_sdk.GlobusAPIError as gapie:
             self.set_status(gapie.http_status)
             response = {"error": gapie.code, "details": gapie.message}
-            if gapie.http_status in [401, 403]:
-                response["login_url"] = self.get_globus_login_url()
+            if self.is_login_required(gapie):
+                response["login_required"] = True
+                try:
+                    self.set_status(401)
+                    response["login_url"] = self.get_globus_login_url(gapie)
+                except LoginException as le:
+                    self.log.error("Failed to generate login URL", exc_info=True)
+                    response["error"] = le.__class__.__name__
+                    response["details"] = str(le)
+            from pprint import pprint
+
+            pprint(response)
             return self.finish(json.dumps(response))
 
 
@@ -119,7 +223,7 @@ class POSTMethodTransferAPIEndpoint(GlobusSDKWrapper):
             self.finish(json.dumps({"code": "InvalidInput", "message": str(ve)}))
 
 
-class EndpointAutoactivate(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
+class EndpointAutoactivate(POSTMethodTransferAPIEndpoint):
     """An API Endpoint doing a Globus LS"""
 
     globus_sdk_method = "endpoint_autoactivate"
@@ -127,7 +231,7 @@ class EndpointAutoactivate(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     optional_args = {}
 
 
-class SubmitTransfer(GCSAuthMixin, BaseAPIHandler):
+class SubmitTransfer(GCSAuthMixin):
     """An API Endpoint for submitting Globus Transfers."""
 
     @tornado.web.authenticated
@@ -227,7 +331,7 @@ class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):
     optional_args = {"path": None, "show_hidden": 0}
 
 
-class EndpointSearch(AutoAuthURLMixin, GetMethodTransferAPIEndpoint):
+class EndpointSearch(GetMethodTransferAPIEndpoint):
     """An API Endpoint for searching for collections"""
 
     globus_sdk_method = "endpoint_search"
