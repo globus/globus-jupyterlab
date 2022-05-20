@@ -53,6 +53,16 @@ class GlobusConfig:
         return os.getenv("GLOBUS_NAMED_GRANT", "Globus JupyterLab")
 
     def get_scopes(self) -> List[str]:
+        """
+        Get all known base scopes required by Globus Jupyterlab. This includes both
+        the base scopes like `transfer`, but also checks for any additional required
+        scopes such as a custom transfer submission scope and adds them to the list.
+
+        While this method will fetch a list of all 'known' scopes, there may be
+        additional dependent scopes, such as the https data_access scope, that can
+        only be known at runtime when a user is accessing a mapped 5.4 GCS collection.
+        In those cases, dependent scopes must be added manually.
+        """
         scopes = self.base_scopes.copy()
         custom_transfer_scope = self.get_transfer_submission_scope()
         if custom_transfer_scope:

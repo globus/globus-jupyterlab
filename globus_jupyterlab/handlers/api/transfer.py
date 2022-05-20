@@ -4,12 +4,25 @@ import tornado
 import globus_sdk
 import pydantic
 import requests
+from typing import List
 from globus_jupyterlab.exc import TokenStorageError
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.models import TransferModel
 
 
-class GCSAuthMixin(BaseAPIHandler):
+class AutoAuthURLMixin(BaseAPIHandler):
+    def get_requested_scopes(self):
+        return self.gconfig.get_scopes()
+
+    def get_globus_login_url(self):
+        login_url = self.reverse_url("login")
+        params = urllib.parse.urlencode(
+            {"requested_scopes": " ".join(self.get_requested_scopes())}
+        )
+        return f"{login_url}?{params}"
+
+
+class GCSAuthMixin(AutoAuthURLMixin):
     """Mixin for handling 403 responses from querying a Globus Connect Server which
     requries the data_access scope. This mixin will introspect the query params for
     the collection using `gcs_query_param`. This value needs to match the expected
@@ -21,27 +34,29 @@ class GCSAuthMixin(BaseAPIHandler):
     that will also be automatically requested."""
 
     gcs_query_param = "endpoint"
-    base_scopes = [globus_sdk.scopes.TransferScopes.all]
 
     def get_requested_scopes(self):
-        collection = self.get_query_argument(self.gcs_query_param)
-        gcs_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(collection)
-        requested_scopes = [
-            f"{base_scope}[{gcs_scope.data_access}]" for base_scope in self.base_scopes
-        ]
+        base_scopes = super().get_requested_scopes()
+        collection = self.get_query_argument(self.gcs_query_param, None)
+        if collection is not None:
+            dependent_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(collection)
+            requested_scopes = [
+                self.login_manager.apply_dependent_scopes(
+                    base, [dependent_scope.data_access]
+                )
+                for base in base_scopes
+            ]
+        else:
+            self.log.warning(
+                f"Could not automatically determine the collection, no dependent scopes will be added!"
+            )
+            requested_scopes = base_scopes
 
-        submission_scope = self.gconfig.get_transfer_submission_scope()
-        if submission_scope:
-            requested_scopes.append(f"{submission_scope}[{gcs_scope.data_access}]")
-
-        return " ".join(requested_scopes)
-
-    def get_login_url(self):
-        login_url = self.reverse_url("login")
-        params = urllib.parse.urlencode(
-            {"requested_scopes": self.get_requested_scopes()}
+        self.log.debug(
+            f"Generated Login URL with the following requested_scopes: {requested_scopes}"
         )
-        return f"{login_url}?{params}"
+
+        return requested_scopes
 
 
 class GlobusSDKWrapper(BaseAPIHandler):
@@ -49,9 +64,6 @@ class GlobusSDKWrapper(BaseAPIHandler):
     globus_sdk_method = None
     mandatory_args = []
     optional_args = {}
-
-    def get_requested_scopes(self):
-        return " ".join(self.gconfig.get_scopes())
 
     def get_globus_sdk_args(self):
         return [], {}
@@ -72,7 +84,7 @@ class GlobusSDKWrapper(BaseAPIHandler):
             self.set_status(gapie.http_status)
             response = {"error": gapie.code, "details": gapie.message}
             if gapie.http_status in [401, 403]:
-                response["login_url"] = self.get_login_url()
+                response["login_url"] = self.get_globus_login_url()
             return self.finish(json.dumps(response))
 
 
@@ -147,7 +159,7 @@ class SubmitTransfer(GCSAuthMixin, BaseAPIHandler):
             self.set_status(gapie.http_status)
             response = {"error": gapie.code, "details": gapie.message}
             if gapie.http_status in [401, 403]:
-                response["login_url"] = self.get_login_url()
+                response["login_url"] = self.get_globus_login_url()
             return self.finish(json.dumps(response))
 
     def submit_custom_transfer(self, transfer_data: TransferModel):
@@ -215,7 +227,7 @@ class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):
     optional_args = {"path": None, "show_hidden": 0}
 
 
-class EndpointSearch(GCSAuthMixin, GetMethodTransferAPIEndpoint):
+class EndpointSearch(AutoAuthURLMixin, GetMethodTransferAPIEndpoint):
     """An API Endpoint for searching for collections"""
 
     globus_sdk_method = "endpoint_search"

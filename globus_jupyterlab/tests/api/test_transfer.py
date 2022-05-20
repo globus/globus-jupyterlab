@@ -62,6 +62,23 @@ def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged
 
 
 @pytest.mark.gen_test
+def test_401_login_url_non_gcs(
+    http_client, base_url, transfer_client, sdk_error, logged_in
+):
+    """
+    Test a call which isn't specific to a GCS endpoint, and uses base login scopes
+    """
+    transfer_client.endpoint_search.side_effect = sdk_error(
+        "401 error!", http_status=401
+    )
+    response = yield http_client.fetch(
+        base_url + f"/endpoint_search", raise_error=False
+    )
+    error = json.loads(response.body.decode("utf-8"))
+    assert "login_url" in error
+
+
+@pytest.mark.gen_test
 def test_401_login_url_with_custom_submission_scope(
     http_client, base_url, transfer_client, sdk_error, monkeypatch, logged_in
 ):
