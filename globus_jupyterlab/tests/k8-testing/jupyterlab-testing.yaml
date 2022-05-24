@@ -26,26 +26,24 @@ hub:
   extraConfig:
     00-server-settings: |
       c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 1}}
-    10-username-settings: |
-      import base64
-      from oauthenticator.globus import GlobusOAuthenticator
-      class OmniProviderOAuthenticator(GlobusOAuthenticator):
-          def get_username(self, user_info):
-              self.log.info(f'User login successful: {user_info.get("preferred_username")}')
-              username, domain = user_info.get('preferred_username').split('@', 1)
-              # 'sub' is a uniquely generated uuid by Globus for each user identity
-              enc_sub = base64.b32encode(bytes(user_info['sub'], 'utf-8')).decode('utf-8')
-              return f'{username}-{enc_sub}'[:32]
-      c.JupyterHub.authenticator_class = OmniProviderOAuthenticator
     20-keep-all-tokens: |
       c.OAuthenticator.exclude_tokens = []
+    30-set-home-dir: |
+      c.KubeSpawner.working_dir = '/home'
 
 singleuser:
   defaultUrl: "/lab"
   extraEnv:
     JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
-  # storage:
-  #   type: none
+    GLOBUS_COLLECTION_ID: "625477a8-faf3-492b-9760-1e0efac06cca"
+  storage:
+    type: static
+    extraLabels: {}
+    static:
+      pvcName: nfs
+      subPath: 'home/{username}'
+    capacity: 10Gi
+    homeMountPath: /home
   image:
     name: nsglobusautobuilds/jupyterlab-testing
     tag: latest
