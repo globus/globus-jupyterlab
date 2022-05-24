@@ -1,0 +1,30 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: hub-testing
+  region: us-east-2
+
+
+nodeGroups:
+  - name: core-pool-t2-medium
+    instanceType: t2.medium
+    desiredCapacity: 1
+    maxSize: 3
+    minSize: 1
+    volumeSize: 20
+    labels:
+      jupyterhub-pool-name: core-pool
+    tags:
+      k8s.io/cluster-autoscaler/node-template/label/jupyterhub-pool-name: core-pool
+    ssh:
+      publicKeyName: Globus Work
+      enableSsm: true
+    availabilityZones:
+      - us-east-2a
+      - us-east-2b
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        cloudWatch: true
