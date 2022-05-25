@@ -29,13 +29,14 @@ hub:
     20-keep-all-tokens: |
       c.OAuthenticator.exclude_tokens = []
     30-set-home-dir: |
-      c.KubeSpawner.working_dir = '/home'
+      c.KubeSpawner.working_dir = '/home/{username}'
 
 singleuser:
   defaultUrl: "/lab"
   extraEnv:
     JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
-    GLOBUS_COLLECTION_ID: "625477a8-faf3-492b-9760-1e0efac06cca"
+    GLOBUS_COLLECTION_ID: "ba90d77e-c5bf-47ea-aa0d-32acbc120244"
+    CHOWN_HOME: "yes"
   storage:
     type: static
     extraLabels: {}
@@ -43,7 +44,7 @@ singleuser:
       pvcName: nfs
       subPath: 'home/{username}'
     capacity: 10Gi
-    homeMountPath: /home
+    homeMountPath: /home/{username}
   image:
     name: nsglobusautobuilds/jupyterlab-testing
     tag: latest
