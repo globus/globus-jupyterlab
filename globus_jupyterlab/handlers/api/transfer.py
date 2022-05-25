@@ -192,9 +192,6 @@ class GlobusSDKWrapper(AutoAuthURLMixin):
                     self.log.error("Failed to generate login URL", exc_info=True)
                     response["error"] = le.__class__.__name__
                     response["details"] = str(le)
-            from pprint import pprint
-
-            pprint(response)
             return self.finish(json.dumps(response))
 
 
