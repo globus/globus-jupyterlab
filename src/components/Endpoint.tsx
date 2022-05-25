@@ -181,7 +181,7 @@ const Endpoint = (props) => {
     if (props.selectedJupyterItems.directories.length === 0 || props.selectedJupyterItems.directories.length > 1) {
       setLoading(false);
       setAPIError({
-        response: { status: '500', statusText: 'Please select one jupyter directory to transfer data to' },
+        response: { status: '500', statusText: 'To transfer to Jupyter Hub, you must select only one directory to transfer to.' },
       });
     }
 
@@ -277,25 +277,6 @@ const Endpoint = (props) => {
     }
   };
 
-  if (apiError) {
-    return (
-      <div className='row'>
-        <div className='col-8'>
-          <div className='alert alert-danger'>
-            <strong>
-              Error {apiError.response.status}: {apiError.response.statusText}.
-            </strong>{' '}
-            {apiError.details && apiError.details}
-            <br />
-            <button className='btn btn-sm btn-outline-danger mt-3' onClick={props.handleShowSearch}>
-              Go Back
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (loading) {
     return <h5 className='mt-3'>Loading</h5>;
   }
@@ -327,7 +308,17 @@ const Endpoint = (props) => {
                   Check Status of Request <i className='fa-solid fa-arrow-up-right-from-square'></i>
                 </a>
               </p>
-              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button type='button' className='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+            </div>
+          )}
+
+          {apiError && (
+            <div className='alert alert-danger alert-dismissible col-8 fade show'>
+              <strong>
+                Error {apiError.response.status}: {apiError.response.statusText}.
+              </strong>{' '}
+              {apiError.details && apiError.details}
+              <button type='button' className='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
             </div>
           )}
           <br />

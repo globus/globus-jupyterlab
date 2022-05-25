@@ -1,9 +1,10 @@
 import { getBaseURL } from './utilities';
-import { requestAPI } from './handler';
 import { HashRouter, Route, Switch } from 'react-router-dom';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useEffect, useState } from 'react';
 import { RecoilRoot, useSetRecoilState } from 'recoil';
+import { requestAPI } from './handler';
 
 import EndpointSearch from './components/EndpointSearch';
 
@@ -11,7 +12,9 @@ import { ConfigAtom } from './components/GlobusObjects';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+
+// Import specific bootstrap javascript plugins
+import 'bootstrap/js/dist/alert.js';
 
 const App = (props: any): JSX.Element => {
   // Local state values
