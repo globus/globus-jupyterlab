@@ -102,3 +102,33 @@ def test_401_login_url_with_custom_submission_scope(
         "http://myscope[https://auth.globus.org/scopes/foo/data_access]"
         in requested_scopes
     )
+
+
+@pytest.mark.gen_test
+def test_transfer_submission_normal(
+    http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
+):
+    body = json.dumps(
+        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 200
+
+
+@pytest.mark.gen_test
+def test_401_transfer_submission_normal(
+    http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
+):
+    transfer_client.submit_transfer.side_effect = sdk_error(
+        "401 error!", http_status=401
+    )
+    body = json.dumps(
+        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    error = json.loads(response.body.decode("utf-8"))
+    assert "login_url" in error

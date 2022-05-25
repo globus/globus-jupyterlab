@@ -75,7 +75,32 @@ def native_client(monkeypatch) -> globus_sdk.NativeAppAuthClient:
 def transfer_client(monkeypatch) -> globus_sdk.TransferClient:
     """Mock the tranfer client, return the class instance"""
     monkeypatch.setattr(globus_sdk, "TransferClient", Mock())
-    return globus_sdk.TransferClient.return_value
+    inst = globus_sdk.TransferClient.return_value
+
+    class MockData:
+        data = {"mock_transfer": "data"}
+
+    inst.submit_transfer.return_value = MockData()
+    return inst
+
+
+@pytest.fixture
+def transfer_data(monkeypatch) -> globus_sdk.TransferClient:
+    """Mock the tranfer data, return the class instance"""
+
+    class MockTransferData:
+        def __init__(self, tc, source, dest):
+            self.data = {
+                "source_endpoint": source,
+                "destination_endpoint": dest,
+                "DATA": [],
+            }
+
+        def add_item(self, src, dest, recursive=False):
+            self.data.append((src, dest, recursive))
+
+    monkeypatch.setattr(globus_sdk, "TransferData", MockTransferData)
+    return globus_sdk.TransferData
 
 
 @pytest.fixture
