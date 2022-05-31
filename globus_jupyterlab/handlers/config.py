@@ -24,6 +24,7 @@ class Config(BaseAPIHandler):
             "is_hub": self.gconfig.is_hub(),
             "is_manual_copy_code_required": copy_required,
             "is_logged_in": self.login_manager.is_logged_in(),
+            "last_login": self.gconfig.last_login,
             "collection_id_owner": self.gconfig.get_collection_id_owner(),
         }
         self.finish(json.dumps(data))

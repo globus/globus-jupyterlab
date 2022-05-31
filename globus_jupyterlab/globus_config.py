@@ -26,6 +26,17 @@ class GlobusConfig:
     base_scopes = [TransferScopes.all]
     globus_auth_code_redirect_url = "https://auth.globus.org/v2/web/auth-code"
 
+    @property
+    def last_login(self) -> str:
+        """Fetch the last time the user logged in. Only returns last login during the time JupyterLab has been running.
+        Format is a datetime string in ISO format. Returns null if the user has not logged in while JupyterLab was running."""
+        return getattr(self, "_last_login", None)
+
+    @last_login.setter
+    def last_login(self, value: str):
+        """Setter for last login. Should only be called by Login handlers."""
+        self._last_login = value
+
     def get_refresh_tokens(self) -> bool:
         """
         Should JupyterLab use Refresh tokens? Default is False. When True,
