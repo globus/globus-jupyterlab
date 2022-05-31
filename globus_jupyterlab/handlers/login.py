@@ -3,6 +3,7 @@ from tornado.concurrent import Future
 import globus_sdk
 import urllib
 import base64
+import datetime
 import os
 import json
 
@@ -53,7 +54,13 @@ class PKCEFlowManager(BaseAPIHandler):
             verifier=self.get_stored_verifier(), redirect_uri=self.get_redirect_uri()
         )
         try:
+            # Raises auth error if unsuccessful
             token_response = client.oauth2_exchange_code_for_tokens(code)
+
+            # Store the last login time and token response. The last_login time
+            # is reported by the config handler and used for polling when the
+            # user has completed auth.
+            self.gconfig.last_login = datetime.datetime.now().isoformat()
             self.login_manager.store(token_response)
             return AuthResponseModel(
                 status_code=token_response.http_status, result="success"
