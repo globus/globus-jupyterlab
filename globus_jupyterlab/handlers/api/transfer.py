@@ -168,18 +168,20 @@ class GlobusSDKWrapper(AutoAuthURLMixin):
     def get_globus_sdk_args(self):
         return [], {}
 
+    def transfer_client_call(self):
+        authorizer = self.login_manager.get_authorizer("transfer.api.globus.org")
+        tc = globus_sdk.TransferClient(authorizer=authorizer)
+        method = getattr(tc, self.globus_sdk_method)
+        args, kwargs = self.get_globus_sdk_args()
+        return method(*args, **kwargs).data
+
     def sdk_wrapper_call(self):
         response = dict()
         if self.login_manager.is_logged_in() is not True:
             self.set_status(401)
             return self.finish(json.dumps({"error": "The user is not logged in"}))
         try:
-            authorizer = self.login_manager.get_authorizer("transfer.api.globus.org")
-            tc = globus_sdk.TransferClient(authorizer=authorizer)
-            method = getattr(tc, self.globus_sdk_method)
-            args, kwargs = self.get_globus_sdk_args()
-            response = method(*args, **kwargs)
-            return self.finish(json.dumps(response.data))
+            return self.finish(json.dumps(self.transfer_client_call()))
         except globus_sdk.GlobusAPIError as gapie:
             self.set_status(gapie.http_status)
             response = {"error": gapie.code, "details": gapie.message}
@@ -192,9 +194,6 @@ class GlobusSDKWrapper(AutoAuthURLMixin):
                     self.log.error("Failed to generate login URL", exc_info=True)
                     response["error"] = le.__class__.__name__
                     response["details"] = str(le)
-            from pprint import pprint
-
-            pprint(response)
             return self.finish(json.dumps(response))
 
 
@@ -237,18 +236,23 @@ class EndpointAutoactivate(POSTMethodTransferAPIEndpoint):
     optional_args = {}
 
 
-class SubmitTransfer(GCSAuthMixin):
+class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     """An API Endpoint for submitting Globus Transfers."""
 
-    @tornado.web.authenticated
-    def post(self):
+    globus_sdk_method = "submit_transfer"
+    mandatory_args = []
+    optional_args = {}
+
+    def transfer_client_call(self):
+        """Transfer submission is a bit more complex than the other wrapped calls. For one, it validates
+        a complex POST document through pydantic instead of taking simple args. Second, the call into the
+        Transfer Client requires a couple helper classes to complete, including both globus_sdk.TransferClient
+        and globus_sdk.TransferModel. Third, the globus_sdk may not be used in the case that a separate
+        service is handling the actual transfer, in which case the document needs to be forwarded instead.
+
+        Auth errors are the only unchanged mechanism. If the remote endpoint isn't active or requires
+        re-auth, the procedure is the same as other operation methods.
         """
-        Attempt to submit a transfer with tokens previously loaded by a user.
-        """
-        response = dict()
-        if self.login_manager.is_logged_in() is not True:
-            self.set_status(401)
-            return self.finish(json.dumps({"error": "The user is not logged in"}))
         try:
             post_data = json.loads(self.request.body)
             self.log.debug("Checking transfer document")
@@ -257,7 +261,6 @@ class SubmitTransfer(GCSAuthMixin):
                 response = self.submit_custom_transfer(tm)
             else:
                 response = self.submit_normal_transfer(tm)
-
             return self.finish(json.dumps(response))
         except pydantic.ValidationError as ve:
             self.set_status(400)
@@ -265,12 +268,6 @@ class SubmitTransfer(GCSAuthMixin):
             return self.finish(
                 json.dumps({"error": "Invalid Input", "details": ve.json()})
             )
-        except globus_sdk.GlobusAPIError as gapie:
-            self.set_status(gapie.http_status)
-            response = {"error": gapie.code, "details": gapie.message}
-            if gapie.http_status in [401, 403]:
-                response["login_url"] = self.get_globus_login_url()
-            return self.finish(json.dumps(response))
 
     def submit_custom_transfer(self, transfer_data: TransferModel):
         url = self.gconfig.get_transfer_submission_url()
