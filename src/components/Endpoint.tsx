@@ -5,6 +5,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 
 import { ConfigAtom } from './GlobusObjects';
+import { HubLogin } from './HubLoginWidget';
 
 const useQuery = () => {
   const { search } = useLocation();
@@ -17,6 +18,7 @@ const Endpoint = (props) => {
   const [endpointList, setEndpointList] = useState({ DATA: [], path: null });
   const [endpoint, setEndpoint] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loginURL, setLoginURL] = useState(null);
   const [selectedEndpointItems, setSelectedEndpointItems] = useState([]);
   const [transfer, setTransfer] = useState(null);
 
@@ -61,10 +63,18 @@ const Endpoint = (props) => {
 
   useEffect(() => {
     getEndpoint(endpointID);
+    return () => {
+      setAPIError(null);
+      setEndpoint(null);
+    }
   }, [endpointID]);
 
   useEffect(() => {
     listEndpointItems(endpointID, path);
+    return () => {
+      setAPIError(null);
+      setEndpointList({ DATA: [], path: null });
+    }
   }, [endpointID, path]);
 
   const getEndpoint = async (endpointID) => {
@@ -99,21 +109,44 @@ const Endpoint = (props) => {
     setEndpointList({ DATA: [], path: null });
     setLoading(true);
     try {
-      let fullPath = query.get('full-path');
-      let url = `operation_ls?endpoint=${endpointID}`;
+      var fullPath = query.get('full-path');
+      var url = `operation_ls?endpoint=${endpointID}`;
       if (fullPath) {
         url = `${url}&path=${fullPath}`;
       }
       const listItems = await requestAPI<any>(url);
       setEndpointList(listItems);
     } catch (error) {
+      setAPIError({ ...error, ...{ global: true } });
       let error_response = await error.response.json();
-      /* Note: This probably isn't a great UX to simply pop up a login page, but it
-      does demonstrate the base functionality for picking endpoints */
+
+      /* 
+        Note: This probably isn't a great UX to simply pop up a login page, but it
+        does demonstrate the base functionality for picking endpoints 
+      */
       if ('login_url' in error_response) {
-        window.open(error_response.login_url, 'Globus Login', 'height=600,width=800').focus();
+        // Poll for successful authentication.
+        var lastConfig = await requestAPI<any>('config');
+        var lastLogin = new Date(lastConfig.last_login).getTime();
+
+        let authInterval = window.setInterval(async () => {
+          const updatedConfig = await requestAPI<any>('config');
+          var newLogin = new Date(updatedConfig.last_login).getTime();
+
+          if (newLogin !== lastLogin) {
+            history.push('/');
+            history.replace(`/endpoints/${endpointID}`);
+            clearInterval(authInterval);
+          }
+        }, 1000);
+
+        if (config.is_hub) {
+          setAPIError(null);
+          setLoginURL(error_response.login_url);
+        } else {
+          window.open(error_response.login_url, 'Globus Login', 'height=600,width=800').focus();
+        }
       }
-      setAPIError({ ...error, ...error_response });
     }
     setLoading(false);
   };
@@ -181,35 +214,39 @@ const Endpoint = (props) => {
     if (props.selectedJupyterItems.directories.length === 0 || props.selectedJupyterItems.directories.length > 1) {
       setLoading(false);
       setAPIError({
-        response: { status: '500', statusText: 'To transfer to Jupyter Hub, you must select only one directory to transfer to.' },
+        response: {
+          status: '500',
+          statusText: 'To transfer to Jupyter Hub, you must select only one directory to transfer to.',
+        },
       });
-    }
+    } else {
+      // Loop through selectedEndpointItems from state
+      for (let selectedEndpointItem of selectedEndpointItems) {
+        transferItems.push({
+          source_path: `${endpointList.path}${selectedEndpointItem.name}`,
+          destination_path: `${config.collection_base_path}/${props.selectedJupyterItems.directories[0].path}/${selectedEndpointItem.name}`,
+          recursive: selectedEndpointItem.type == 'dir' ? true : false,
+        });
+      }
 
-    // Loop through selectedEndpointItems from state
-    for (let selectedEndpointItem of selectedEndpointItems) {
-      transferItems.push({
-        source_path: `${endpointList.path}${selectedEndpointItem.name}`,
-        destination_path: `${config.collection_base_path}/${props.selectedJupyterItems.directories[0].path}/${selectedEndpointItem.name}`,
-        recursive: selectedEndpointItem.type == 'dir' ? true : false,
-      });
-    }
+      // @ts-ignore
+      let transferRequest = {
+        source_endpoint: sourceEndpoint,
+        destination_endpoint: destinationEndpoint,
+        DATA: transferItems,
+      };
 
-    let transferRequest = {
-      source_endpoint: sourceEndpoint,
-      destination_endpoint: destinationEndpoint,
-      DATA: transferItems,
-    };
-
-    try {
-      const transferResponse = await requestAPI<any>('submit_transfer', {
-        body: JSON.stringify(transferRequest),
-        method: 'POST',
-      });
-      setLoading(false);
-      setTransfer(transferResponse);
-    } catch (error) {
-      setLoading(false);
-      setAPIError(error);
+      try {
+        const transferResponse = await requestAPI<any>('submit_transfer', {
+          body: JSON.stringify(transferRequest),
+          method: 'POST',
+        });
+        setLoading(false);
+        setTransfer(transferResponse);
+      } catch (error) {
+        setLoading(false);
+        setAPIError(error);
+      }
     }
   };
 
@@ -277,8 +314,24 @@ const Endpoint = (props) => {
     }
   };
 
+  if (apiError && apiError.global) {
+    return (
+      <div className='alert alert-danger alert-dismissible col-8 fade show'>
+        <strong>
+          Error {apiError.response.status}: {apiError.response.statusText}.
+        </strong>{' '}
+        {apiError.details && apiError.details}
+        <button type='button' className='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>
+    );
+  }
+
   if (loading) {
     return <h5 className='mt-3'>Loading</h5>;
+  }
+
+  if (loginURL) {
+    return <HubLogin loginURL={loginURL} />;
   }
 
   return (
