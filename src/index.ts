@@ -3,7 +3,7 @@ import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
 import { PageConfig } from '@jupyterlab/coreutils';
 
-import { getBaseURL, GlobusIcon } from './utilities';
+import { GlobusIcon } from './utilities';
 import { GlobusWidget } from './widget';
 import { HubLoginWidget } from './components/HubLoginWidget';
 import { requestAPI } from './handler';
@@ -40,7 +40,7 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
     console.log('Fetching basic data about the notebook server environment:', data);
 
     /*
-      Commands to initiate a Globus Transfer. 
+      Commands to initiate a Globus Transfer.
       */
     let extensionCommands = [
       {
@@ -80,7 +80,7 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
               hubWidget.title.icon = GlobusIcon;
               app.shell.add(hubWidget, 'main');
             } else {
-              window.open(getBaseURL('globus-jupyterlab/login'), 'Globus Login', 'height=600,width=800').focus();
+              window.open('globus-jupyterlab/login', 'Globus Login', 'height=600,width=800').focus();
             }
 
             // Poll for successful authentication.

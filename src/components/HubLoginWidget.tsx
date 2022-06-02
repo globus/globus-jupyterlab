@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 
-import { getBaseURL } from '../utilities';
 import { requestAPI } from '../handler';
 
 export const HubLogin = (props) => {
@@ -78,7 +77,7 @@ export const HubLogin = (props) => {
               className='btn btn-outline-primary'
               onClick={() => {
                 let loginURL = 'loginURL' in props ? props.loginURL : 'globus-jupyterlab/login';
-                window.open(getBaseURL(loginURL), 'Login with Globus', 'height=600,width=800').focus();
+                window.open(loginURL, 'Login with Globus', 'height=600,width=800').focus();
               }}>
               Login to Globus
             </button>
