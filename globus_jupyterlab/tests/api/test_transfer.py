@@ -2,7 +2,7 @@ from unittest.mock import Mock
 from urllib.parse import urlencode, urlparse, parse_qs
 import json
 import tornado
-from globus_jupyterlab.tests.mocks import SDKResponse
+from globus_jupyterlab.tests.mocks import (SDKResponse, GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN, GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE)
 import pytest
 
 
@@ -41,6 +41,29 @@ def test_get_api(
         )
         assert response.code == 200
 
+
+@pytest.mark.gen_test
+@pytest.mark.parametrize(
+    "grid_ftp_message",
+    [
+        GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
+        GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+    ],
+)
+def test_gridftp_login_errors(
+    grid_ftp_message,
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    logged_in,
+):
+    transfer_client.operation_ls.side_effect = sdk_error(grid_ftp_message, code='ExternalError.DirListingFailed.LoginFailed',
+    http_status=502)
+    response = yield http_client.fetch(base_url + f"/operation_ls?endpoint=Foo", raise_error=False)
+    assert response.code == 401
+    error = json.loads(response.body.decode("utf-8"))
+    assert error["login_required"] is True
 
 @pytest.mark.gen_test
 def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged_in):

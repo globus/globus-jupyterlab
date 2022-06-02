@@ -38,8 +38,9 @@ class AutoAuthURLMixin(BaseAPIHandler):
     ) -> exception_handlers.AuthExceptionHandler:
         for cls in self.login_checks:
             instance = cls(exception)
-            self.log.debug(f"Checking {cls.__name__}")
-            if instance.check() is True:
+            check_value = instance.check()
+            self.log.debug(f"Checking {cls.__name__}: {check_value}")
+            if check_value is True:
                 return instance
 
     def get_requested_scopes(
