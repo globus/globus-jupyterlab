@@ -88,14 +88,14 @@ class GCSAuthMixin(AutoAuthURLMixin):
     for the data_access scope, for each `base_scope` defined below (by default it
     is only transfer) Additionally, if a custom transfer submission scope is used,
     that will also be automatically requested."""
-
-    possible_endpoint_params = ["endpoint", "endpoint_id"]
     login_checks = [
         exception_handlers.LoginRequired,
         exception_handlers.GCSv4Endpoint,
         exception_handlers.GCSv54HighAssurance,
         exception_handlers.GCSv54S3Credentials,
         exception_handlers.GCSv54DataAccessConsent,
+        # Note! This should always be last, after all other GRIDFTP error types! 
+        exception_handlers.GCSUnexpectedGridFTPError,
     ]
 
     def get_login_exception_handler(

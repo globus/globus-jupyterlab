@@ -2,7 +2,7 @@ from unittest.mock import Mock
 from urllib.parse import urlencode, urlparse, parse_qs
 import json
 import tornado
-from globus_jupyterlab.tests.mocks import (SDKResponse, GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN, GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE)
+from globus_jupyterlab.tests.mocks import (SDKResponse, GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN, GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE, GRIDFTP_UNEXPECTED_MESSAGE)
 import pytest
 
 
@@ -44,14 +44,16 @@ def test_get_api(
 
 @pytest.mark.gen_test
 @pytest.mark.parametrize(
-    "grid_ftp_message",
+    "grid_ftp_message, login_url",
     [
-        GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
-        GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+        (GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN, '/login?requested_scopes=urn%3Aglobus%3Aauth%3Ascope%3Atransfer.api.globus.org%3Aall&session_required_single_domain=globus.org'),
+        (GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE, 'https://app.globus.org/file-manager?origin_id=Foo'),
+        (GRIDFTP_UNEXPECTED_MESSAGE, 'https://app.globus.org/file-manager?origin_id=Foo'),
     ],
 )
 def test_gridftp_login_errors(
     grid_ftp_message,
+    login_url,
     http_client,
     base_url,
     transfer_client,
@@ -64,6 +66,7 @@ def test_gridftp_login_errors(
     assert response.code == 401
     error = json.loads(response.body.decode("utf-8"))
     assert error["login_required"] is True
+    assert error['login_url'] == login_url
 
 @pytest.mark.gen_test
 def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged_in):

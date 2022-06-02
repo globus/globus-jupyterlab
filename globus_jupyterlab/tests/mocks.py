@@ -45,8 +45,17 @@ Message: Login Failed
 Details: 530-Login incorrect. : GlobusError: v=1 c=LOGIN_DENIED\r\n530-GridFTP-Message: Your credential requires some initial setup.\r\n530-GridFTP-JSON-Result: {"DATA_TYPE": "result#1.0.0", "code": "invalid_credential", "detail": {"DATA_TYPE": "invalid_credential#1.0.0", "user_credential_id": "249248d1-df8e-5c27-8d43-7b35a8924004"}, "has_next_page": false, "http_response_code": 403, "message": "Your credential requires some initial setup."}\r\n530 End.\r\n
 """
 
+GRIDFTP_UNEXPECTED_MESSAGE = r"""Error validating login to endpoint 'Globus Staff Interdimensional (9xdac9c3-b409-4ca9-91df-8c29f294f1f9)', Error (login)
+Endpoint: Globus Staff Interdimensional (9xdac9c3-b409-4ca9-91df-8c29f294f1f9)
+Server: m-bxabc7.fa5e.bd7c.data.globus.org:443
+Message: Login Failed
+---
+Details: 530-Login incorrect. : GlobusError: v=1 c=LOGIN_DENIED\r\n530-GridFTP-Message: Something Horrible Happened.\r\n530-GridFTP-JSON-Result: {"DATA_TYPE": "result#1.0.0", "code": "invalid_credential", "detail": {"DATA_TYPE": "does_not_exist#1.0.0", "user_credential_id": "249248d1-df8e-5c27-8d43-7b35a8924004"}, "has_next_page": false, "http_response_code": 403, "message": "The collection appears to have been blown up by a giant moon laser. Before attempting to fix this problem, you should probably find somewhere to hide. Like right now. Seriously."}\r\n530 End.\r\n
+"""
+
 for message in [
     GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
     GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+    GRIDFTP_UNEXPECTED_MESSAGE,
 ]:
     assert re.search(r"530-GridFTP-JSON-Result: (.+)\\r\\n530 End", message), f'Mock messages not setup correctly! {message}'
