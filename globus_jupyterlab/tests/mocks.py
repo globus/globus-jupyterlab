@@ -58,4 +58,6 @@ for message in [
     GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
     GRIDFTP_UNEXPECTED_MESSAGE,
 ]:
-    assert re.search(r"530-GridFTP-JSON-Result: (.+)\\r\\n530 End", message), f'Mock messages not setup correctly! {message}'
+    assert re.search(
+        r"530-GridFTP-JSON-Result: (.+)\\r\\n530 End", message
+    ), f"Mock messages not setup correctly! {message}"

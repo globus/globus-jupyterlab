@@ -102,7 +102,7 @@ class GCSUnexpectedGridFTPError(GCSAuthExceptionHandler):
     requires_endpoint = True
 
     def check(self) -> bool:
-        
+
         return bool(self.exception.http_status == 502 and self.gridftp_response)
 
     def get_custom_login_url(self) -> str:
