@@ -16,6 +16,7 @@ class EndpointAutoactivate(POSTMethodTransferAPIEndpoint):
     globus_sdk_method = "endpoint_autoactivate"
     mandatory_args = ["endpoint_id"]
     optional_args = {}
+    endpoint_or_collection_parameter = "endpoint_id"
 
 
 class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
@@ -114,6 +115,7 @@ class OperationLS(GCSAuthMixin, GetMethodTransferAPIEndpoint):
     globus_sdk_method = "operation_ls"
     mandatory_args = ["endpoint"]
     optional_args = {"path": None, "show_hidden": 0}
+    endpoint_or_collection_parameter = "endpoint"
 
 
 class EndpointSearch(GetMethodTransferAPIEndpoint):
@@ -136,6 +138,7 @@ class EndpointDetail(GCSAuthMixin, GetMethodTransferAPIEndpoint):
     globus_sdk_method = "get_endpoint"
     mandatory_args = ["endpoint"]
     optional_args = {}
+    endpoint_or_collection_parameter = "endpoint"
 
 
 default_handlers = [
