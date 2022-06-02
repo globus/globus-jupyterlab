@@ -94,6 +94,7 @@ class GCSAuthMixin(AutoAuthURLMixin):
         exception_handlers.LoginRequired,
         exception_handlers.GCSv4Endpoint,
         exception_handlers.GCSv54HighAssurance,
+        exception_handlers.GCSv54S3Credentials,
         exception_handlers.GCSv54DataAccessConsent,
     ]
 

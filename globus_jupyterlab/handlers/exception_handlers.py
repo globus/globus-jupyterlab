@@ -83,6 +83,21 @@ class GCSv54HighAssurance(GCSAuthExceptionHandler):
         return domains
 
 
+class GCSv54S3Credentials(GCSAuthExceptionHandler):
+    requires_endpoint = True
+
+    def check(self) -> bool:
+        return (
+            self.exception.http_status == 502
+            and self.gridftp_response
+            and self.gridftp_response.get("detail", {}).get("DATA_TYPE")
+            == "invalid_credential#1.0.0"
+        )
+
+    def get_custom_login_url(self) -> str:
+        return f"https://app.globus.org/file-manager?origin_id={self.endpoint}"
+
+
 class GCSv54DataAccessConsent(GCSAuthExceptionHandler):
     def check(self) -> bool:
         """
