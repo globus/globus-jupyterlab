@@ -4,7 +4,7 @@ import { ReactWidget } from '@jupyterlab/apputils';
 import { getBaseURL } from '../utilities';
 import { requestAPI } from '../handler';
 
-const HubLogin = (props) => {
+export const HubLogin = (props) => {
   const [apiError, setAPIError] = useState(null);
   const [hubInputCode, setHubInputCode] = useState(null);
 
@@ -27,12 +27,23 @@ const HubLogin = (props) => {
     event.preventDefault();
 
     try {
-      let response = await requestAPI<any>(`oauth_callback_manual?code=${hubInputCode}`);
-      console.log(response);
+      await requestAPI<any>(`oauth_callback_manual?code=${hubInputCode}`);
     } catch (error) {
       setAPIError(error);
     }
   };
+
+  if (apiError) {
+    return (
+      <div className='alert alert-danger alert-dismissible col-8 fade show'>
+        <strong>
+          Error {apiError.response.status}: {apiError.response.statusText}.
+        </strong>{' '}
+        {apiError.details && apiError.details}
+        <button type='button' className='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>
+    );
+  }
 
   return (
     <div className='container mt-3'>
@@ -65,9 +76,10 @@ const HubLogin = (props) => {
             <button
               type='button'
               className='btn btn-outline-primary'
-              onClick={() =>
-                window.open(getBaseURL('globus-jupyterlab/login'), 'Login with Globus', 'height=600,width=800').focus()
-              }>
+              onClick={() => {
+                let loginURL = 'loginURL' in props ? props.loginURL : 'globus-jupyterlab/login';
+                window.open(getBaseURL(loginURL), 'Login with Globus', 'height=600,width=800').focus();
+              }}>
               Login to Globus
             </button>
           </div>

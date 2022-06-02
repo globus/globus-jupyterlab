@@ -6,8 +6,11 @@ export const ConfigAtom = atom({
     collection_id: '',
     collection_base_path: '',
     is_gcp: false,
+    is_hub: false,
+    is_manual_copy_code_required: false,
     is_logged_in: false,
-    collection_id_owner: ''
+    collection_id_owner: '',
+    last_login: null,
   },
 });
 

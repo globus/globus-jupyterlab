@@ -70,7 +70,7 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
           widget.title.label = label;
           widget.title.icon = GlobusIcon;
 
-          if (config.is_logged_in) {
+          if (config.is_logged_in && config.last_login) {
             app.shell.add(widget, 'main');
           } else {
             if (config.is_hub) {
@@ -79,6 +79,8 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
               hubWidget.title.label = 'Authorization Code';
               hubWidget.title.icon = GlobusIcon;
               app.shell.add(hubWidget, 'main');
+            } else {
+              window.open(getBaseURL('globus-jupyterlab/login'), 'Globus Login', 'height=600,width=800').focus();
             }
 
             // Poll for successful authentication.
@@ -89,7 +91,6 @@ async function activateGlobus(app: JupyterFrontEnd, factory: IFileBrowserFactory
                 clearInterval(authInterval);
               }
             }, 1000);
-            window.open(getBaseURL('globus-jupyterlab/login'), 'Globus Login', 'height=600,width=800').focus();
           }
         },
       }
