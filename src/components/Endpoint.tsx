@@ -7,6 +7,9 @@ import { useRecoilValue } from 'recoil';
 import { ConfigAtom } from './GlobusObjects';
 import { HubLogin } from './HubLoginWidget';
 
+import * as path from 'path';
+var _path = path;
+
 const useQuery = () => {
   const { search } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
@@ -66,7 +69,7 @@ const Endpoint = (props) => {
     return () => {
       setAPIError(null);
       setEndpoint(null);
-    }
+    };
   }, [endpointID]);
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const Endpoint = (props) => {
     return () => {
       setAPIError(null);
       setEndpointList({ DATA: [], path: null });
-    }
+    };
   }, [endpointID, path]);
 
   const getEndpoint = async (endpointID) => {
@@ -215,21 +218,27 @@ const Endpoint = (props) => {
       setLoading(false);
       setAPIError({
         response: {
-          status: '500',
+          status: 'DirectorySelectionError',
           statusText: 'To transfer to Jupyter Hub, you must select only one directory to transfer to.',
         },
       });
     } else {
       // Loop through selectedEndpointItems from state
       for (let selectedEndpointItem of selectedEndpointItems) {
+        let sourcePath = _path.posix.resolve(endpointList.path, selectedEndpointItem.name);
+        let destinationPath = _path.posix.resolve(
+          config.collection_base_path,
+          props.selectedJupyterItems.directories[0].path,
+          selectedEndpointItem.name
+        );
+
         transferItems.push({
-          source_path: `${endpointList.path}${selectedEndpointItem.name}`,
-          destination_path: `${config.collection_base_path}/${props.selectedJupyterItems.directories[0].path}/${selectedEndpointItem.name}`,
+          source_path: sourcePath,
+          destination_path: destinationPath,
           recursive: selectedEndpointItem.type == 'dir' ? true : false,
         });
       }
 
-      // @ts-ignore
       let transferRequest = {
         source_endpoint: sourceEndpoint,
         destination_endpoint: destinationEndpoint,
@@ -262,7 +271,10 @@ const Endpoint = (props) => {
 
     if (selectedEndpointItems.length > 1) {
       setAPIError({
-        response: { status: '500', statusText: 'Please only select one remote directory to transfer data to' },
+        response: {
+          status: 'DirectorySelectionError',
+          statusText: 'Please only select one remote directory to transfer data to',
+        },
       });
     }
 
@@ -270,11 +282,13 @@ const Endpoint = (props) => {
     if (props.selectedJupyterItems.directories.length) {
       for (let directory of props.selectedJupyterItems.directories) {
         let destinationPath = selectedEndpointItems.length
-          ? `${endpointList.path}${selectedEndpointItems[0].name}/${directory.path}`
-          : `${endpointList.path}${directory.path}`;
+          ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, directory.path)
+          : _path.posix.resolve(endpointList.path, directory.path);
+
+        let sourcePath = _path.posix.resolve(config.collection_base_path, directory.path);
 
         transferItems.push({
-          source_path: `${config.collection_base_path}/${directory.path}`,
+          source_path: sourcePath,
           destination_path: destinationPath,
           recursive: true,
         });
@@ -284,11 +298,13 @@ const Endpoint = (props) => {
     if (props.selectedJupyterItems.files.length) {
       for (let file of props.selectedJupyterItems.files) {
         let destinationPath = selectedEndpointItems.length
-          ? `${endpointList.path}${selectedEndpointItems[0].name}/${file.path}`
-          : `${endpointList.path}${file.path}`;
+          ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, file.path)
+          : _path.posix.resolve(endpointList.path, file.path);
+
+        let sourcePath = _path.posix.resolve(config.collection_base_path, file.path);
 
         transferItems.push({
-          source_path: `${config.collection_base_path}/${file.path}`,
+          source_path: sourcePath,
           destination_path: destinationPath,
           recursive: false,
         });
