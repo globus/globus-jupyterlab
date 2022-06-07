@@ -16,6 +16,10 @@ class LoginException(GlobusJupyterlabException):
     pass
 
 
+class DataAccessScopesRequired(LoginException):
+    pass
+
+
 class TokenStorageError(GlobusJupyterlabException):
     """A problem loading user Globus tokens"""
 

@@ -2,7 +2,12 @@ from unittest.mock import Mock
 from urllib.parse import urlencode, urlparse, parse_qs
 import json
 import tornado
-from globus_jupyterlab.tests.mocks import SDKResponse
+from globus_jupyterlab.tests.mocks import (
+    SDKResponse,
+    GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
+    GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+    GRIDFTP_UNEXPECTED_MESSAGE,
+)
 import pytest
 
 
@@ -40,6 +45,47 @@ def test_get_api(
             base_url + f"/{operation}?{urlencode(input)}"
         )
         assert response.code == 200
+
+
+@pytest.mark.gen_test
+@pytest.mark.parametrize(
+    "grid_ftp_message, login_url",
+    [
+        (
+            GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
+            "/login?requested_scopes=urn%3Aglobus%3Aauth%3Ascope%3Atransfer.api.globus.org%3Aall&session_required_single_domain=globus.org",
+        ),
+        (
+            GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+            "https://app.globus.org/file-manager?origin_id=Foo",
+        ),
+        (
+            GRIDFTP_UNEXPECTED_MESSAGE,
+            "https://app.globus.org/file-manager?origin_id=Foo",
+        ),
+    ],
+)
+def test_gridftp_login_errors(
+    grid_ftp_message,
+    login_url,
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    logged_in,
+):
+    transfer_client.operation_ls.side_effect = sdk_error(
+        grid_ftp_message,
+        code="ExternalError.DirListingFailed.LoginFailed",
+        http_status=502,
+    )
+    response = yield http_client.fetch(
+        base_url + f"/operation_ls?endpoint=Foo", raise_error=False
+    )
+    assert response.code == 401
+    error = json.loads(response.body.decode("utf-8"))
+    assert error["login_required"] is True
+    assert error["login_url"] == login_url
 
 
 @pytest.mark.gen_test
