@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.4](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b3...v1.0.0b4) (2022-06-07)
+
+
+### Bug Fixes
+
+* Alert dismiss not working ([527daf8](https://github.com/globus/globus-jupyterlab/commit/527daf8b941ea90e1965cf444ffc57a0d41ddf0c))
+* login url for hub login ([c462d78](https://github.com/globus/globus-jupyterlab/commit/c462d78277663a0da9e06957e958692eedc2dd99))
+* multiple logins, transfer, collection types ([3ddc1c0](https://github.com/globus/globus-jupyterlab/commit/3ddc1c049ca8cc2e915877bd01f3132a19b3bb96))
+* prettier pre-commit, error status, and use standard node path for transfer ([2041175](https://github.com/globus/globus-jupyterlab/commit/20411754908e08659296fa28e6a1cdce932bf65f))
+* Respond to GCS S3 collection "Credentials Required" errors ([86012f0](https://github.com/globus/globus-jupyterlab/commit/86012f06c036138ed1ff3d70f0b6d6302e8d57b4))
+* Transfer Submission not properly responding to auth exceptions ([4af8fe5](https://github.com/globus/globus-jupyterlab/commit/4af8fe5011e74f42ab254a802e658f004c9e3c4f))
+
 ## [1.0.0-beta.3](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b2...v1.0.0b3) (2022-05-20)
 
 
