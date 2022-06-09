@@ -1,16 +1,55 @@
 import time
 import re
 
+now_seconds = int(time.time())
+two_days_from_now_seconds = now_seconds * 60 * 60 * 48
+
 MOCK_TOKENS = {
     "transfer.api.globus.org": {
         "access_token": "mock_user_access_token",
-        # Simulate brand new fresh tokens that expire in 48 hours
-        "expires_at_seconds": int(time.time()) + 60 * 60 * 48,
+        "expires_at_seconds": two_days_from_now_seconds,
         "refresh_token": None,
         "resource_server": "transfer.api.globus.org",
         "scope": "urn:globus:auth:scope:transfer.api.globus.org:all",
         "token_type": "Bearer",
-    }
+    },
+    "auth.globus.org": {
+        "access_token": "auth_access_token",
+        "expires_at_seconds": two_days_from_now_seconds,
+        "refresh_token": None,
+        "resource_server": "auth.globus.org",
+        "scope": "openid profile",
+        "token_type": "Bearer",
+    },
+}
+
+MOCK_IDENTITIES = {
+    "sub": "e5446c8f-bf6c-4db1-9e3c-b0987b385172",
+    "organization": "Globus",
+    "name": "Owl Lady",
+    "preferred_username": "theowllady@globusid.org",
+    "identity_provider": "228a7af8-16a2-486c-b212-d8c7860d16e2",
+    "identity_provider_display_name": "Globus ID",
+    "last_authentication": 1654732330,
+    "identity_set": [
+        {
+            "sub": "e5446c8f-bf6c-4db1-9e3c-b0987b385172",
+            "organization": "Globus",
+            "name": "Owl Lady",
+            "username": "theowllady@globusid.org",
+            "identity_provider": "228a7af8-16a2-486c-b212-d8c7860d16e2",
+            "identity_provider_display_name": "Globus ID",
+            "last_authentication": now_seconds,
+        },
+        {
+            "sub": "7d4657a1-0422-409a-a0ee-077f4a6a99a1",
+            "name": "Owl Lady",
+            "username": "theowllady@globus.org",
+            "identity_provider": "04b5377c-3b1a-4e9d-b84c-bdeaa6c2fc1f",
+            "identity_provider_display_name": "Globus Staff",
+            "last_authentication": now_seconds,
+        },
+    ],
 }
 
 

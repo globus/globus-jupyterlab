@@ -5,7 +5,7 @@ import base64
 from typing import List
 
 import globus_sdk
-from globus_sdk.scopes import TransferScopes
+from globus_sdk.scopes import TransferScopes, AuthScopes
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class GlobusConfig:
     """
 
     default_client_id = "64d2d5b3-b77e-4e04-86d9-e3f143f563f7"
-    base_scopes = [TransferScopes.all]
+    base_scopes = [TransferScopes.all, AuthScopes.profile, AuthScopes.openid]
     globus_auth_code_redirect_url = "https://auth.globus.org/v2/web/auth-code"
 
     @property
@@ -75,6 +75,18 @@ class GlobusConfig:
         In those cases, dependent scopes must be added manually.
         """
         scopes = self.base_scopes.copy()
+        custom_transfer_scope = self.get_transfer_submission_scope()
+        if custom_transfer_scope:
+            scopes.append(custom_transfer_scope)
+        return scopes
+
+    def get_transfer_scopes(self) -> List[str]:
+        """
+        Get all known transfer scopes required by Globus JupyterLab. Typically this
+        is only globus_sdk.scopes.TransferScopes.all, but if GLOBUS_TRANSFER_SUBMISSION_SCOPE
+        is set, it will return a list containing both.
+        """
+        scopes = [TransferScopes.all]
         custom_transfer_scope = self.get_transfer_submission_scope()
         if custom_transfer_scope:
             scopes.append(custom_transfer_scope)
