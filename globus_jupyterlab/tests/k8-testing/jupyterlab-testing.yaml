@@ -8,9 +8,9 @@ proxy:
 
 hub:
   config:
-    # Authenticator:
+    Authenticator:
       # Enable Globus Tokens in the notebooks from the hub service
-      # enable_auth_state: true
+      enable_auth_state: true
     GlobusOAuthenticator:
       client_id: ""
       client_secret: ""
@@ -30,12 +30,31 @@ hub:
       c.OAuthenticator.exclude_tokens = []
     30-set-home-dir: |
       c.KubeSpawner.working_dir = '/home/{username}'
+    40-set-username-in-auth-state: |
+      from oauthenticator.globus import GlobusOAuthenticator
+
+      class CustomGlobusOAuthenticator(GlobusOAuthenticator):
+          async def authenticate(self, handler, data=None):
+              data = await super().authenticate(handler, data)
+              data['auth_state']['name'] = data['name']
+              return data
+
+      c.JupyterHub.authenticator_class = CustomGlobusOAuthenticator
+
+    35-set-server-user: |
+      def userdata_hook(spawner, auth_state):
+        spawner.environment['NB_USER'] = auth_state["name"]
+
+      c.Spawner.auth_state_hook = userdata_hook
+    40-set-local-globus-collection: |
+      # Note: This is possible in either the globus-jupyter var or via OAuthehnticator
+      c.OAuthenticator.globus_local_endpoint = '1346ef68-d9b8-4757-a537-47cefb7698e8'
 
 singleuser:
   defaultUrl: "/lab"
   extraEnv:
     JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
-    GLOBUS_COLLECTION_ID: "ba90d77e-c5bf-47ea-aa0d-32acbc120244"
+    # GLOBUS_COLLECTION_ID: "1346ef68-d9b8-4757-a537-47cefb7698e8"
     CHOWN_HOME: "yes"
   storage:
     type: static
