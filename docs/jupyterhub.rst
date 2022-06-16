@@ -2,18 +2,41 @@ JupyterHub
 ==========
 
 For the most part, running JupyterLab in a Hub environment is the same as running JupyterLab
-locally on a workstation. 
+locally on a workstation.
 
-Users can transfer to or from any accessible Globus endpoint or collection. As a convenience, 
-Globus JupyterLab will automatically detect a local, running Globus Connect Personal endpoint. 
+Users can transfer to or from any accessible Globus endpoint or collection. As a convenience,
+Globus JupyterLab will automatically detect a local, running Globus Connect Personal endpoint.
 Globus Connect Personal may be downloaded from the Globus web application. https://app.globus.org/file-manager/gcp
 
 Globus Connect Server collections cannot be determined automatically.  These collections will need to be speficied
-manually either in the env directly, or by `OAuthenticator <https://oauthenticator.readthedocs.io/en/latest/getting-started.html#globus-scopes-and-transfer>`_
+manually either directly as env variables in the environment, or by `OAuthenticator <https://oauthenticator.readthedocs.io/en/latest/getting-started.html#globus-scopes-and-transfer>`_
+
+For example:
 
 .. code-block:: bash
 
    export GLOBUS_COLLECTION_ID='MyCollectionUUID'
+
+See :ref:`config` for a full list of config options.
+
+Kubernetes
+----------
+
+The Zero-To-JupyterHub the single-user-server is typically run on a pod separate from the hub,
+and so needs to be configured accordingly. See the `User Environment Documentation <https://zero-to-jupyterhub.readthedocs.io/en/latest/jupyterhub/customizing/user-environment.html>`_
+
+.. code-block:: yaml
+
+    singleuser:
+        extraEnv:
+            GLOBUS_COLLECTION_ID: "MyCollectionUUID"
+
+    hub:
+        extraConfig:
+            10-set-local-globus-collection: |
+                # This is only possible if users login via the Globus OAuthenticator.
+                # GLOBUS_COLLECTION_ID will take precedence if both are present.
+                c.OAuthenticator.globus_local_endpoint = '1346ef68-d9b8-4757-a537-47cefb7698e8'
 
 
 Customized Transfer Submissions
@@ -22,7 +45,7 @@ Customized Transfer Submissions
 By default, JupyterLab submits transfer requests directly to Globus Transfer.
 This behavior is customizable such that JupyterLab submits to a third-party
 Globus Resource Server instead. This is useful when a third-party app needs to
-submit the transfer request to Globus Transfer. 
+submit the transfer request to Globus Transfer.
 
 .. code-block:: bash
 
