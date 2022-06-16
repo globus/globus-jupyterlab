@@ -87,7 +87,7 @@ class GlobusConfig:
 
         * A GLOBUS_COLLECTION_ID environment variable
         * A local Globus Connect Personal Collection (GCP is installed)
-        * An endpoint ID configured in OAuthenticator
+        * Environment Variable set by OAuthenticator (GLOBUS_LOCAL_ENDPOINT)
 
         If a Globus Collection is not found, transfers cannot be submited by JupyterLab.
 
@@ -95,7 +95,7 @@ class GlobusConfig:
         """
         env = os.getenv("GLOBUS_COLLECTION_ID", None)
         gcp = self.get_gcp_collection()
-        oauthenticator = self.get_oauthenticator_data().get("endpoint_id")
+        oauthenticator = os.getenv("GLOBUS_LOCAL_ENDPOINT", None)
         collection = env or gcp or oauthenticator
         if not collection:
             log.warning(

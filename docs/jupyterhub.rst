@@ -9,7 +9,7 @@ Globus JupyterLab will automatically detect a local, running Globus Connect Pers
 Globus Connect Personal may be downloaded from the Globus web application. https://app.globus.org/file-manager/gcp
 
 Globus Connect Server collections cannot be determined automatically.  These collections will need to be speficied
-manually.
+manually either in the env directly, or by `OAuthenticator <https://oauthenticator.readthedocs.io/en/latest/getting-started.html#globus-scopes-and-transfer>`_
 
 .. code-block:: bash
 
