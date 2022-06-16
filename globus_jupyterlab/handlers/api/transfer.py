@@ -44,7 +44,8 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
                 response = self.submit_custom_transfer(tm)
             else:
                 response = self.submit_normal_transfer(tm)
-            return self.finish(json.dumps(response))
+            self.log.info('User transfer submission succeeded.')
+            return response
         except pydantic.ValidationError as ve:
             self.set_status(400)
             self.log.debug("Transfer doc failed validation", exc_info=True)

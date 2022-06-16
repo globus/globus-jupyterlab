@@ -154,6 +154,7 @@ def test_401_login_url_with_custom_submission_scope(
 def test_transfer_submission_normal(
     http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
 ):
+    transfer_client.submit_transfer.return_value = SDKResponse(data={'task_id': 'my_taks_id'})
     body = json.dumps(
         {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
     )
@@ -161,6 +162,8 @@ def test_transfer_submission_normal(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
     )
     assert response.code == 200
+    data = json.loads(response.body.decode("utf-8"))
+    assert 'task_id' in data
 
 
 @pytest.mark.gen_test
