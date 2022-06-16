@@ -10,7 +10,12 @@ import tornado.web
 
 from globus_jupyterlab.handlers import get_handlers, HANDLER_MODULES
 from globus_jupyterlab.handlers.base import BaseAPIHandler
-from globus_jupyterlab.tests.mocks import MockGlobusAPIError, MOCK_TOKENS
+from globus_jupyterlab.tests.mocks import (
+    MockGlobusAPIError,
+    MOCK_TOKENS,
+    MOCK_IDENTITIES,
+    SDKResponse,
+)
 from globus_jupyterlab.login_manager import LoginManager
 from globus_jupyterlab.globus_config import GlobusConfig
 
@@ -82,6 +87,15 @@ def transfer_client(monkeypatch) -> globus_sdk.TransferClient:
 
     inst.submit_transfer.return_value = MockData()
     return inst
+
+
+@pytest.fixture
+def auth_client(monkeypatch) -> globus_sdk.AuthClient:
+    """Mock the auth client, return the class instance"""
+    monkeypatch.setattr(globus_sdk, "AuthClient", Mock())
+    inst = globus_sdk.AuthClient.return_value
+    inst.oauth2_userinfo.return_value = SDKResponse(data=MOCK_IDENTITIES)
+    return globus_sdk.AuthClient.return_value
 
 
 @pytest.fixture

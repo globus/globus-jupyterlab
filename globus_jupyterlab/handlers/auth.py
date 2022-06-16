@@ -1,5 +1,6 @@
 import urllib
 import globus_sdk
+from typing import List
 from globus_jupyterlab.exc import DataAccessScopesRequired
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.handlers import exception_handlers
@@ -11,7 +12,7 @@ class AutoAuthURLMixin(BaseAPIHandler):
         exception_handlers.LoginRequired,
     ]
 
-    def get_endpoint_or_collection(self):
+    def get_endpoint_or_collection(self) -> str:
         """
         Used internally by exception handlers when an endpoint or collection is needed
         to determine the next course of action. For example, a gcs v4 endpoint needs activation.
@@ -47,7 +48,9 @@ class AutoAuthURLMixin(BaseAPIHandler):
         self, exception_handler: exception_handlers.AuthExceptionHandler
     ) -> list:
         try:
-            return exception_handler.get_extended_scopes(self.gconfig.get_scopes())
+            return exception_handler.get_extended_scopes(
+                self.gconfig.get_transfer_scopes()
+            )
         except DataAccessScopesRequired:
             dependent_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(
                 self.get_endpoint_or_collection()
@@ -56,8 +59,20 @@ class AutoAuthURLMixin(BaseAPIHandler):
                 self.login_manager.apply_dependent_scopes(
                     base, [dependent_scope.data_access]
                 )
-                for base in self.gconfig.get_scopes()
+                for base in self.gconfig.get_transfer_scopes()
             ]
+
+    def get_required_identities(self, domains: List[str]) -> List[str]:
+        authorizer = self.login_manager.get_authorizer("auth.globus.org")
+        auth_client = globus_sdk.AuthClient(
+            client_id=self.login_manager.client_id, authorizer=authorizer
+        )
+        response = auth_client.oauth2_userinfo()
+        return [
+            ident["sub"]
+            for ident in response.data["identity_set"]
+            if any([domain in ident["username"] for domain in domains])
+        ]
 
     def get_globus_login_url(self, exception: globus_sdk.GlobusAPIError) -> str:
         exception_handler = self.get_login_exception_handler(exception)
@@ -68,10 +83,16 @@ class AutoAuthURLMixin(BaseAPIHandler):
 
         params = dict(
             requested_scopes=" ".join(self.get_requested_scopes(exception_handler)),
+            prompt="login",
         )
         domains = exception_handler.get_required_session_domains()
         if domains:
-            params["session_required_single_domain"] = domains[0]
+            params["session_required_identities"] = ",".join(
+                self.get_required_identities(domains)
+            )
+            params[
+                "session_message"
+            ] = "The collection you selected requires a fresh login"
 
         full_login_url = f"{login_url}?{urllib.parse.urlencode(params)}"
         self.log.debug(f"Generated login url: {full_login_url}")

@@ -53,7 +53,7 @@ def test_get_api(
     [
         (
             GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
-            "/login?requested_scopes=urn%3Aglobus%3Aauth%3Ascope%3Atransfer.api.globus.org%3Aall&session_required_single_domain=globus.org",
+            "/login?requested_scopes=urn%3Aglobus%3Aauth%3Ascope%3Atransfer.api.globus.org%3Aall&prompt=login&session_required_identities=7d4657a1-0422-409a-a0ee-077f4a6a99a1&session_message=The+collection+you+selected+requires+a+fresh+login",
         ),
         (
             GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
@@ -72,6 +72,7 @@ def test_gridftp_login_errors(
     base_url,
     transfer_client,
     sdk_error,
+    auth_client,
     logged_in,
 ):
     transfer_client.operation_ls.side_effect = sdk_error(
@@ -140,6 +141,9 @@ def test_401_login_url_with_custom_submission_scope(
     error = json.loads(response.body.decode("utf-8"))
     query_params = parse_qs(urlparse(error["login_url"]).query)
     requested_scopes = query_params["requested_scopes"][0]
+
+    # There should be only two scopes given data_access
+    assert len(requested_scopes.split()) == 2
 
     assert query_params["requested_scopes"][0].startswith(
         "urn:globus:auth:scope:transfer.api.globus.org:all"
