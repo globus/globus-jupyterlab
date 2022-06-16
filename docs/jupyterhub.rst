@@ -13,7 +13,7 @@ manually.
 
 .. code-block:: bash
 
-   export GLOBUS_COLLECTION='MyCollectionUUID'
+   export GLOBUS_COLLECTION_ID='MyCollectionUUID'
 
 
 Customized Transfer Submissions
