@@ -1,3 +1,4 @@
+from logging import exception
 import urllib
 import globus_sdk
 from typing import List
@@ -11,6 +12,16 @@ class AutoAuthURLMixin(BaseAPIHandler):
     login_checks = [
         exception_handlers.LoginRequired,
     ]
+
+    def get_exception_info(self, exception: globus_sdk.GlobusAPIError) -> bool:
+        exc_handler = self.get_login_exception_handler(exception)
+        info = {
+            "error": exception.code,
+            "details": exception.message,
+        }
+        info.update(exc_handler.metadata)
+        info["login_url"] = self.get_globus_login_url(exc_handler)
+        return info
 
     def get_endpoint_or_collection(self) -> str:
         """
@@ -26,13 +37,6 @@ class AutoAuthURLMixin(BaseAPIHandler):
                 "parameter for transfer operations. It should define `endpoint_or_collection_parameter`."
             )
         return self.get_argument(col)
-
-    def is_login_required(self, exception: globus_sdk.GlobusAPIError) -> bool:
-        """
-        Check if the exception requries login. For normal calls to services, this just
-        means a 401, but there are a slew of possible login cases for GCS.
-        """
-        return bool(self.get_login_exception_handler(exception))
 
     def get_login_exception_handler(
         self, exception: globus_sdk.GlobusAPIError
@@ -74,11 +78,9 @@ class AutoAuthURLMixin(BaseAPIHandler):
             if any([domain in ident["username"] for domain in domains])
         ]
 
-    def get_globus_login_url(self, exception: globus_sdk.GlobusAPIError) -> str:
-        exception_handler = self.get_login_exception_handler(exception)
-        custom_login_url = exception_handler.get_custom_login_url()
-        if custom_login_url:
-            return custom_login_url
+    def get_globus_login_url(
+        self, exception_handler: exception_handlers.AuthExceptionHandler
+    ) -> str:
         login_url = self.reverse_url("login")
 
         params = dict(
@@ -120,10 +122,9 @@ class GCSAuthMixin(AutoAuthURLMixin):
         exception_handlers.GCSUnexpectedGridFTPError,
     ]
 
-    def get_login_exception_handler(
-        self, exception: globus_sdk.GlobusAPIError
-    ) -> exception_handlers.AuthExceptionHandler:
-        handler = super().get_login_exception_handler(exception)
-        if handler and handler.requires_endpoint:
-            handler.endpoint = self.get_endpoint_or_collection()
-        return handler
+    def get_globus_login_url(
+        self, exception_handler: exception_handlers.AuthExceptionHandler
+    ) -> str:
+        if exception_handler.requires_user_intervention:
+            return f"https://app.globus.org/file-manager?origin_id={self.get_endpoint_or_collection()}"
+        return super().get_globus_login_url(exception_handler)

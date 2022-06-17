@@ -35,19 +35,15 @@ class GlobusSDKWrapper(AutoAuthURLMixin):
             return self.finish(json.dumps(self.transfer_client_call()))
         except globus_sdk.GlobusAPIError as gapie:
             self.set_status(gapie.http_status)
-            response = {
-                "error": gapie.code,
-                "details": gapie.message,
-                "login_required": self.is_login_required(gapie),
-            }
+            response = self.get_exception_info(gapie)
             self.log.debug(
-                f'Globus SDK Error encountered, Login Required to fix above error? {response["login_required"]}',
+                f'Globus Auth Error, Login Required? {response["login_required"]} '
+                f'Requires User intervention? {response["requires_user_intervention"]}',
                 exc_info=True,
             )
-            if response["login_required"] is True:
+            if response["login_required"] or response["requires_user_intervention"]:
                 try:
                     self.set_status(401)
-                    response["login_url"] = self.get_globus_login_url(gapie)
                 except LoginException as le:
                     self.log.error("Failed to generate login URL", exc_info=True)
                     response["error"] = le.__class__.__name__
