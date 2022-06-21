@@ -49,24 +49,32 @@ def test_get_api(
 
 @pytest.mark.gen_test
 @pytest.mark.parametrize(
-    "grid_ftp_message, login_url",
+    "grid_ftp_message, login_required, requires_user_intervention, login_url",
     [
         (
             GRIDFTP_HA_NOT_FROM_ALLOWED_DOMAIN,
+            True,
+            False,
             "/login?requested_scopes=urn%3Aglobus%3Aauth%3Ascope%3Atransfer.api.globus.org%3Aall&prompt=login&session_required_identities=7d4657a1-0422-409a-a0ee-077f4a6a99a1&session_message=The+collection+you+selected+requires+a+fresh+login",
         ),
         (
             GRIDFTP_S3_CREDENTIALS_REQUIRED_MESSAGE,
+            False,
+            True,
             "https://app.globus.org/file-manager?origin_id=Foo",
         ),
         (
             GRIDFTP_UNEXPECTED_MESSAGE,
+            False,
+            True,
             "https://app.globus.org/file-manager?origin_id=Foo",
         ),
     ],
 )
 def test_gridftp_login_errors(
     grid_ftp_message,
+    login_required,
+    requires_user_intervention,
     login_url,
     http_client,
     base_url,
@@ -85,7 +93,8 @@ def test_gridftp_login_errors(
     )
     assert response.code == 401
     error = json.loads(response.body.decode("utf-8"))
-    assert error["login_required"] is True
+    assert error["login_required"] == login_required
+    assert error["requires_user_intervention"] == requires_user_intervention
     assert error["login_url"] == login_url
 
 
@@ -158,7 +167,9 @@ def test_401_login_url_with_custom_submission_scope(
 def test_transfer_submission_normal(
     http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
 ):
-    transfer_client.submit_transfer.return_value = SDKResponse(data={'task_id': 'my_taks_id'})
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
     body = json.dumps(
         {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
     )
@@ -167,7 +178,7 @@ def test_transfer_submission_normal(
     )
     assert response.code == 200
     data = json.loads(response.body.decode("utf-8"))
-    assert 'task_id' in data
+    assert "task_id" in data
 
 
 @pytest.mark.gen_test
