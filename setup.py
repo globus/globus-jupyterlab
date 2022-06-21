@@ -66,10 +66,6 @@ setup_args = dict(
     long_description_content_type="text/x-rst",
     packages=setuptools.find_packages(),
     install_requires=install_requires,
-    tests_require=install_requires + [
-        'pytest',
-        'pytest-tornado',
-    ],
     zip_safe=False,
     include_package_data=True,
     python_requires=">=3.6",

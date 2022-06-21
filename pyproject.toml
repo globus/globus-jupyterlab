@@ -15,3 +15,8 @@ npm = ["jlpm"]
 
 [tool.check-manifest]
 ignore = ["globus_jupyterlab/labextension/**", "yarn.lock", ".*", "package-lock.json"]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:.*There is no current event loop:DeprecationWarning"
+]
