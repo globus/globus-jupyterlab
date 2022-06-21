@@ -3,12 +3,18 @@ import { URLExt } from "@jupyterlab/coreutils";
 import { ServerConnection } from "@jupyterlab/services";
 
 export function normalizeURL(endPoint = "") {
+  console.log(endPoint);
+  if (endPoint.includes("workspaces")) {
+    endPoint = endPoint.replace("workspace", "");
+  }
+
   const settings = ServerConnection.makeSettings();
   const requestUrl = URLExt.join(
     settings.baseUrl,
     "globus-jupyterlab",
     endPoint
   );
+
   return requestUrl;
 }
 
