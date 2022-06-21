@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ReactWidget } from "@jupyterlab/apputils";
 
-import { requestAPI } from "../handler";
+import { normalizeURL, requestAPI } from "../handler";
 
 export const HubLogin = (props) => {
   const [apiError, setAPIError] = useState(null);
@@ -75,12 +75,10 @@ export const HubLogin = (props) => {
                   className="btn btn-outline-primary"
                   onClick={() => {
                     let loginURL =
-                      "loginURL" in props
-                        ? props.loginURL
-                        : "globus-jupyterlab/login";
+                      "loginURL" in props ? props.loginURL : "login";
                     window
                       .open(
-                        loginURL,
+                        normalizeURL(loginURL),
                         "Login with Globus",
                         "height=600,width=800"
                       )

@@ -3,8 +3,8 @@ name: ci
 on:
   push:
     branches:
-      - 'main'
-      - 'fix-directory-transfer-error'
+      - "main"
+      - "fix-login-workspaces-url"
 
 jobs:
   docker:
