@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.5](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b4...v1.0.0b5) (2022-06-23)
+
+
+### Bug Fixes
+
+* Exception in server extension when submitting normal transfer ([ff14f28](https://github.com/globus/globus-jupyterlab/commit/ff14f28999ae66bec22ab117e801f07517515f8e))
+* Globus JupyterLab not recognizing GLOBUS_LOCAL_ENDPOINT ([eccd2ac](https://github.com/globus/globus-jupyterlab/commit/eccd2ace87ef1b42f052de6a65a1888b61d8f06a))
+* login when workspaces in url ([f05bd32](https://github.com/globus/globus-jupyterlab/commit/f05bd327ee657c262023260f8c509c53c6986bb3))
+* Possible infinite login redirect on HA Collections ([1641565](https://github.com/globus/globus-jupyterlab/commit/16415656745d7a6e54a1dc18b854140f6a6262a9))
+
 ## [1.0.0-beta.4](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b3...v1.0.0b4) (2022-06-07)
 
 
