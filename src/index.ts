@@ -98,7 +98,7 @@ async function activateGlobus(
             } else {
               window
                 .open(
-                  normalizeURL("login"),
+                  normalizeURL("globus-jupyterlab/login"),
                   "Globus Login",
                   "height=600,width=800"
                 )

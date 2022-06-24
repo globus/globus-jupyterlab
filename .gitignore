@@ -16,3 +16,4 @@ labextension
 **/test-results/
 
 package-lock.json
+.vscode/
