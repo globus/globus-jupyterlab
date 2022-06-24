@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlparse, parse_qs
 import json
+import urllib
 import tornado
 from globus_jupyterlab.tests.mocks import (
     SDKResponse,
@@ -95,7 +96,11 @@ def test_gridftp_login_errors(
     error = json.loads(response.body.decode("utf-8"))
     assert error["login_required"] == login_required
     assert error["requires_user_intervention"] == requires_user_intervention
-    assert error["login_url"] == login_url
+    response_login_url = urllib.parse.urlparse(error["login_url"])
+    if response_login_url.netloc == "app.globus.org":
+        assert error["login_url"] == login_url
+    else:
+        assert f"{response_login_url.path}?{response_login_url.query}" == login_url
 
 
 @pytest.mark.gen_test
