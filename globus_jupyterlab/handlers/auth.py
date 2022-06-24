@@ -81,7 +81,6 @@ class AutoAuthURLMixin(BaseAPIHandler):
     def get_globus_login_url(
         self, exception_handler: exception_handlers.AuthExceptionHandler
     ) -> str:
-        login_url = self.reverse_url("login")
 
         params = dict(
             requested_scopes=" ".join(self.get_requested_scopes(exception_handler)),
@@ -96,7 +95,16 @@ class AutoAuthURLMixin(BaseAPIHandler):
                 "session_message"
             ] = "The collection you selected requires a fresh login"
 
-        full_login_url = f"{login_url}?{urllib.parse.urlencode(params)}"
+        full_login_url = urllib.parse.urlunparse(
+            (
+                self.request.protocol,
+                self.request.host,
+                self.reverse_url("login"),
+                "",
+                urllib.parse.urlencode(params),
+                "",
+            )
+        )
         self.log.debug(f"Generated login url: {full_login_url}")
         return full_login_url
 
