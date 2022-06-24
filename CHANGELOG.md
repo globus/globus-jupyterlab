@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.6](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b5...v1.0.0b6) (2022-06-24)
+
+
+### Bug Fixes
+
+* Regression with additional GCS v5.4 required logins generating incorrect login URLs ([5b25909](https://github.com/globus/globus-jupyterlab/commit/5b259095eaabb074bca7bf16d3d7cce35fe57949))
+
 ## [1.0.0-beta.5](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b4...v1.0.0b5) (2022-06-23)
 
 
