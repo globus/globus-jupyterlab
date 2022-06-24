@@ -75,13 +75,11 @@ export const HubLogin = (props) => {
                   className="btn btn-outline-primary"
                   onClick={() => {
                     let loginURL =
-                      "loginURL" in props ? props.loginURL : "login";
+                      "loginURL" in props
+                        ? props.loginURL
+                        : normalizeURL("globus-jupyterlab/login");
                     window
-                      .open(
-                        normalizeURL(loginURL),
-                        "Login with Globus",
-                        "height=600,width=800"
-                      )
+                      .open(loginURL, "Globus Login", "height=600,width=800")
                       .focus();
                   }}
                 >

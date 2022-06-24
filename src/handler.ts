@@ -4,11 +4,7 @@ import { ServerConnection } from "@jupyterlab/services";
 
 export function normalizeURL(endPoint = "") {
   const settings = ServerConnection.makeSettings();
-  const requestUrl = URLExt.join(
-    settings.baseUrl,
-    "globus-jupyterlab",
-    endPoint
-  );
+  const requestUrl = URLExt.join(settings.baseUrl, endPoint);
 
   return requestUrl;
 }
