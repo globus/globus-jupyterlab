@@ -7,15 +7,14 @@ from globus_jupyterlab.exc import DataAccessScopesRequired, LoginException
 
 
 class AuthExceptionHandler(abc.ABC):
-
-    requires_session_identities = False
-    requires_transfer_scopes = True
+    # True for v4 endpoints, or special mapped collecionns like s3 which require configuring custom credentials
     requires_user_intervention = False
+    # True only for GCS v5.4 mapped collections
+    requires_data_access = False
 
     def __init__(self, exception: globus_sdk.GlobusAPIError):
         self.exception = exception
         self.available_session_identities = None
-        self.requires_transfer_scopes = None
 
     @abc.abstractmethod
     def check(self) -> bool:
@@ -39,9 +38,6 @@ class AuthExceptionHandler(abc.ABC):
         See self.requires_user_intervention.
         """
         return self.requires_user_intervention is False
-
-    def get_extended_scopes(self, transfer_scopes: List) -> list:
-        return transfer_scopes
 
     def get_required_session_domains(self) -> list:
         return None
@@ -121,6 +117,8 @@ class GCSUnexpectedGridFTPError(GCSAuthExceptionHandler):
 
 
 class GCSv54DataAccessConsent(GCSAuthExceptionHandler):
+    requires_data_access = True
+
     def check(self) -> bool:
         """
         Collection is a GCS v5.4 mapped collection and requires a data_access scope
@@ -129,6 +127,3 @@ class GCSv54DataAccessConsent(GCSAuthExceptionHandler):
             self.exception.http_status == 403
             and self.exception.code == "ConsentRequired"
         )
-
-    def get_extended_scopes(self, transfer_scopes):
-        raise DataAccessScopesRequired(f"data_access scope required!")

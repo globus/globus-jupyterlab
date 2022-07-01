@@ -9,7 +9,7 @@ import { PageConfig } from "@jupyterlab/coreutils";
 import { GlobusIcon } from "./utilities";
 import { GlobusWidget } from "./widget";
 import { HubLoginWidget } from "./components/HubLoginWidget";
-import { normalizeURL, requestAPI } from "./handler";
+import { requestAPI } from "./handler";
 
 import "../style/index.css";
 
@@ -97,11 +97,7 @@ async function activateGlobus(
               app.shell.add(hubWidget, "main");
             } else {
               window
-                .open(
-                  normalizeURL("globus-jupyterlab/login"),
-                  "Globus Login",
-                  "height=600,width=800"
-                )
+                .open(config.login_url, "Globus Login", "height=600,width=800")
                 .focus();
             }
 

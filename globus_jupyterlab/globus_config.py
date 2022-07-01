@@ -134,6 +134,46 @@ class GlobusConfig:
         env = os.getenv("GLOBUS_COLLECTION_PATH", None)
         return env or os.getcwd()
 
+    def get_collection_is_mapped(self) -> str:
+        """
+        Set this if the collection set by GLOBUS_COLLECTION_ID is configured
+        as a (non-HA) mapped collection. This will automatically request a data_access scope
+        as a dependency for transfer (and GLOBUS_TRANSFER_SUBMISSION_SCOPE if set),
+        on logins for the user. If the collection is a High Assurance collection, skip
+        this setting and use GLOBUS_COLLECTION_REQUIRED_DOMAIN instead.
+
+        Configurable via evironment variable: GLOBUS_COLLECTION_IS_MAPPED
+        Default: false
+
+        Acceptable env values:
+
+        * 'true' -- for a true value
+        * 'false' -- for a false value
+        """
+        return self.check_env_boolean("GLOBUS_COLLECTION_IS_MAPPED", default=False)
+
+    def get_collection_required_domain(self) -> str:
+        """
+        Set this if the collection set by GLOBUS_COLLECTION_ID is a GCS v5.4 High
+        Assurance (HA) collection, and requires a session with a specific identity
+        provider. An identity with this domain will be enforced on the user's
+        initial login.
+
+        Note: This setting only satisfies HA requirements for transfer operations on
+        the Globus Collection, but does not prevent users logging in with different
+        identities (Clever users can bypass this requirement). See GLOBUS_CLIENT_ID
+        for registering an app which only requires specific identities.
+
+        Configurable via evironment variable: GLOBUS_COLLECTION_REQUIRED_DOMAIN
+        Default: None (Any identity acceptable)
+
+        Example:
+        export GLOBUS_COLLECTION_REQUIRED_DOMAIN=uchicago.edu
+
+        Ensures all users will login with <user>@uchicago.edu identities
+        """
+        return os.getenv("GLOBUS_COLLECTION_REQUIRED_DOMAIN", None)
+
     def get_transfer_submission_url(self) -> str:
         """
         By default, JupyterLab will start transfers on the user's

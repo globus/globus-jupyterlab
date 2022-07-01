@@ -1,9 +1,11 @@
 import json
 import tornado
-from globus_jupyterlab.handlers.base import BaseAPIHandler
+from globus_jupyterlab.handlers.auth import AutoAuthURLMixin
+
+# from globus_jupyterlab.handlers.base import BaseAPIHandler
 
 
-class Config(BaseAPIHandler):
+class Config(AutoAuthURLMixin):
     """API Endpoint for fetching information about how the Juptyerlab Backend is configured.
     Configuration can be customized through the hub, such as by setting the Globus Collection
     where the hub prefers its transfers, or alternatively by the user's local installation if
@@ -22,6 +24,7 @@ class Config(BaseAPIHandler):
             "collection_base_path": self.gconfig.get_collection_path(),
             "is_gcp": self.gconfig.is_gcp(),
             "is_hub": self.gconfig.is_hub(),
+            "login_url": self.get_globus_login_url(),
             "is_manual_copy_code_required": copy_required,
             "is_logged_in": self.login_manager.is_logged_in(),
             "last_login": self.gconfig.last_login,

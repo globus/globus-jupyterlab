@@ -49,22 +49,22 @@ class AutoAuthURLMixin(BaseAPIHandler):
                 return instance
 
     def get_requested_scopes(
-        self, exception_handler: exception_handlers.AuthExceptionHandler
+        self, exception_handler: exception_handlers.AuthExceptionHandler = None
     ) -> list:
-        try:
-            return exception_handler.get_extended_scopes(
-                self.gconfig.get_transfer_scopes()
-            )
-        except DataAccessScopesRequired:
-            dependent_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(
-                self.get_endpoint_or_collection()
-            )
-            return [
-                self.login_manager.apply_dependent_scopes(
-                    base, [dependent_scope.data_access]
-                )
-                for base in self.gconfig.get_transfer_scopes()
-            ]
+        mapped_collections = []
+        if exception_handler and exception_handler.requires_data_access:
+            mapped_collections.append(self.get_endpoint_or_collection())
+        if self.gconfig.get_collection_is_mapped():
+            mapped_collections.append(self.gconfig.get_collection_id())
+        dependent_scopes = [
+            globus_sdk.scopes.GCSCollectionScopeBuilder(collection).data_access
+            for collection in mapped_collections
+        ]
+
+        return [
+            self.login_manager.apply_dependent_scopes(base, dependent_scopes)
+            for base in self.gconfig.get_transfer_scopes()
+        ]
 
     def get_required_identities(self, domains: List[str]) -> List[str]:
         authorizer = self.login_manager.get_authorizer("auth.globus.org")
@@ -79,21 +79,34 @@ class AutoAuthURLMixin(BaseAPIHandler):
         ]
 
     def get_globus_login_url(
-        self, exception_handler: exception_handlers.AuthExceptionHandler
+        self, exception_handler: exception_handlers.AuthExceptionHandler = None
     ) -> str:
 
         params = dict(
             requested_scopes=" ".join(self.get_requested_scopes(exception_handler)),
-            prompt="login",
         )
-        domains = exception_handler.get_required_session_domains()
-        if domains:
-            params["session_required_identities"] = ",".join(
-                self.get_required_identities(domains)
-            )
-            params[
-                "session_message"
-            ] = "The collection you selected requires a fresh login"
+        self.log.info(params["requested_scopes"])
+        if not self.login_manager.is_logged_in():
+            domain = self.gconfig.get_collection_required_domain()
+            if domain:
+                extra = {
+                    "session_required_single_domain": domain,
+                    "session_message": "The JupyterHub configured collection requires specific identities",
+                    "prompt": "login",
+                }
+                params.update(extra)
+
+        if self.login_manager.is_logged_in() and exception_handler is not None:
+            domains = exception_handler.get_required_session_domains()
+            if domains:
+                extra = {
+                    "session_required_identities": ",".join(
+                        self.get_required_identities(domains)
+                    ),
+                    "session_message": "The collection you selected requires a fresh login",
+                    "prompt": "login",
+                }
+                params.update(extra)
 
         full_login_url = urllib.parse.urlunparse(
             (
