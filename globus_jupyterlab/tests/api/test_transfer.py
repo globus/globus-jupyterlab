@@ -196,6 +196,43 @@ def test_transfer_submission_normal(
 
 
 @pytest.mark.gen_test
+def test_transfer_submission_with_posix_basepath(
+    monkeypatch,
+    http_client,
+    base_url,
+    transfer_client,
+    transfer_data,
+    sdk_error,
+    logged_in,
+):
+    monkeypatch.setenv("GLOBUS_COLLECTION_ID", "mysource")
+    monkeypatch.setenv("GLOBUS_POSIX_BASEPATH", "/home/")
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [
+                {
+                    "source_path": "/home/jovyan/foo.txt",
+                    "destination_path": "foo.txt",
+                    "recursive": False,
+                }
+            ],
+        }
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    # Fetch arg in submit_transfer(transfer_data)
+    mock_transfer_data = transfer_client.submit_transfer.call_args[0][0]
+    assert mock_transfer_data.data["DATA"] == [("foo.txt", "foo.txt", False)]
+    assert response.code == 200
+
+
+@pytest.mark.gen_test
 def test_401_transfer_submission_normal(
     http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
 ):

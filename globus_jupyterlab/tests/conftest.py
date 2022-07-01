@@ -111,7 +111,7 @@ def transfer_data(monkeypatch) -> globus_sdk.TransferClient:
             }
 
         def add_item(self, src, dest, recursive=False):
-            self.data.append((src, dest, recursive))
+            self.data["DATA"].append((src, dest, recursive))
 
     monkeypatch.setattr(globus_sdk, "TransferData", MockTransferData)
     return globus_sdk.TransferData

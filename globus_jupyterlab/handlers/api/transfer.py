@@ -26,6 +26,28 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     mandatory_args = []
     optional_args = {}
 
+    def translate_base_paths(self, path: str) -> TransferModel:
+        return path.replace(
+            self.gconfig.get_posix_basepath(),
+            self.gconfig.get_collection_basepath(),
+        )
+
+    def translate_transfer_submission(
+        self, transfer_model: TransferModel
+    ) -> TransferModel:
+        col_id = self.gconfig.get_collection_id()
+        for transfer_items in transfer_model.DATA:
+            if transfer_model.source_endpoint == col_id:
+                transfer_items.source_path = self.translate_base_paths(
+                    transfer_items.source_path
+                )
+            elif transfer_model.destination_endpoint == col_id:
+                transfer_items.destination_path = self.translate_base_paths(
+                    transfer_items.destination_path
+                )
+            else:
+                raise ValueError(f"Non-local endpoint used in transfer {col_id}")
+
     def transfer_client_call(self):
         """Transfer submission is a bit more complex than the other wrapped calls. For one, it validates
         a complex POST document through pydantic instead of taking simple args. Second, the call into the
@@ -40,11 +62,12 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
             post_data = json.loads(self.request.body)
             self.log.debug("Checking transfer document")
             tm = TransferModel(**post_data)
+            self.translate_transfer_submission(tm)
             if self.gconfig.get_transfer_submission_url():
                 response = self.submit_custom_transfer(tm)
             else:
                 response = self.submit_normal_transfer(tm)
-            self.log.info('User transfer submission succeeded.')
+            self.log.info("User transfer submission succeeded.")
             return response
         except pydantic.ValidationError as ve:
             self.set_status(400)

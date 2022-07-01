@@ -144,6 +144,12 @@ class GlobusConfig:
         env = os.getenv("GLOBUS_COLLECTION_PATH", None)
         return env or os.getcwd()
 
+    def get_posix_basepath(self) -> str:
+        return os.getenv("GLOBUS_POSIX_BASEPATH", "")
+
+    def get_collection_basepath(self) -> str:
+        return os.getenv("GLOBUS_COLLECTION_BASEPATH", "")
+
     def get_transfer_submission_url(self) -> str:
         """
         By default, JupyterLab will start transfers on the user's
