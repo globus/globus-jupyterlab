@@ -38,15 +38,22 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
         col_id = self.gconfig.get_collection_id()
         for transfer_items in transfer_model.DATA:
             if transfer_model.source_endpoint == col_id:
-                transfer_items.source_path = self.translate_base_paths(
-                    transfer_items.source_path
+                new_path = self.translate_base_paths(transfer_items.source_path)
+                # TODO: Set this to debug when finished debugging on the hub
+                self.log.info(
+                    f"Translating source path {transfer_items.source_path} --> {new_path}"
                 )
+                transfer_items.source_path = new_path
+
             elif transfer_model.destination_endpoint == col_id:
-                transfer_items.destination_path = self.translate_base_paths(
-                    transfer_items.destination_path
+                new_path = self.translate_base_paths(transfer_items.destination_path)
+                self.log.debug(
+                    f"Translating destination path {transfer_items.destination_path} --> {new_path}"
                 )
+                transfer_items.destination_path = new_path
             else:
                 raise ValueError(f"Non-local endpoint used in transfer {col_id}")
+            self.log.debug(f"Translated path ")
 
     def transfer_client_call(self):
         """Transfer submission is a bit more complex than the other wrapped calls. For one, it validates
