@@ -7,16 +7,42 @@ export const HubLogin = (props) => {
   const [apiError, setAPIError] = useState(null);
   const [hubInputCode, setHubInputCode] = useState(null);
 
-  const hubLoginButton = useRef();
+  const errorDetails = useRef(null);
+  const hubLoginButton = useRef(null);
 
   useEffect(() => {
-    // @ts-ignore
     hubLoginButton.current.disabled = true;
   }, []);
 
+  useEffect(() => {
+    if ("details" in props.hubResponse) {
+      const errorDetailsDOM = errorDetails.current;
+      const cleanErrorDetails = props.hubResponse.details.replace(
+        /(?:\r\n|\\r\\n|\r|\n)/g,
+        "<br/>"
+      );
+      errorDetailsDOM.innerHTML += cleanErrorDetails;
+    }
+  }, [props]);
+
+  const handleErrorDetails = (event) => {
+    var text;
+    if (errorDetails.current.classList.contains("hide-element")) {
+      errorDetails.current.classList.remove("hide-element");
+      errorDetails.current.classList.add("show-element");
+      text = document.createTextNode("Hide Details");
+    } else {
+      errorDetails.current.classList.remove("show-element");
+      errorDetails.current.classList.add("hide-element");
+      text = document.createTextNode("Show Details");
+    }
+
+    event.target.removeChild(event.target.childNodes[0]);
+    event.target.appendChild(text);
+  };
+
   const handleHubInputChange = (event) => {
     if (event.target.value) {
-      // @ts-ignore
       hubLoginButton.current.disabled = false;
     }
     setHubInputCode(event.target.value);
@@ -75,8 +101,8 @@ export const HubLogin = (props) => {
                   className="btn btn-outline-primary"
                   onClick={() => {
                     let loginURL =
-                      "loginURL" in props
-                        ? props.loginURL
+                      "login_url" in props.hubResponse
+                        ? props.hubResponse.login_url
                         : normalizeURL("globus-jupyterlab/login");
                     window
                       .open(loginURL, "Globus Login", "height=600,width=800")
@@ -114,6 +140,20 @@ export const HubLogin = (props) => {
                 </button>
               </div>
             </li>
+
+            {"details" in props.hubResponse && (
+              <li className="list-group-item">
+                <div className="ms-2 me-auto my-3">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={handleErrorDetails}
+                  >
+                    Show details
+                  </button>
+                  <div className="hide-element mt-3" ref={errorDetails}></div>
+                </div>
+              </li>
+            )}
           </ol>
         </div>
       </div>
@@ -123,6 +163,6 @@ export const HubLogin = (props) => {
 
 export class HubLoginWidget extends ReactWidget {
   render(): JSX.Element {
-    return <HubLogin />;
+    return <HubLogin hubResponse={{}} />;
   }
 }
