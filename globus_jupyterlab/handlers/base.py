@@ -1,4 +1,4 @@
-from notebook.base.handlers import APIHandler
+from jupyter_server.base.handlers import APIHandler
 from globus_jupyterlab.globus_config import GlobusConfig
 from globus_jupyterlab.login_manager import LoginManager
 
