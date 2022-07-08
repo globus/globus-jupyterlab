@@ -206,7 +206,7 @@ def test_transfer_submission_with_posix_basepath(
     logged_in,
 ):
     monkeypatch.setenv("GLOBUS_COLLECTION_ID", "mysource")
-    monkeypatch.setenv("GLOBUS_POSIX_BASEPATH", "/home/")
+    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", "/home/jovyan/")
     transfer_client.submit_transfer.return_value = SDKResponse(
         data={"task_id": "my_taks_id"}
     )

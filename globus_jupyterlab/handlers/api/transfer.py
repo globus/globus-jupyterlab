@@ -28,8 +28,8 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
 
     def translate_base_paths(self, path: str) -> TransferModel:
         return path.replace(
-            self.gconfig.get_posix_basepath(),
-            self.gconfig.get_collection_basepath(),
+            self.gconfig.get_host_posix_basepath(),
+            self.gconfig.get_host_collection_basepath(),
         )
 
     def translate_transfer_submission(
