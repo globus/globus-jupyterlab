@@ -198,9 +198,6 @@ class GlobusConfig:
             "GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", False
         )
 
-    def get_named_grant(self) -> str:
-        return os.getenv("GLOBUS_NAMED_GRANT", "Globus JupyterLab")
-
     def get_hub_token(self) -> str:
         """
         Fetch the Jupyter API 'hub' token when JuptyerHub starts a single-user-server.
