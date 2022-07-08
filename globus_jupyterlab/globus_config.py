@@ -194,7 +194,9 @@ class GlobusConfig:
         * 'true' - use refresh tokens
         * 'false' - do not use refresh tokens
         """
-        self.check_env_boolean("GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", False)
+        return self.check_env_boolean(
+            "GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", False
+        )
 
     def get_named_grant(self) -> str:
         return os.getenv("GLOBUS_NAMED_GRANT", "Globus JupyterLab")
