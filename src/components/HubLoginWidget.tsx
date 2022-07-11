@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ReactWidget } from "@jupyterlab/apputils";
+import { useHistory } from "react-router-dom";
 
 import { normalizeURL, requestAPI } from "../handler";
 
@@ -7,6 +8,7 @@ export const HubLogin = (props) => {
   const [apiError, setAPIError] = useState(null);
   const [hubInputCode, setHubInputCode] = useState(null);
 
+  const history = useHistory();
   const hubLoginButton = useRef();
 
   useEffect(() => {
@@ -39,12 +41,7 @@ export const HubLogin = (props) => {
           Error {apiError.response.status}: {apiError.response.statusText}.
         </strong>{" "}
         {apiError.details && apiError.details}
-        <button
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
+        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     );
   }
@@ -56,33 +53,29 @@ export const HubLogin = (props) => {
           {apiError && (
             <div id="api-error" className="alert alert-danger">
               <strong>
-                Error {apiError.response.status}: {apiError.response.statusText}
-                .
+                Error {apiError.response.status}: {apiError.response.statusText}.
               </strong>{" "}
               Please try again.
             </div>
           )}
 
+          <button className="btn btn-sm btn-outline-secondary mb-3" onClick={() => history.goBack()}>
+            <i className="fa-solid fa-angle-left"></i> Back to Search
+          </button>
+
           <ol className="list-group">
             <li className="list-group-item d-flex justify-content-between align-items-start">
               <div className="ms-2 me-auto">
                 <div className="fw-bold mb-3">
-                  1. Log In to Globus to obtain an Authorization Code for this
-                  transfer
+                  1. Log In to Globus to obtain an Authorization Code for this transfer
                 </div>
                 <button
                   type="button"
                   className="btn btn-outline-primary"
                   onClick={() => {
-                    let loginURL =
-                      "loginURL" in props
-                        ? props.loginURL
-                        : normalizeURL("globus-jupyterlab/login");
-                    window
-                      .open(loginURL, "Globus Login", "height=600,width=800")
-                      .focus();
-                  }}
-                >
+                    let loginURL = "loginURL" in props ? props.loginURL : normalizeURL("globus-jupyterlab/login");
+                    window.open(loginURL, "Globus Login", "height=600,width=800").focus();
+                  }}>
                   Log In to Globus
                 </button>
               </div>
@@ -91,8 +84,7 @@ export const HubLogin = (props) => {
             <li className="list-group-item">
               <div className="ms-2 me-auto">
                 <div className="fw-bold mb-3">
-                  2. Copy and paste the Authorization Code you just received
-                  from Globus
+                  2. Copy and paste the Authorization Code you just received from Globus
                 </div>
                 <label htmlFor="code-input" className="form-label">
                   Authorization Code
@@ -102,14 +94,8 @@ export const HubLogin = (props) => {
                   id="code-input"
                   className="form-control mb-3"
                   name="code-input"
-                  onChange={handleHubInputChange}
-                ></input>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  ref={hubLoginButton}
-                  onClick={handleHubLogin}
-                >
+                  onChange={handleHubInputChange}></input>
+                <button type="button" className="btn btn-primary" ref={hubLoginButton} onClick={handleHubLogin}>
                   Continue
                 </button>
               </div>
