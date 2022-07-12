@@ -155,3 +155,10 @@ def token_storage(monkeypatch) -> SimpleJSONFileAdapter:
 def pathlib_unlink(monkeypatch):
     monkeypatch.setattr(pathlib.Path, "unlink", Mock())
     return pathlib.Path.unlink
+
+
+@pytest.fixture()
+def mock_hub_env(monkeypatch):
+    """JupyterLab uses these env values to determine if it's in a 'hub' and not a local user machine"""
+    monkeypatch.setenv("JUPYTERHUB_USER", "jovyan")
+    monkeypatch.setenv("JUPYTERHUB_API_TOKEN", "abcd")
