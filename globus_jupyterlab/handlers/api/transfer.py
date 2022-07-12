@@ -1,4 +1,5 @@
 import json
+import pathlib
 import globus_sdk
 import pydantic
 import requests
@@ -27,9 +28,18 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     optional_args = {}
 
     def translate_base_paths(self, path: str) -> TransferModel:
-        return path.replace(
-            self.gconfig.get_host_posix_basepath(),
-            self.gconfig.get_host_collection_basepath(),
+        """
+        Take the path that JupyterLab generated and translate it into a "Globus" collection acessible
+        path. This is typically needed if the mount path on the collection causes a 'mismatch' in paths
+        between how JupyterLab sees files and the Collection sees files.
+        """
+        host_collection_basepath = pathlib.Path(
+            self.gconfig.get_host_collection_basepath()
+        )
+        transfer_path = pathlib.Path(path)
+        return str(
+            host_collection_basepath
+            / transfer_path.relative_to(self.gconfig.get_host_posix_basepath())
         )
 
     def translate_transfer_submission(
