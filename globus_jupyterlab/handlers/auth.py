@@ -14,13 +14,21 @@ class AutoAuthURLMixin(BaseAPIHandler):
     ]
 
     def get_exception_info(self, exception: globus_sdk.GlobusAPIError) -> bool:
-        exc_handler = self.get_login_exception_handler(exception)
         info = {
             "error": exception.code,
             "details": exception.message,
         }
-        info.update(exc_handler.metadata)
-        info["login_url"] = self.get_globus_login_url(exc_handler)
+        exc_handler = self.get_login_exception_handler(exception)
+        if exc_handler is not None:
+            info.update(exc_handler.metadata)
+            info["login_url"] = self.get_globus_login_url(exc_handler)
+        else:
+            info.update(
+                {
+                    "login_required": False,
+                    "requires_user_intervention": False,
+                }
+            )
         return info
 
     def get_endpoint_or_collection(self) -> str:
@@ -52,6 +60,8 @@ class AutoAuthURLMixin(BaseAPIHandler):
         self, exception_handler: exception_handlers.AuthExceptionHandler
     ) -> list:
         try:
+            if exception_handler is None:
+                return self.gconfig.get_transfer_scopes
             return exception_handler.get_extended_scopes(
                 self.gconfig.get_transfer_scopes()
             )
@@ -133,6 +143,6 @@ class GCSAuthMixin(AutoAuthURLMixin):
     def get_globus_login_url(
         self, exception_handler: exception_handlers.AuthExceptionHandler
     ) -> str:
-        if exception_handler.requires_user_intervention:
+        if exception_handler and exception_handler.requires_user_intervention:
             return f"https://app.globus.org/file-manager?origin_id={self.get_endpoint_or_collection()}"
         return super().get_globus_login_url(exception_handler)

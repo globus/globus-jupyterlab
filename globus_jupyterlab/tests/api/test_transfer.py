@@ -104,6 +104,15 @@ def test_gridftp_login_errors(
 
 
 @pytest.mark.gen_test
+def test_400_unrelated(http_client, base_url, transfer_client, sdk_error, logged_in):
+    transfer_client.operation_ls.side_effect = sdk_error("400 error!", http_status=400)
+    response = yield http_client.fetch(
+        base_url + f"/operation_ls?endpoint=", raise_error=False
+    )
+    assert response.code == 400
+
+
+@pytest.mark.gen_test
 def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged_in):
     transfer_client.operation_ls.side_effect = sdk_error("401 error!", http_status=401)
     response = yield http_client.fetch(
