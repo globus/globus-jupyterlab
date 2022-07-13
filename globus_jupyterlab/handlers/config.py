@@ -24,6 +24,9 @@ class Config(BaseAPIHandler):
             "is_hub": self.gconfig.is_hub(),
             "is_manual_copy_code_required": copy_required,
             "is_logged_in": self.login_manager.is_logged_in(),
+            "transfer_submission_url": self.gconfig.get_transfer_submission_url(),
+            "transfer_submission_scope": self.gconfig.get_transfer_submission_scope(),
+            "transfer_submission_is_hub_service": self.gconfig.get_transfer_submission_is_hub_service(),
             "last_login": self.gconfig.last_login,
             "collection_id_owner": self.gconfig.get_collection_id_owner(),
         }
