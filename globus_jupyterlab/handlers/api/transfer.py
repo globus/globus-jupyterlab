@@ -44,7 +44,7 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
                 response = self.submit_custom_transfer(tm)
             else:
                 response = self.submit_normal_transfer(tm)
-            self.log.info('User transfer submission succeeded.')
+            self.log.info("User transfer submission succeeded.")
             return response
         except pydantic.ValidationError as ve:
             self.set_status(400)
@@ -84,7 +84,7 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
             data = result.json()
             if "task_id" not in data:
                 self.log.error(f"Response from {url} did not return a task ID!")
-            data["task_id"] = None
+                data["task_id"] = None
             return data
         except requests.exceptions.HTTPError as http_error:
             self.set_status(503)
