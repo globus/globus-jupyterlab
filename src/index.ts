@@ -84,7 +84,7 @@ async function activateGlobus(
           widget.title.label = label;
           widget.title.icon = GlobusIcon;
 
-          if (config.is_logged_in && config.last_login) {
+          if (config.is_logged_in) {
             app.shell.add(widget, "main");
           } else {
             if (config.is_hub) {

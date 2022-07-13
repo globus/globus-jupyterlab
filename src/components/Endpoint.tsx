@@ -20,8 +20,10 @@ const Endpoint = (props) => {
   const [apiError, setAPIError] = useState(null);
   const [endpointList, setEndpointList] = useState({ DATA: [], path: null });
   const [endpoint, setEndpoint] = useState(null);
+
+  const [hubResponse, setHubResponse] = useState(null);
+
   const [loading, setLoading] = useState(false);
-  const [loginURL, setLoginURL] = useState(null);
   const [selectedEndpointItems, setSelectedEndpointItems] = useState([]);
   const [transfer, setTransfer] = useState(null);
 
@@ -143,7 +145,7 @@ const Endpoint = (props) => {
 
         if (config.is_hub) {
           setAPIError(null);
-          setLoginURL(error_response.login_url);
+          setHubResponse(error_response);
         } else {
           window
             .open(
@@ -381,8 +383,8 @@ const Endpoint = (props) => {
     return <h5 className="mt-3">Loading</h5>;
   }
 
-  if (loginURL) {
-    return <HubLogin loginURL={loginURL} />;
+  if (hubResponse) {
+    return <HubLogin hubResponse={hubResponse} />;
   }
 
   return (
