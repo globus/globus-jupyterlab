@@ -21,7 +21,7 @@ export const HubLogin = (props) => {
         /(?:\r\n|\\r\\n|\r|\n)/g,
         "<br/>"
       );
-      errorDetailsDOM.innerHTML += cleanErrorDetails;
+      errorDetailsDOM.innerHTML = cleanErrorDetails;
     }
   }, [props]);
 

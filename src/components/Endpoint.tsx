@@ -44,7 +44,7 @@ const Endpoint = (props) => {
   // ComponentDidMount Functions
   useEffect(() => {
     const handleKeyUp = (event) => {
-      if (event.key === "Shift") {
+      if (event.shiftKey) {
         setShift(false);
       }
     };
@@ -56,7 +56,7 @@ const Endpoint = (props) => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.shiftKey || event.metaKey) {
+      if (event.shiftKey) {
         setShift(true);
       }
     };
