@@ -20,6 +20,8 @@ class Config(BaseAPIHandler):
             # TODO: Make these configurable
             "collection_id": self.gconfig.get_collection_id(),
             "collection_base_path": self.gconfig.get_collection_path(),
+            "host_posix_basepath": self.gconfig.get_host_posix_basepath(),
+            "host_collection_basepath": self.gconfig.get_host_collection_basepath(),
             "is_gcp": self.gconfig.is_gcp(),
             "is_hub": self.gconfig.is_hub(),
             "is_manual_copy_code_required": copy_required,

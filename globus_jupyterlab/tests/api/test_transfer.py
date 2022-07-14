@@ -11,6 +11,7 @@ from globus_jupyterlab.tests.mocks import (
     GRIDFTP_UNEXPECTED_MESSAGE,
 )
 import pytest
+from globus_jupyterlab.handlers.api.transfer import SubmitTransfer
 
 
 @pytest.mark.gen_test
@@ -194,6 +195,113 @@ def test_transfer_submission_normal(
     assert response.code == 200
     data = json.loads(response.body.decode("utf-8"))
     assert "task_id" in data
+
+
+@pytest.mark.gen_test
+@pytest.mark.parametrize(
+    "collection, basepath, transfer_doc, expected, case",
+    [
+        (
+            "jupyterlab_collection",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Rationally configured environment",
+        ),
+        (
+            "jupyterlab_collection",
+            "/home/jovyan",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Missing Trailing Slash",
+        ),
+        (
+            "jupyterlab_collection",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "user_selected_collection",
+                "destination_endpoint": "jupyterlab_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "/home/jovyan/foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Test Translating Destination",
+        ),
+        (
+            "no_exist",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "/home/jovyan/foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            "error",
+            "Test no hub endpoint for transfer",
+        ),
+    ],
+)
+def test_transfer_submission_with_posix_basepath(
+    monkeypatch,
+    collection,
+    basepath,
+    transfer_doc,
+    expected,
+    case,
+    http_client,
+    base_url,
+    transfer_client,
+    transfer_data,
+    sdk_error,
+    logged_in,
+):
+    monkeypatch.setenv("GLOBUS_COLLECTION_ID", collection)
+    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", basepath)
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(transfer_doc)
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    print(response.body.decode("utf-8"))
+    if expected == "error":
+        assert response.code == 400
+    else:
+        # Fetch arg in submit_transfer(transfer_data)
+        mock_transfer_data = transfer_client.submit_transfer.call_args[0][0]
+        assert mock_transfer_data.data["DATA"] == [expected], case
+        assert response.code == 200
 
 
 @pytest.mark.gen_test

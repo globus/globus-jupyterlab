@@ -1,4 +1,5 @@
 import json
+import pathlib
 import globus_sdk
 import pydantic
 import requests
@@ -26,6 +27,44 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
     mandatory_args = []
     optional_args = {}
 
+    def translate_base_paths(self, path: str) -> TransferModel:
+        """
+        Take the path that JupyterLab generated and translate it into a "Globus" collection acessible
+        path. This is typically needed if the mount path on the collection causes a 'mismatch' in paths
+        between how JupyterLab sees files and the Collection sees files.
+        """
+        host_collection_basepath = pathlib.Path(
+            self.gconfig.get_host_collection_basepath()
+        )
+        transfer_path = pathlib.Path(path)
+        return str(
+            host_collection_basepath
+            / transfer_path.relative_to(self.gconfig.get_host_posix_basepath())
+        )
+
+    def translate_transfer_submission(
+        self, transfer_model: TransferModel
+    ) -> TransferModel:
+        col_id = self.gconfig.get_collection_id()
+        for transfer_items in transfer_model.DATA:
+            if transfer_model.source_endpoint == col_id:
+                new_path = self.translate_base_paths(transfer_items.source_path)
+                # TODO: Set this to debug when finished debugging on the hub
+                self.log.info(
+                    f"Translating source path {transfer_items.source_path} --> {new_path}"
+                )
+                transfer_items.source_path = new_path
+
+            elif transfer_model.destination_endpoint == col_id:
+                new_path = self.translate_base_paths(transfer_items.destination_path)
+                self.log.debug(
+                    f"Translating destination path {transfer_items.destination_path} --> {new_path}"
+                )
+                transfer_items.destination_path = new_path
+            else:
+                raise ValueError(f"Non-local endpoint used in transfer {col_id}")
+            self.log.debug(f"Translated path ")
+
     def transfer_client_call(self):
         """Transfer submission is a bit more complex than the other wrapped calls. For one, it validates
         a complex POST document through pydantic instead of taking simple args. Second, the call into the
@@ -40,6 +79,7 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
             post_data = json.loads(self.request.body)
             self.log.debug("Checking transfer document")
             tm = TransferModel(**post_data)
+            self.translate_transfer_submission(tm)
             if self.gconfig.get_transfer_submission_url():
                 response = self.submit_custom_transfer(tm)
             else:

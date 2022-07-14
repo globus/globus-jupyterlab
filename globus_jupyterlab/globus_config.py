@@ -144,6 +144,43 @@ class GlobusConfig:
         env = os.getenv("GLOBUS_COLLECTION_PATH", None)
         return env or os.getcwd()
 
+    def get_host_posix_basepath(self) -> str:
+        """
+        Configure the base path which JupyterLab uses to access files on a Globus Collection,
+        relative to the path the Globus Collection uses to access files. For example, if
+        the same file is referred to by both the Collection and JupyterLab (POSIX):
+
+        * JupyterLab (POSIX): /home/jovyan/foo.txt
+        * Collection (Globus): /foo.txt
+
+        You may set "GLOBUS_HOST_POSIX_BASEPATH=/home/jovyan". This will ensure a file
+        transferred by JupyterLab "/home/jovyan/foo.txt" will be rewritten to "foo.txt"
+        on transfer, such that the Globus Transfer can complete with the correct path.
+
+        This is typically only needed on Shared collections which mount storage in
+        convienient locations on the provided Docker image but do not match the Collection
+        base path. This usually isn't needed when using Mapped Collections.
+
+        By default when blank or unset, no path translation takes place.
+        """
+        return os.getenv("GLOBUS_HOST_POSIX_BASEPATH", "")
+
+    def get_host_collection_basepath(self) -> str:
+        """
+        Similar to GLOBUS_HOST_POSIX_BASEPATH, this will prepend a base path on a Globus
+        Collection which isn't visible from JupyterLab (POSIX)
+
+        * JupyterLab (POSIX): foo.txt
+        * Collection (Globus): /shared/foo.txt
+
+        You may set "GLOBUS_HOST_COLLECTION_BASEPATH=/shared". This will ensure a file
+        transferred by JupyterLab "~/foo.txt" will be rewritten to "/shared/foo.txt"
+        on transfer, such that the Globus Transfer can complete with the correct path.
+
+        By default when blank or unset, no path translation takes place.
+        """
+        return os.getenv("GLOBUS_HOST_COLLECTION_BASEPATH", "")
+
     def get_transfer_submission_url(self) -> str:
         """
         By default, JupyterLab will start transfers on the user's
