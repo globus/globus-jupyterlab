@@ -199,13 +199,14 @@ def test_transfer_submission_normal(
 
 @pytest.mark.gen_test
 @pytest.mark.parametrize(
-    "collection, basepath, transfer_doc, expected, case",
+    "collection, globus_host_posix_basepath, globus_host_collection_basepath, transfer_doc, expected, case",
     [
         (
-            "jupyterlab_collection",
+            "host_collection_uuid",
             "/home/jovyan/",
+            "",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "host_collection_uuid",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
@@ -219,10 +220,11 @@ def test_transfer_submission_normal(
             "Rationally configured environment",
         ),
         (
-            "jupyterlab_collection",
+            "host_collection_uuid",
             "/home/jovyan",
+            "",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "host_collection_uuid",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
@@ -236,11 +238,12 @@ def test_transfer_submission_normal(
             "Missing Trailing Slash",
         ),
         (
-            "jupyterlab_collection",
+            "host_collection_uuid",
             "/home/jovyan/",
+            "",
             {
                 "source_endpoint": "user_selected_collection",
-                "destination_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "host_collection_uuid",
                 "DATA": [
                     {
                         "source_path": "foo.txt",
@@ -255,8 +258,9 @@ def test_transfer_submission_normal(
         (
             "no_exist",
             "/home/jovyan/",
+            "",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "some_other_collection",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
@@ -267,14 +271,15 @@ def test_transfer_submission_normal(
                 ],
             },
             "error",
-            "Test no hub endpoint for transfer",
+            "Test no hub collection for transfer",
         ),
     ],
 )
 def test_transfer_submission_with_posix_basepath(
     monkeypatch,
     collection,
-    basepath,
+    globus_host_posix_basepath,
+    globus_host_collection_basepath,
     transfer_doc,
     expected,
     case,
@@ -286,7 +291,10 @@ def test_transfer_submission_with_posix_basepath(
     logged_in,
 ):
     monkeypatch.setenv("GLOBUS_COLLECTION_ID", collection)
-    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", basepath)
+    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", globus_host_posix_basepath)
+    monkeypatch.setenv(
+        "GLOBUS_HOST_COLLECTION_BASEPATH", globus_host_collection_basepath
+    )
     transfer_client.submit_transfer.return_value = SDKResponse(
         data={"task_id": "my_taks_id"}
     )
