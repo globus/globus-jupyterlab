@@ -78,6 +78,11 @@ class LoginManager:
         else:
             return globus_sdk.AccessTokenAuthorizer(tokens["access_token"])
 
+    def get_token_by_scope(self, scope: str) -> str:
+        for data in self.storage.get_by_resource_server().values():
+            if data.get("scope") == scope:
+                return data["access_token"]
+
     def logout(self) -> bool:
         """Revoke user tokens and clear them from storage. Returns true if tokens were revoked"""
         tokens_revoked = False

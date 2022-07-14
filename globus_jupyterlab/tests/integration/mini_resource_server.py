@@ -18,7 +18,7 @@ https://globus-jupyterlab.readthedocs.io/en/docs/config.html
 
 For example:
 
-export GLOBUS_TRANSFER_SUBMISSION_URL=http://127.0.0.1:5000
+export GLOBUS_TRANSFER_SUBMISSION_URL=http://127.0.0.1:5000/transfer
 export GLOBUS_TRANSFER_SUBMISSION_SCOPE=my-scope-i-created-above
 
 Run your flask app with the following:
