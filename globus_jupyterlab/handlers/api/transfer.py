@@ -3,6 +3,7 @@ import pathlib
 import globus_sdk
 import pydantic
 import requests
+from globus_jupyterlab.exc import TransferSubmission
 from globus_jupyterlab.models import TransferModel
 from globus_jupyterlab.handlers.auth import GCSAuthMixin
 from globus_jupyterlab.handlers.api.sdk_wrappers import (
@@ -33,14 +34,29 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
         path. This is typically needed if the mount path on the collection causes a 'mismatch' in paths
         between how JupyterLab sees files and the Collection sees files.
         """
+        user_transfer_path = pathlib.Path(path)
         host_collection_basepath = pathlib.Path(
             self.gconfig.get_host_collection_basepath()
         )
-        transfer_path = pathlib.Path(path)
-        return str(
-            host_collection_basepath
-            / transfer_path.relative_to(self.gconfig.get_host_posix_basepath())
-        )
+        host_posix_basepath = self.gconfig.get_host_posix_basepath()
+
+        if not user_transfer_path.exists():
+            self.log.warning(
+                f"User specified path {user_transfer_path} does not exist!"
+            )
+
+        if host_posix_basepath:
+            try:
+                user_transfer_path = user_transfer_path.relative_to(host_posix_basepath)
+            except ValueError:
+                raise TransferSubmission(
+                    f"Path {user_transfer_path} is not in the subpath of {host_posix_basepath}, and is inaccessible via the configured Globus Collection. Consider moving {user_transfer_path} into {host_posix_basepath} first."
+                ) from None
+
+        if host_collection_basepath:
+            user_transfer_path = host_collection_basepath / user_transfer_path
+
+        return str(user_transfer_path)
 
     def translate_transfer_submission(
         self, transfer_model: TransferModel
@@ -89,9 +105,11 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
         except pydantic.ValidationError as ve:
             self.set_status(400)
             self.log.debug("Transfer doc failed validation", exc_info=True)
-            return self.finish(
-                json.dumps({"error": "Invalid Input", "details": ve.json()})
-            )
+            return {"error": "Invalid Input", "details": ve.json()}
+        except TransferSubmission as ts:
+            self.set_status(400)
+            self.log.info("User error for attempted Globus Transfer", exc_info=True)
+            return {"error": "Invalid Input", "details": str(ts)}
 
     def submit_custom_transfer(self, transfer_data: TransferModel):
         url = self.gconfig.get_transfer_submission_url()

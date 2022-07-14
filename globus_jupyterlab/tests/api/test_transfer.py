@@ -203,6 +203,24 @@ def test_transfer_submission_normal(
     [
         (
             "host_collection_uuid",
+            "",
+            "",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Base case, no path translation",
+        ),
+        (
+            "host_collection_uuid",
             "/home/jovyan/",
             "",
             {
@@ -256,6 +274,78 @@ def test_transfer_submission_normal(
             "Test Translating Destination",
         ),
         (
+            "host_collection_uuid",
+            "",
+            "/shared",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test Collection Base Path",
+        ),
+        (
+            "host_collection_uuid",
+            "",
+            "shared",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("shared/foo.txt", "foo.txt", False),
+            "Test Relative Collection Base Path",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan",
+            "/shared",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test both posix basepath with collection basepath",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan/",
+            "/shared/",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test trailing slash",
+        ),
+        (
             "no_exist",
             "/home/jovyan/",
             "",
@@ -265,13 +355,31 @@ def test_transfer_submission_normal(
                 "DATA": [
                     {
                         "source_path": "foo.txt",
-                        "destination_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
                         "recursive": False,
                     }
                 ],
             },
-            "error",
+            500,
             "Test no hub collection for transfer",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan/",
+            "",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/some/other/path/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            400,
+            "Test transfer is outside share path",
         ),
     ],
 )
@@ -302,9 +410,9 @@ def test_transfer_submission_with_posix_basepath(
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
     )
-    print(response.body.decode("utf-8"))
-    if expected == "error":
-        assert response.code == 400
+    print(f'Response {response.body.decode("utf-8")}')
+    if isinstance(expected, int):
+        assert response.code == expected
     else:
         # Fetch arg in submit_transfer(transfer_data)
         mock_transfer_data = transfer_client.submit_transfer.call_args[0][0]
