@@ -2,8 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.0.0-beta.6](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b5...v1.0.0b6) (2022-06-24)
+## [1.0.0-beta.7](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b6...v1.0.0b7) (2022-07-12)
 
+### Bug Fixes
+
+- Exception from improper handling of non-auth Globus API errors ([25b4ae5](https://github.com/globus/globus-jupyterlab/commit/25b4ae5a12879a3b73352cd2859a34e4bbe0e6da))
+- GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE not properly being picked up ([47cade4](https://github.com/globus/globus-jupyterlab/commit/47cade49751d70558f3cd8e31595eb67ff7940bc))
+- Possible exception if notebook is not installed ([31ff718](https://github.com/globus/globus-jupyterlab/commit/31ff718d91a4242b0d3a3a79dc59a3c4be03a49d))
+
+## [1.0.0-beta.6](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b5...v1.0.0b6) (2022-06-24)
 
 ### Bug Fixes
 

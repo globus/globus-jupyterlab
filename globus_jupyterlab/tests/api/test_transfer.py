@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlparse, parse_qs
 import json
+import requests
 import urllib
 import tornado
 from globus_jupyterlab.tests.mocks import (
@@ -10,6 +11,7 @@ from globus_jupyterlab.tests.mocks import (
     GRIDFTP_UNEXPECTED_MESSAGE,
 )
 import pytest
+from globus_jupyterlab.handlers.api.transfer import SubmitTransfer
 
 
 @pytest.mark.gen_test
@@ -104,6 +106,15 @@ def test_gridftp_login_errors(
 
 
 @pytest.mark.gen_test
+def test_400_unrelated(http_client, base_url, transfer_client, sdk_error, logged_in):
+    transfer_client.operation_ls.side_effect = sdk_error("400 error!", http_status=400)
+    response = yield http_client.fetch(
+        base_url + f"/operation_ls?endpoint=", raise_error=False
+    )
+    assert response.code == 400
+
+
+@pytest.mark.gen_test
 def test_401_login_url(http_client, base_url, transfer_client, sdk_error, logged_in):
     transfer_client.operation_ls.side_effect = sdk_error("401 error!", http_status=401)
     response = yield http_client.fetch(
@@ -187,6 +198,113 @@ def test_transfer_submission_normal(
 
 
 @pytest.mark.gen_test
+@pytest.mark.parametrize(
+    "collection, basepath, transfer_doc, expected, case",
+    [
+        (
+            "jupyterlab_collection",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Rationally configured environment",
+        ),
+        (
+            "jupyterlab_collection",
+            "/home/jovyan",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Missing Trailing Slash",
+        ),
+        (
+            "jupyterlab_collection",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "user_selected_collection",
+                "destination_endpoint": "jupyterlab_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "/home/jovyan/foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Test Translating Destination",
+        ),
+        (
+            "no_exist",
+            "/home/jovyan/",
+            {
+                "source_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "/home/jovyan/foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            "error",
+            "Test no hub endpoint for transfer",
+        ),
+    ],
+)
+def test_transfer_submission_with_posix_basepath(
+    monkeypatch,
+    collection,
+    basepath,
+    transfer_doc,
+    expected,
+    case,
+    http_client,
+    base_url,
+    transfer_client,
+    transfer_data,
+    sdk_error,
+    logged_in,
+):
+    monkeypatch.setenv("GLOBUS_COLLECTION_ID", collection)
+    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", basepath)
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(transfer_doc)
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    print(response.body.decode("utf-8"))
+    if expected == "error":
+        assert response.code == 400
+    else:
+        # Fetch arg in submit_transfer(transfer_data)
+        mock_transfer_data = transfer_client.submit_transfer.call_args[0][0]
+        assert mock_transfer_data.data["DATA"] == [expected], case
+        assert response.code == 200
+
+
+@pytest.mark.gen_test
 def test_401_transfer_submission_normal(
     http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
 ):
@@ -201,3 +319,178 @@ def test_401_transfer_submission_normal(
     )
     error = json.loads(response.body.decode("utf-8"))
     assert "login_url" in error
+
+
+@pytest.mark.gen_test
+def test_401_transfer_submission_invalid_body(
+    http_client, base_url, transfer_client, transfer_data, sdk_error, logged_in
+):
+    body = json.dumps({"src": "mysource", "destination_endpoint": "mydest", "DATA": []})
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 400
+
+
+@pytest.mark.gen_test
+def test_transfer_submission_custom_valid_non_hub_service(
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    monkeypatch,
+    post_request,
+    logged_in_custom_transfer_service,
+    mock_hub_env,
+):
+    post_request.return_value.data = {"task_id": "my_task_id"}
+
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [
+                {
+                    "source_path": "foo.txt",
+                    "destination_path": "foo.txt",
+                    "recursive": False,
+                }
+            ],
+        }
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 200
+    data = json.loads(response.body.decode("utf-8"))
+    assert data == {"task_id": "my_task_id"}
+    post_request.assert_called_with(
+        "https://myservice.gov",
+        headers={"Authorization": "Bearer my_scope_access_token"},
+        json={
+            "globus_token": None,
+            "transfer": {
+                "source_endpoint": "mysource",
+                "destination_endpoint": "mydest",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+        },
+    )
+
+
+@pytest.mark.gen_test
+def test_transfer_submission_custom_valid_hub_service(
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    monkeypatch,
+    post_request,
+    logged_in_custom_transfer_service,
+    mock_hub_env,
+):
+
+    monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", "true")
+    post_request.return_value.data = {"task_id": "my_task_id"}
+
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [
+                {
+                    "source_path": "foo.txt",
+                    "destination_path": "foo.txt",
+                    "recursive": False,
+                }
+            ],
+        }
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 200
+    data = json.loads(response.body.decode("utf-8"))
+    assert data == {"task_id": "my_task_id"}
+    post_request.assert_called_with(
+        "https://myservice.gov",
+        headers={"Authorization": "Bearer mock_jupyterhub_api_token"},
+        json={
+            "globus_token": "my_scope_access_token",
+            "transfer": {
+                "source_endpoint": "mysource",
+                "destination_endpoint": "mydest",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+        },
+    )
+
+
+@pytest.mark.gen_test
+def test_transfer_submission_custom_no_task_id_returned(
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    monkeypatch,
+    post_request,
+    logged_in_custom_transfer_service,
+    mock_hub_env,
+):
+    post_request.return_value.data = {}
+
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(
+        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 200
+    data = json.loads(response.body.decode("utf-8"))
+    assert data == {"task_id": None}
+
+
+@pytest.mark.gen_test
+def test_transfer_submission_custom_resource_server_error(
+    http_client,
+    base_url,
+    transfer_client,
+    sdk_error,
+    monkeypatch,
+    post_request,
+    logged_in_custom_transfer_service,
+    mock_hub_env,
+):
+    post_request.return_value.status_code = 500
+
+    transfer_client.submit_transfer.return_value = SDKResponse(
+        data={"task_id": "my_taks_id"}
+    )
+    body = json.dumps(
+        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+    )
+    response = yield http_client.fetch(
+        base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
+    )
+    assert response.code == 503

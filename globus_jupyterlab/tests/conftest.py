@@ -2,6 +2,7 @@ import pathlib
 import pytest
 import copy
 from unittest.mock import Mock
+import requests
 import globus_sdk
 from globus_sdk.tokenstorage import SimpleJSONFileAdapter
 import base64
@@ -15,6 +16,7 @@ from globus_jupyterlab.tests.mocks import (
     MOCK_TOKENS,
     MOCK_IDENTITIES,
     SDKResponse,
+    two_days_from_now_seconds,
 )
 from globus_jupyterlab.login_manager import LoginManager
 from globus_jupyterlab.globus_config import GlobusConfig
@@ -54,6 +56,40 @@ def login_refresh(logged_in) -> SimpleJSONFileAdapter:
 def logged_out(token_storage) -> SimpleJSONFileAdapter:
     token_storage.tokens = {}
     return token_storage
+
+
+@pytest.fixture
+def logged_in_custom_transfer_service(monkeypatch, logged_in) -> SimpleJSONFileAdapter:
+    logged_in.tokens["my_tokens"] = {
+        "scope": "http://myscope",
+        "access_token": "my_scope_access_token",
+        "expires_at_seconds": two_days_from_now_seconds,
+    }
+    monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_URL", "https://myservice.gov")
+    monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_SCOPE", "http://myscope")
+    return logged_in
+
+
+@pytest.fixture
+def post_request(monkeypatch):
+    "Mock the requests.post function, return the mock"
+
+    class MockedPostResponse:
+        data = {}
+        status_code = 200
+
+        def raise_for_status(self):
+            if self.status_code == 500:
+                response = Mock()
+                response.status_code = 500
+                raise requests.exceptions.HTTPError(response=response)
+
+        def json(self):
+            return self.data
+
+    post = Mock(return_value=MockedPostResponse())
+    monkeypatch.setattr(requests, "post", post)
+    return post
 
 
 @pytest.fixture
@@ -111,7 +147,7 @@ def transfer_data(monkeypatch) -> globus_sdk.TransferClient:
             }
 
         def add_item(self, src, dest, recursive=False):
-            self.data.append((src, dest, recursive))
+            self.data["DATA"].append((src, dest, recursive))
 
     monkeypatch.setattr(globus_sdk, "TransferData", MockTransferData)
     return globus_sdk.TransferData
@@ -155,3 +191,10 @@ def token_storage(monkeypatch) -> SimpleJSONFileAdapter:
 def pathlib_unlink(monkeypatch):
     monkeypatch.setattr(pathlib.Path, "unlink", Mock())
     return pathlib.Path.unlink
+
+
+@pytest.fixture()
+def mock_hub_env(monkeypatch):
+    """JupyterLab uses these env values to determine if it's in a 'hub' and not a local user machine"""
+    monkeypatch.setenv("JUPYTERHUB_USER", "jovyan")
+    monkeypatch.setenv("JUPYTERHUB_API_TOKEN", "mock_jupyterhub_api_token")

@@ -19,6 +19,25 @@ For example:
 
 See :ref:`config` for a full list of config options.
 
+Shared Mapped Collections
+-------------------------
+
+Support is coming soon!
+
+
+Shared Host Collections
+-----------------------
+
+If using a shared collection, special care needs to be taken to ensure the POSIX location accessible
+by JupyterLab matches the location accessible by the host Globus Collection. Commonly, the home directory
+of the Docker image will be the mount location for external storage, typically ``/home/jovyan``. For Shared collections
+which mount a root directory, this can cause a path mis-match where ``/home/jovyan/foo.txt`` accessible from
+JupyterLab appears as ``/foo.txt`` on the Globus Collection.
+
+See :ref:`config` for the values ``GLOBUS_HOST_POSIX_BASEPATH`` and ``GLOBUS_HOST_COLLECTION_BASEPATH`` for translating
+these paths for transfers at runtime.
+
+
 Kubernetes
 ----------
 

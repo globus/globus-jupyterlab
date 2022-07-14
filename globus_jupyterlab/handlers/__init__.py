@@ -3,8 +3,8 @@ import logging
 from types import ModuleType
 from typing import List, Tuple
 
-from notebook.utils import url_path_join
-from notebook.base.handlers import APIHandler
+from jupyter_server.base.handlers import APIHandler
+from jupyter_server.utils import url_path_join
 from jupyter_server.serverapp import ServerWebApplication
 from tornado.web import StaticFileHandler, url
 from globus_jupyterlab.handlers import login, config, api

@@ -1,31 +1,47 @@
 .jp-Globus-home {
-    background-color: var(--jp-layout-color1);
-    font-size: 0.8em;
-    display: flex;
+  background-color: var(--jp-layout-color1);
+  font-size: 0.8em;
+  display: flex;
 }
 
 .jp-Globus-loginScreen {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .jp-Globus-logo {
-    background-size: 100%;
-    width: 150px;
-    height: 150px;
-    background-image: var(--jp-Globus-image-logo);
-    background-repeat: no-repeat;
+  background-size: 100%;
+  width: 150px;
+  height: 150px;
+  background-image: var(--jp-Globus-image-logo);
+  background-repeat: no-repeat;
 }
 
 .jp-Globus-tablogo {
-    background-size: 100%;
-    width: var(--jp-private-sidebar-tab-width);
-    height: var(--jp-private-sidebar-tab-width);
-    background-image: var(--jp-Globus-image-logo-dark);
-    background-repeat: no-repeat;
+  background-size: 100%;
+  width: var(--jp-private-sidebar-tab-width);
+  height: var(--jp-private-sidebar-tab-width);
+  background-image: var(--jp-Globus-image-logo-dark);
+  background-repeat: no-repeat;
 }
 
-.jp-ReactWidget { overflow: scroll !important; }
+.jp-ReactWidget {
+  overflow: scroll !important;
+}
+
+.hide-element,
+.show-element {
+  background: black;
+  border-radius: 15px;
+  color: white;
+  padding: 1rem;
+}
+.hide-element {
+  display: none;
+}
+.show-element {
+  display: block;
+}
