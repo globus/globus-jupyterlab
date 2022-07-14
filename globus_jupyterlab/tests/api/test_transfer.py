@@ -343,6 +343,7 @@ def test_transfer_submission_custom_valid_non_hub_service(
     logged_in_custom_transfer_service,
     mock_hub_env,
 ):
+    monkeypatch.setenv("GLOBUS_COLLECTION_ID", "mysource")
     post_request.return_value.data = {"task_id": "my_task_id"}
 
     transfer_client.submit_transfer.return_value = SDKResponse(
@@ -399,6 +400,7 @@ def test_transfer_submission_custom_valid_hub_service(
     mock_hub_env,
 ):
 
+    monkeypatch.setenv("GLOBUS_COLLECTION_ID", "mysource")
     monkeypatch.setenv("GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE", "true")
     post_request.return_value.data = {"task_id": "my_task_id"}
 
