@@ -65,8 +65,7 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
         for transfer_items in transfer_model.DATA:
             if transfer_model.source_endpoint == col_id:
                 new_path = self.translate_base_paths(transfer_items.source_path)
-                # TODO: Set this to debug when finished debugging on the hub
-                self.log.info(
+                self.log.debug(
                     f"Translating source path {transfer_items.source_path} --> {new_path}"
                 )
                 transfer_items.source_path = new_path
@@ -78,8 +77,9 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
                 )
                 transfer_items.destination_path = new_path
             else:
-                raise ValueError(f"Non-local endpoint used in transfer {col_id}")
-            self.log.debug(f"Translated path ")
+                raise ValueError(
+                    f"Non-local collection used in transfer, expected '{col_id}' in transfer. The following transfer document is invalid: {transfer_model.json()}"
+                )
 
     def transfer_client_call(self):
         """Transfer submission is a bit more complex than the other wrapped calls. For one, it validates

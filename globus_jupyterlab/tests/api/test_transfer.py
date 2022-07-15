@@ -37,17 +37,11 @@ def test_get_api(
     logged_in,
 ):
     setattr(transfer_client, sdk_method, Mock(return_value=SDKResponse()))
-    if expected_status >= 400:
-        with pytest.raises(tornado.httpclient.HTTPClientError) as http_client_error:
-            yield http_client.fetch(base_url + f"/{operation}?{urlencode(input)}")
-        # This seems to be the best way to assert the status code response from tornado. It isn't ideal,
-        # But it should be accurate
-        assert f"HTTP {expected_status}" in str(http_client_error)
-    else:
-        response = yield http_client.fetch(
-            base_url + f"/{operation}?{urlencode(input)}"
-        )
-        assert response.code == 200
+    response = yield http_client.fetch(
+        base_url + f"/{operation}?{urlencode(input)}", raise_error=False
+    )
+    print(response.body.decode("utf-8"))
+    assert response.code == expected_status
 
 
 @pytest.mark.gen_test
