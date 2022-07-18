@@ -5,6 +5,7 @@ import logging
 import globus_sdk
 import globus_sdk.tokenstorage
 import globus_sdk.scopes
+import globus_jupyterlab.exc
 
 log = logging.getLogger(__name__)
 
@@ -12,14 +13,20 @@ log = logging.getLogger(__name__)
 class LoginManager:
 
     storage_class = globus_sdk.tokenstorage.SimpleJSONFileAdapter
-    storage_path = "~/.globus_jupyterlab_tokens.json"
 
-    def __init__(self, client_id: str):
+    def __init__(self, client_id: str, storage_path: pathlib.Path):
         self.client_id = client_id
 
-        self.storage_path = pathlib.Path(self.storage_path).expanduser()
+        self.storage_path = storage_path.expanduser()
+        self.check_storage_path(self.storage_path)
         self.storage = self.storage_class(str(self.storage_path))
         self.churn_tokens()
+
+    def check_storage_path(self, path: pathlib.Path):
+        if str(path) == "." or path.is_dir():
+            raise globus_jupyterlab.exc.TokenStorageError(
+                f"Invalid Path for GLOBUS_TOKEN_STORAGE_PATH '{path}': Must be a locally accessible file."
+            )
 
     def store(self, token_response: globus_sdk.OAuthTokenResponse):
         self.storage.store(token_response)

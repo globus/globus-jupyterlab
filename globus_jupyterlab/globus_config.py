@@ -64,6 +64,21 @@ class GlobusConfig:
         """
         return self.check_env_boolean("GLOBUS_REFRESH_TOKENS", default=False)
 
+    def get_token_storage_path(self) -> str:
+        """
+        Modify the default path of token storage for Globus JupyterLab. This location MUST
+        be only accessible by the logged in Globus User.
+
+        Configurable via evironment variable: GLOBUS_TOKEN_STORAGE_PATH
+
+        Default is: ~/.globus_jupyterlab_tokens.json
+
+        "~" Expands to the local POSIX user, on JupyterHub this is /home/jovyan
+        """
+        return os.getenv(
+            "GLOBUS_TOKEN_STORAGE_PATH", "~/.globus_jupyterlab_tokens.json"
+        )
+
     def get_named_grant(self) -> str:
         """
         Set a custom Named Grant when a user logs into Globus. Changes the pre-filled
