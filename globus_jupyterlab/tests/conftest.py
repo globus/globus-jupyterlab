@@ -32,7 +32,7 @@ def app(token_storage, monkeypatch):
 
 
 @pytest.fixture
-def logged_in(token_storage) -> SimpleJSONFileAdapter:
+def logged_in(login_manager, token_storage) -> SimpleJSONFileAdapter:
     """Simulate a logged in Globus application"""
     token_storage.tokens = copy.deepcopy(MOCK_TOKENS)
     return token_storage
@@ -182,9 +182,20 @@ def token_storage(monkeypatch) -> SimpleJSONFileAdapter:
         store = Mock()
 
     storage = MockStorage
-    monkeypatch.setattr(LoginManager, "storage_class", MockStorage)
     monkeypatch.setattr(pathlib.Path, "unlink", MockStorage.clear_tokens)
     return storage
+
+
+@pytest.fixture
+def login_manager(monkeypatch, token_storage, login_manager_mocked_storage_check):
+    monkeypatch.setattr(LoginManager, "storage_class", token_storage)
+    return LoginManager("mock_client_id", pathlib.Path("/mock/path"))
+
+
+@pytest.fixture
+def login_manager_mocked_storage_check(monkeypatch):
+    monkeypatch.setattr(LoginManager, "check_storage_path", Mock())
+    return LoginManager.check_storage_path
 
 
 @pytest.fixture(autouse=True)
