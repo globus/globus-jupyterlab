@@ -1,6 +1,7 @@
 import json
 import globus_sdk
-from globus_jupyterlab.exc import LoginException
+import tornado
+from globus_jupyterlab.exc import InvalidAPIInput, LoginException
 from globus_jupyterlab.handlers.auth import AutoAuthURLMixin
 
 
@@ -49,6 +50,22 @@ class GlobusSDKWrapper(AutoAuthURLMixin):
                     response["error"] = le.__class__.__name__
                     response["details"] = str(le)
             return self.finish(json.dumps(response))
+        except (tornado.web.MissingArgumentError, InvalidAPIInput) as e:
+            self.set_status(400)
+            self.finish(json.dumps({"code": "InvalidInput", "message": str(e)}))
+        except Exception:
+            self.set_status(500)
+            self.log.error(
+                "Unexpected error when transfer-related SDK call was attempted. This could be a misconfiguration or a bug in Globus JupyterLab.",
+                exc_info=True,
+            )
+            return self.finish(
+                json.dumps(
+                    {
+                        "error": "An unexpected error occurred, have your admin check logs for more details."
+                    }
+                )
+            )
 
 
 class GetMethodTransferAPIEndpoint(GlobusSDKWrapper):
@@ -71,12 +88,8 @@ class POSTMethodTransferAPIEndpoint(GlobusSDKWrapper):
             args = [post_data.pop(arg) for arg in self.mandatory_args]
         except KeyError:
             msg = f'Minimum args not specified: {", ".join(self.mandatory_args)}'
-            raise ValueError(msg) from None
+            raise InvalidAPIInput(msg) from None
         return args, post_data
 
     def post(self):
-        try:
-            self.sdk_wrapper_call()
-        except ValueError as ve:
-            self.set_status(400)
-            self.finish(json.dumps({"code": "InvalidInput", "message": str(ve)}))
+        self.sdk_wrapper_call()

@@ -37,17 +37,11 @@ def test_get_api(
     logged_in,
 ):
     setattr(transfer_client, sdk_method, Mock(return_value=SDKResponse()))
-    if expected_status >= 400:
-        with pytest.raises(tornado.httpclient.HTTPClientError) as http_client_error:
-            yield http_client.fetch(base_url + f"/{operation}?{urlencode(input)}")
-        # This seems to be the best way to assert the status code response from tornado. It isn't ideal,
-        # But it should be accurate
-        assert f"HTTP {expected_status}" in str(http_client_error)
-    else:
-        response = yield http_client.fetch(
-            base_url + f"/{operation}?{urlencode(input)}"
-        )
-        assert response.code == 200
+    response = yield http_client.fetch(
+        base_url + f"/{operation}?{urlencode(input)}", raise_error=False
+    )
+    print(response.body.decode("utf-8"))
+    assert response.code == expected_status
 
 
 @pytest.mark.gen_test
@@ -199,13 +193,32 @@ def test_transfer_submission_normal(
 
 @pytest.mark.gen_test
 @pytest.mark.parametrize(
-    "collection, basepath, transfer_doc, expected, case",
+    "collection, globus_host_posix_basepath, globus_host_collection_basepath, transfer_doc, expected, case",
     [
         (
-            "jupyterlab_collection",
-            "/home/jovyan/",
+            "host_collection_uuid",
+            "",
+            "",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("foo.txt", "foo.txt", False),
+            "Base case, no path translation",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan/",
+            "",
+            {
+                "source_endpoint": "host_collection_uuid",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
@@ -219,10 +232,11 @@ def test_transfer_submission_normal(
             "Rationally configured environment",
         ),
         (
-            "jupyterlab_collection",
+            "host_collection_uuid",
             "/home/jovyan",
+            "",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "host_collection_uuid",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
@@ -236,11 +250,12 @@ def test_transfer_submission_normal(
             "Missing Trailing Slash",
         ),
         (
-            "jupyterlab_collection",
+            "host_collection_uuid",
             "/home/jovyan/",
+            "",
             {
                 "source_endpoint": "user_selected_collection",
-                "destination_endpoint": "jupyterlab_collection",
+                "destination_endpoint": "host_collection_uuid",
                 "DATA": [
                     {
                         "source_path": "foo.txt",
@@ -253,28 +268,120 @@ def test_transfer_submission_normal(
             "Test Translating Destination",
         ),
         (
-            "no_exist",
-            "/home/jovyan/",
+            "host_collection_uuid",
+            "",
+            "/shared",
             {
-                "source_endpoint": "jupyterlab_collection",
+                "source_endpoint": "host_collection_uuid",
                 "destination_endpoint": "user_selected_collection",
                 "DATA": [
                     {
                         "source_path": "foo.txt",
-                        "destination_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
                         "recursive": False,
                     }
                 ],
             },
-            "error",
-            "Test no hub endpoint for transfer",
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test Collection Base Path",
+        ),
+        (
+            "host_collection_uuid",
+            "",
+            "shared",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("shared/foo.txt", "foo.txt", False),
+            "Test Relative Collection Base Path",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan",
+            "/shared",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test both posix basepath with collection basepath",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan/",
+            "/shared/",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/home/jovyan/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            ("/shared/foo.txt", "foo.txt", False),
+            "Test trailing slash",
+        ),
+        (
+            "no_exist",
+            "/home/jovyan/",
+            "",
+            {
+                "source_endpoint": "some_other_collection",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            500,
+            "Test no hub collection for transfer",
+        ),
+        (
+            "host_collection_uuid",
+            "/home/jovyan/",
+            "",
+            {
+                "source_endpoint": "host_collection_uuid",
+                "destination_endpoint": "user_selected_collection",
+                "DATA": [
+                    {
+                        "source_path": "/some/other/path/foo.txt",
+                        "destination_path": "foo.txt",
+                        "recursive": False,
+                    }
+                ],
+            },
+            400,
+            "Test transfer is outside share path",
         ),
     ],
 )
 def test_transfer_submission_with_posix_basepath(
     monkeypatch,
     collection,
-    basepath,
+    globus_host_posix_basepath,
+    globus_host_collection_basepath,
     transfer_doc,
     expected,
     case,
@@ -286,7 +393,10 @@ def test_transfer_submission_with_posix_basepath(
     logged_in,
 ):
     monkeypatch.setenv("GLOBUS_COLLECTION_ID", collection)
-    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", basepath)
+    monkeypatch.setenv("GLOBUS_HOST_POSIX_BASEPATH", globus_host_posix_basepath)
+    monkeypatch.setenv(
+        "GLOBUS_HOST_COLLECTION_BASEPATH", globus_host_collection_basepath
+    )
     transfer_client.submit_transfer.return_value = SDKResponse(
         data={"task_id": "my_taks_id"}
     )
@@ -294,9 +404,9 @@ def test_transfer_submission_with_posix_basepath(
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
     )
-    print(response.body.decode("utf-8"))
-    if expected == "error":
-        assert response.code == 400
+    print(f'Response {response.body.decode("utf-8")}')
+    if isinstance(expected, int):
+        assert response.code == expected
     else:
         # Fetch arg in submit_transfer(transfer_data)
         mock_transfer_data = transfer_client.submit_transfer.call_args[0][0]
