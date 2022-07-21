@@ -1,3 +1,4 @@
+import pathlib
 from jupyter_server.base.handlers import APIHandler
 from globus_jupyterlab.globus_config import GlobusConfig
 from globus_jupyterlab.login_manager import LoginManager
@@ -7,7 +8,10 @@ globus_config = GlobusConfig()
 
 class BaseAPIHandler(APIHandler):
     gconfig = globus_config
-    login_manager = LoginManager(globus_config.get_client_id())
+    login_manager = LoginManager(
+        globus_config.get_client_id(),
+        pathlib.Path(globus_config.get_token_storage_path()),
+    )
 
 
 class RedirectWebHandler(BaseAPIHandler):
