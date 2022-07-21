@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.8](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b7...v1.0.0b8) (2022-07-21)
+
+### Features
+
+- add back button to additional login ([163ec19](https://github.com/globus/globus-jupyterlab/commit/163ec19405bed8bf3fe9b3236fe10b8aacc913d7))
+- Allow custom token storage location with GLOBUS_TOKEN_STORAGE_PATH ([4b466b2](https://github.com/globus/globus-jupyterlab/commit/4b466b20199eae1251aeaea5170d91de866a050e))
+- Improved error reporting in server extension logs ([08982ce](https://github.com/globus/globus-jupyterlab/commit/08982cecd3047b48b490d5716cbebe3cf70ea201))
+- Support path translation for NFS mounts of GCS ([e647647](https://github.com/globus/globus-jupyterlab/commit/e6476472da86fd4386747c40a84af162979caddc))
+
+### Bug Fixes
+
+- Custom Transfer Submission not properly returning task id ([7698b33](https://github.com/globus/globus-jupyterlab/commit/7698b33996c59d9e9ce402377831cdc166479b27))
+- is_hub_service not raising an Exception on start if mis-configured ([c2f4bc0](https://github.com/globus/globus-jupyterlab/commit/c2f4bc042e361d4935027f7f51bb36cd33c73c99))
+- Regression in custom transfer submission not picking up scope ([0292283](https://github.com/globus/globus-jupyterlab/commit/0292283ca2c99e482606783a2871df40f95957fe))
+
 ## [1.0.0-beta.7](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b6...v1.0.0b7) (2022-07-12)
 
 ### Bug Fixes
