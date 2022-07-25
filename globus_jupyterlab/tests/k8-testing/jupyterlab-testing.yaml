@@ -18,9 +18,9 @@ hub:
       # admin_globus_groups:
       #   - '7a346d31-3838-11ec-af8e-f561b5a488be'
       scope:
-        - 'email'
-        - 'profile'
-        - 'openid'
+        - "email"
+        - "profile"
+        - "openid"
     JupyterHub:
       authenticator_class: globus
   extraConfig:
@@ -28,8 +28,8 @@ hub:
       c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 1}}
     20-keep-all-tokens: |
       c.OAuthenticator.exclude_tokens = []
-    30-set-home-dir: |
-      c.KubeSpawner.working_dir = '/home/{username}'
+    # 30-set-home-dir: |
+    # c.KubeSpawner.working_dir = '/home/{username}'
     40-set-username-in-auth-state: |
       from oauthenticator.globus import GlobusOAuthenticator
 
@@ -54,16 +54,19 @@ singleuser:
   defaultUrl: "/lab"
   extraEnv:
     JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
-    # GLOBUS_COLLECTION_ID: "1346ef68-d9b8-4757-a537-47cefb7698e8"
+    GLOBUS_COLLECTION_ID: "acfeef4a-4afc-4120-aebd-05cd47fb10bb"
+    GLOBUS_HOST_COLLECTION_BASEPATH: "/"
+    GLOBUS_HOST_POSIX_BASEPATH: "/home/jovyan"
+    GLOBUS_TOKEN_STORAGE_PATH: "/tmp/globus_jupyterlab_tokens.json"
     CHOWN_HOME: "yes"
   storage:
     type: static
     extraLabels: {}
     static:
       pvcName: nfs
-      subPath: 'home/{username}'
+      subPath: "home/shared"
     capacity: 10Gi
-    homeMountPath: /home/{username}
+    # homeMountPath: /home/jovyan
   image:
     name: nsglobusautobuilds/jupyterlab-testing
     tag: latest
