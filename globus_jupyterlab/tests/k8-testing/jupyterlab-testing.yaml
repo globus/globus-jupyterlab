@@ -41,14 +41,14 @@ hub:
 
       c.JupyterHub.authenticator_class = CustomGlobusOAuthenticator
 
-    35-set-server-user: |
-      def userdata_hook(spawner, auth_state):
-        spawner.environment['NB_USER'] = auth_state["name"]
+    # 35-set-server-user: |
+    #   def userdata_hook(spawner, auth_state):
+    #     spawner.environment['NB_USER'] = auth_state["name"]
 
-      c.Spawner.auth_state_hook = userdata_hook
-    40-set-local-globus-collection: |
-      # Note: This is possible in either the globus-jupyter var or via OAuthehnticator
-      c.OAuthenticator.globus_local_endpoint = '1346ef68-d9b8-4757-a537-47cefb7698e8'
+    #   c.Spawner.auth_state_hook = userdata_hook
+    # 40-set-local-globus-collection: |
+    #   # Note: This is possible in either the globus-jupyter var or via OAuthehnticator
+    #   c.OAuthenticator.globus_local_endpoint = '1346ef68-d9b8-4757-a537-47cefb7698e8'
 
 singleuser:
   defaultUrl: "/lab"
