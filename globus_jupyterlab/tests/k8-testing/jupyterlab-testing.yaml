@@ -57,7 +57,7 @@ singleuser:
     GLOBUS_COLLECTION_ID: "acfeef4a-4afc-4120-aebd-05cd47fb10bb"
     GLOBUS_HOST_COLLECTION_BASEPATH: "/"
     GLOBUS_HOST_POSIX_BASEPATH: "/home/jovyan"
-    GLOBUS_TOKEN_STORAGE_PATH: "/tmp/globus_jupyterlab_tokens.json"
+    GLOBUS_TOKEN_STORAGE_PATH: "/private/globus_jupyterlab_tokens.json"
     CHOWN_HOME: "yes"
   storage:
     type: static
