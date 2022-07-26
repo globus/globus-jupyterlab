@@ -388,7 +388,9 @@ const Endpoint = (props) => {
   }
 
   if (hubResponse) {
-    return <HubLogin endpoint={endpoint} hubResponse={hubResponse} />;
+    return (
+      <HubLogin config={config} endpoint={endpoint} hubResponse={hubResponse} />
+    );
   }
 
   return (

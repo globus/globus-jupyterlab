@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ReactWidget } from "@jupyterlab/apputils";
+import { useHistory } from "react-router-dom";
 
 import { normalizeURL, requestAPI } from "../handler";
 
@@ -8,11 +9,14 @@ export const HubLogin = (props) => {
   const [hubInputCode, setHubInputCode] = useState(null);
 
   const errorDetails = useRef(null);
+  const history = useHistory();
   const hubLoginButton = useRef(null);
 
-  useEffect(() => {
-    hubLoginButton.current.disabled = true;
-  }, []);
+  if (props.hubResponse.login_required) {
+    useEffect(() => {
+      hubLoginButton.current.disabled = true;
+    }, []);
+  }
 
   useEffect(() => {
     if ("details" in props.hubResponse) {
@@ -65,7 +69,12 @@ export const HubLogin = (props) => {
           Error {apiError.response.status}: {apiError.response.statusText}.
         </strong>{" "}
         {apiError.details && apiError.details}
-        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
       </div>
     );
   }
@@ -77,24 +86,19 @@ export const HubLogin = (props) => {
           {apiError && (
             <div id="api-error" className="alert alert-danger">
               <strong>
-                Error {apiError.response.status}: {apiError.response.statusText}.
+                Error {apiError.response.status}: {apiError.response.statusText}
+                .
               </strong>{" "}
               Please try again.
             </div>
           )}
 
-          {props.endpoint ? (
-            <p className="mb-3 lead">
-              <i className="fa-solid fa-circle-info"></i> You must authenticate
-              with the identity that is allowed to access this endpoint or
-              collection.
-            </p>
-          ) : (
-            <p className="mb-3 lead">
-              <i className="fa-solid fa-circle-info"></i> Please log in and
-              consent to JupyterLab performing a Globus transfer on your behalf.
-            </p>
-          )}
+          <button
+            className="btn btn-sm btn-outline-secondary mb-3"
+            onClick={() => history.goBack()}
+          >
+            <i className="fa-solid fa-angle-left"></i> Back to Search
+          </button>
 
           <ol className="list-group">
             {props.endpoint && (
@@ -118,12 +122,22 @@ export const HubLogin = (props) => {
 
             <li className="list-group-item p-4">
               <div className="ms-2 me-auto">
-                <div className="fw-bold mb-3">
-                  <p className="lead">
-                    1. Log In to Globus to obtain an Authorization Code for this
-                    transfer
-                  </p>
-                </div>
+                {props.hubResponse.login_required ||
+                !props.config.is_logged_in ? (
+                  <div className="fw-bold mb-3">
+                    <p className="lead">
+                      Log In to Globus to obtain an Authorization Code for this
+                      transfer
+                    </p>
+                  </div>
+                ) : (
+                  <div className="fw-bold mb-3">
+                    <p className="lead">
+                      You must authenticate with the identity that is allowed to
+                      access this endpoint or collection
+                    </p>
+                  </div>
+                )}
                 <button
                   type="button"
                   className="btn btn-outline-primary"
@@ -137,39 +151,51 @@ export const HubLogin = (props) => {
                       .focus();
                   }}
                 >
-                  Log In to Globus
+                  {props.hubResponse.login_required ||
+                  !props.config.is_logged_in
+                    ? "Log In to Globus"
+                    : "Continue"}
                 </button>
               </div>
             </li>
 
-            <li className="list-group-item p-4">
-              <div className="ms-2 me-auto">
-                <div className="fw-bold mb-3">
-                  <p className="lead">
-                    2. Copy and paste the Authorization Code you just received
-                    from Globus
-                  </p>
+            {(props.hubResponse.login_required ||
+              !props.config.is_logged_in) && (
+              <li className="list-group-item p-4">
+                <div className="ms-2 me-auto">
+                  <div className="fw-bold mb-3">
+                    <p className="lead">
+                      Copy and paste the Authorization Code you just received
+                      from Globus
+                    </p>
+                  </div>
+                  <label htmlFor="code-input" className="form-label">
+                    Authorization Code
+                  </label>
+                  <input
+                    type="text"
+                    id="code-input"
+                    className="form-control mb-3"
+                    name="code-input"
+                    onChange={handleHubInputChange}
+                  ></input>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    ref={hubLoginButton}
+                    onClick={handleHubLogin}
+                  >
+                    Continue
+                  </button>
                 </div>
-                <label htmlFor="code-input" className="form-label">
-                  Authorization Code
-                </label>
-                <input
-                  type="text"
-                  id="code-input"
-                  className="form-control mb-3"
-                  name="code-input"
-                  onChange={handleHubInputChange}></input>
-                <button type="button" className="btn btn-primary" ref={hubLoginButton} onClick={handleHubLogin}>
-                  Continue
-                </button>
-              </div>
-            </li>
+              </li>
+            )}
 
             {"details" in props.hubResponse && (
               <li className="list-group-item">
                 <div className="ms-2 me-auto my-3">
                   <button
-                    className="btn btn-outline-primary"
+                    className="btn btn-outline-secondary"
                     onClick={handleErrorDetails}
                   >
                     Show details
@@ -186,7 +212,19 @@ export const HubLogin = (props) => {
 };
 
 export class HubLoginWidget extends ReactWidget {
+  state: { config: any };
+  constructor(props) {
+    super(props);
+    this.state = { config: props.config };
+  }
+
   render(): JSX.Element {
-    return <HubLogin endpoint={null} hubResponse={{}} />;
+    return (
+      <HubLogin
+        config={"config" in this.state ? this.state.config : null}
+        endpoint={null}
+        hubResponse={{}}
+      />
+    );
   }
 }

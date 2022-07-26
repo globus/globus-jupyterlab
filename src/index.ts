@@ -88,7 +88,7 @@ async function activateGlobus(
             app.shell.add(widget, "main");
           } else {
             if (config.is_hub) {
-              const hubContent = new HubLoginWidget();
+              const hubContent = new HubLoginWidget({ config: config });
               const hubWidget = new MainAreaWidget<HubLoginWidget>({
                 content: hubContent,
               });
