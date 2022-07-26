@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "requires-user-intervention"
 
 jobs:
   docker:
