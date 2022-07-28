@@ -19,23 +19,32 @@ For example:
 
 See :ref:`config` for a full list of config options.
 
-Shared Mapped Collections
--------------------------
+Mapped Collections
+------------------
 
 Support is coming soon!
 
 
-Shared Host Collections
------------------------
+Guest Collections
+-----------------
 
-If using a shared collection, special care needs to be taken to ensure the POSIX location accessible
-by JupyterLab matches the location accessible by the host Globus Collection. Commonly, the home directory
-of the Docker image will be the mount location for external storage, typically ``/home/jovyan``. For Shared collections
-which mount a root directory, this can cause a path mis-match where ``/home/jovyan/foo.txt`` accessible from
-JupyterLab appears as ``/foo.txt`` on the Globus Collection.
+Guest Collections are typically mounted filesystems over NFS. The same file viewed by the user in Globus JupyterLab may have a differenet path
+viewed through Globus Connect Server.
 
-See :ref:`config` for the values ``GLOBUS_HOST_POSIX_BASEPATH`` and ``GLOBUS_HOST_COLLECTION_BASEPATH`` for translating
-these paths for transfers at runtime.
+For example, a GCS share may be mounted inside a single user server at ``/home/jovyan``. A file in a single user server in Globus
+JupyterLab will be ``/home/jovyan/foo.txt``, but can only be accessed from the Globus Collection as ``/foo.txt``.
+Setting ``GLOBUS_HOST_POSIX_BASEPATH`` to ``/home/jovyan`` fixes this mismatch. Now when Globus JupyterLab submits a transfer,
+paths will be translated to "GCS" paths, transferring ``/foo.txt`` instead of ``/home/jovyan/foo.txt``.
+
+``GLOBUS_HOST_COLLECTION_BASEPATH`` is also available if you want Globus JupyterLab to transfer files to a subfolder inside
+a Guest Collection share.
+
+See :ref:`config` for more info on ``GLOBUS_HOST_POSIX_BASEPATH`` and ``GLOBUS_HOST_COLLECTION_BASEPATH``.
+
+
+.. warning::
+    User tokens are stored in the user's home directory by default. This path needs to be changed if the Guest Collection share
+    could be visible to other users. See the :ref:`config` option GLOBUS_TOKEN_STORAGE_PATH.
 
 
 Kubernetes

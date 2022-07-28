@@ -161,20 +161,18 @@ class GlobusConfig:
 
     def get_host_posix_basepath(self) -> str:
         """
-        Configure the base path which JupyterLab uses to access files on a Globus Collection,
-        relative to the path the Globus Collection uses to access files. For example, if
-        the same file is referred to by both the Collection and JupyterLab (POSIX):
+        If JupyterLab is generating incorrect paths for transfer on a Gloubs Collection,
+        this setting will 'fix' them during transfers to ensure the path within POSIX and
+        the path visible through the Gloubs Collection point to the same file. For example,
+        if the Host Globus collection was mounted at ``/home/jovyan``, JupyterLab and the
+        Host collection would refer to the same file with two separate paths:
 
         * JupyterLab (POSIX): /home/jovyan/foo.txt
         * Collection (Globus): /foo.txt
 
-        You may set "GLOBUS_HOST_POSIX_BASEPATH=/home/jovyan". This will ensure a file
+        Setting "GLOBUS_HOST_POSIX_BASEPATH=/home/jovyan" will ensure a file
         transferred by JupyterLab "/home/jovyan/foo.txt" will be rewritten to "foo.txt"
         on transfer, such that the Globus Transfer can complete with the correct path.
-
-        This is typically only needed on Shared collections which mount storage in
-        convienient locations on the provided Docker image but do not match the Collection
-        base path. This usually isn't needed when using Mapped Collections.
 
         By default when blank or unset, no path translation takes place.
         """
@@ -189,10 +187,11 @@ class GlobusConfig:
         * Collection (Globus): /shared/foo.txt
 
         You may set "GLOBUS_HOST_COLLECTION_BASEPATH=/shared". This will ensure a file
-        transferred by JupyterLab "~/foo.txt" will be rewritten to "/shared/foo.txt"
+        transferred by JupyterLab "foo.txt" will be rewritten to "/shared/foo.txt"
         on transfer, such that the Globus Transfer can complete with the correct path.
 
-        By default when blank or unset, no path translation takes place.
+        By default when blank or unset, no path translation takes place. This setting can be
+        used with or without GLOBUS_HOST_POSIX_BASEPATH.
         """
         return os.getenv("GLOBUS_HOST_COLLECTION_BASEPATH", "")
 
