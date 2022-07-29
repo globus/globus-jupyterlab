@@ -139,10 +139,11 @@ def transfer_data(monkeypatch) -> globus_sdk.TransferClient:
     """Mock the tranfer data, return the class instance"""
 
     class MockTransferData:
-        def __init__(self, tc, source, dest):
+        def __init__(self, tc, source, dest, label=None):
             self.data = {
                 "source_endpoint": source,
                 "destination_endpoint": dest,
+                "label": label,
                 "DATA": [],
             }
 

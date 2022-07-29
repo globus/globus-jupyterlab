@@ -486,6 +486,7 @@ def test_transfer_submission_custom_valid_non_hub_service(
             "transfer": {
                 "source_endpoint": "mysource",
                 "destination_endpoint": "mydest",
+                "label": None,
                 "DATA": [
                     {
                         "source_path": "foo.txt",
@@ -544,6 +545,7 @@ def test_transfer_submission_custom_valid_hub_service(
             "transfer": {
                 "source_endpoint": "mysource",
                 "destination_endpoint": "mydest",
+                "label": None,
                 "DATA": [
                     {
                         "source_path": "foo.txt",
