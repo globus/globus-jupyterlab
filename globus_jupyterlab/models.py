@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from enum import Enum
 from pydantic import BaseModel
 
@@ -13,6 +13,7 @@ class TransferModel(BaseModel):
     source_endpoint: str
     destination_endpoint: str
     DATA: List[TransferItemsModel]
+    label: Optional[str]
 
 
 class StatusEnum(str, Enum):
