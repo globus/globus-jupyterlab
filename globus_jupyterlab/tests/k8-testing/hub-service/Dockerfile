@@ -1,5 +1,5 @@
 # Dockerfile
-# 0.11.1 is latest stable release at the time of this writing
+# 1.2.0 is latest stable release at the time of this writing
 FROM jupyterhub/k8s-hub:1.2.0
 
 USER root

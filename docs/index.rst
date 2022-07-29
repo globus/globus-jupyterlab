@@ -20,6 +20,7 @@ in a JupyterHub environment like `Zero-to-JupyterHub <https://zero-to-jupyterhub
    installation
    gcp
    jupyterhub
+   hub-service-transfers
    config
    CHANGELOG
 
