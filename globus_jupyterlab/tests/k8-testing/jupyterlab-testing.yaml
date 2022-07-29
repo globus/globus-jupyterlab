@@ -56,33 +56,35 @@ hub:
     # 40-set-local-globus-collection: |
     #   # Note: This is possible in either the globus-jupyter var or via OAuthehnticator
     #   c.OAuthenticator.globus_local_endpoint = '1346ef68-d9b8-4757-a537-47cefb7698e8'
-  # services:
-  #   acls-service:
-  #     url: http://hub:8181
-  #     command:
-  #       - flask
-  #       - run
-  #       - --port
-  #       - "8181"
-  #     environment:
-  #       FLASK_APP: 'usr/src/flask/app.py'
-  #       CLIENT_ID: ''
-  #       CLIENT_SECRET: ''
+  # Note: Requires acls service to be built into the hub image.
+  services:
+    acls-service:
+      url: http://hub:8181
+      command:
+        - flask
+        - run
+        - --port
+        - "8181"
+      environment:
+        FLASK_APP: "usr/src/flask/app.py"
+        CLIENT_ID: ""
+        CLIENT_SECRET: ""
+        GLOBUS_COLLECTION_ID: "1346ef68-d9b8-4757-a537-47cefb7698e8"
 
-  # networkPolicy:
-  #   ingress:
-  #     - ports:
-  #         - port: 8181
-  #       from:
-  #         - podSelector:
-  #             matchLabels:
-  #               hub.jupyter.org/network-access-hub: "true"
+  networkPolicy:
+    ingress:
+      - ports:
+          - port: 8181
+        from:
+          - podSelector:
+              matchLabels:
+                hub.jupyter.org/network-access-hub: "true"
 
-  # service:
-  #   extraPorts:
-  #     - port: 8181
-  #       targetPort: 8181
-  #       name: acls-service
+  service:
+    extraPorts:
+      - port: 8181
+        targetPort: 8181
+        name: acls-service
 
 singleuser:
   defaultUrl: "/lab"
