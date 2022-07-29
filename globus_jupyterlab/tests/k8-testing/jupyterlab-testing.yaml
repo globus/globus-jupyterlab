@@ -65,11 +65,13 @@ hub:
         - run
         - --port
         - "8181"
+        - --host
+        - "0.0.0.0"
       environment:
-        FLASK_APP: "usr/src/flask/app.py"
+        FLASK_APP: "/usr/src/flask/app.py"
         CLIENT_ID: ""
         CLIENT_SECRET: ""
-        GLOBUS_COLLECTION_ID: "1346ef68-d9b8-4757-a537-47cefb7698e8"
+        GLOBUS_COLLECTION_ID: "acfeef4a-4afc-4120-aebd-05cd47fb10bb"
 
   networkPolicy:
     ingress:
@@ -94,7 +96,12 @@ singleuser:
     GLOBUS_HOST_COLLECTION_BASEPATH: "/"
     GLOBUS_HOST_POSIX_BASEPATH: "/home/jovyan"
     GLOBUS_TOKEN_STORAGE_PATH: "/private/globus_jupyterlab_tokens.json"
-    CHOWN_HOME: "yes"
+
+    # Re-route transfers through the ACLs service
+    GLOBUS_TRANSFER_SUBMISSION_SCOPE: "https://auth.globus.org/scopes/6811789a-3f4b-419e-92e2-7cd55d87591e/genepattern_transfer"
+    GLOBUS_TRANSFER_SUBMISSION_URL: "https://jupyterlab-testing.nick.globuscs.info/services/acls-service/"
+    GLOBUS_TRANSFER_SUBMISSION_IS_HUB_SERVICE: "true"
+    # CHOWN_HOME: "yes"
   storage:
     type: static
     extraLabels: {}
