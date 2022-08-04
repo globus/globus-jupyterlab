@@ -21,6 +21,10 @@ RUN apt-get update \
 COPY . /custom_extensions/globus_jupyterlab
 RUN chown -R jovyan /custom_extensions/globus_jupyterlab
 
+# Expose /private for a possible token storage location if GCS guest collection storage
+# is enabled, and using /home/jovyan for a public share is desired.
+RUN mkdir -p /private && chown -R jovyan /private
+
 USER $NB_USER
 
 RUN python -m pip install jupyterlab build jupyter-packaging globus-sdk pydantic
