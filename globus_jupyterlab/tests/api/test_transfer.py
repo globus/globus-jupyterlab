@@ -168,7 +168,7 @@ def test_401_login_url_with_custom_submission_scope(
         "urn:globus:auth:scope:transfer.api.globus.org:all"
     )
     assert (
-        "http://myscope[https://auth.globus.org/scopes/foo/data_access]"
+        "http://myscope[urn:globus:auth:scope:transfer.api.globus.org:all[https://auth.globus.org/scopes/foo/data_access]"
         in requested_scopes
     )
 
