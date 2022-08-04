@@ -157,7 +157,10 @@ class SubmitTransfer(GCSAuthMixin, POSTMethodTransferAPIEndpoint):
         tc = globus_sdk.TransferClient(authorizer=authorizer)
 
         td = globus_sdk.TransferData(
-            tc, transfer_data.source_endpoint, transfer_data.destination_endpoint
+            tc,
+            transfer_data.source_endpoint,
+            transfer_data.destination_endpoint,
+            label=transfer_data.label,
         )
         for transfer_item in transfer_data.DATA:
             td.add_item(

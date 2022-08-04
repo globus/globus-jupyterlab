@@ -259,6 +259,8 @@ const Endpoint = (props) => {
       let transferRequest = {
         source_endpoint: sourceEndpoint,
         destination_endpoint: destinationEndpoint,
+        // Label is now supported
+        // label: "TEST LABEL",
         DATA: transferItems,
       };
 
@@ -346,6 +348,8 @@ const Endpoint = (props) => {
     let transferRequest = {
       source_endpoint: sourceEndpoint,
       destination_endpoint: destinationEndpoint,
+      // Label is now supported:
+      // label: "TEST LABEL",
       DATA: transferItems,
     };
 
