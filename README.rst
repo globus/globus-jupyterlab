@@ -19,7 +19,7 @@ Globus Jupyterlab is an extension to Jupyterlab for easily submitting Globus Tra
 within a running lab environment. Integration within the Jupyterlab filemanager makes
 starting transfers just a few clicks away!
 
-Install with the following: 
+Install with the following:
 
 .. code-block:: bash
 
@@ -30,7 +30,7 @@ For information on usage, see the `Read-The-Docs <https://globus-jupyterlab.read
 Developing
 ----------
 
-For development, use the following instructions: 
+For development, use the following instructions:
 
 .. code-block:: bash
 

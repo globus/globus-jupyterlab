@@ -1,110 +1,110 @@
 .jp-Globus-search {
-    flex: 1 1 auto;
-    display: block;
-    overflow-y: auto;
+  flex: 1 1 auto;
+  display: block;
+  overflow-y: auto;
 }
 
 .jp-Globus-search .jp-Search-indexSelect {
-    flex: 1 1 auto;
-    padding: 5px;
-    margin-bottom: 10px;
+  flex: 1 1 auto;
+  padding: 5px;
+  margin-bottom: 10px;
 }
 
 .jp-Globus-search .jp-Globus-listItem {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .jp-Globus-search .jp-Search-menuFilter {
-    text-align: left;
+  text-align: left;
 }
 
 .jp-Globus-search .jp-Search-menuFilter::before {
-    content: '';
-    float: left;
-    height: 30px;
-    width: 30px;
-    background: var(--jp-Globus-icon-angle-arrow-down) no-repeat center;
-    background-size: 13px 13px;
+  content: "";
+  float: left;
+  height: 30px;
+  width: 30px;
+  background: var(--jp-Globus-icon-angle-arrow-down) no-repeat center;
+  background-size: 13px 13px;
 }
 
 .jp-Globus-search .jp-Search-menuFilter.jp-Globus-active::before {
-    background: var(--jp-Globus-icon-angle-arrow-up) no-repeat center;
-    background-size: 13px 13px;
+  background: var(--jp-Globus-icon-angle-arrow-up) no-repeat center;
+  background-size: 13px 13px;
 }
 
 .jp-Globus-search .jp-Search-menu {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    width: 75px;
-    align-self: flex-end;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  width: 75px;
+  align-self: flex-end;
 }
 
 .jp-Globus-search .jp-Search-resultList {
-    position: relative;
-    border-top-right-radius: 0;
-    border-top: none;
+  position: relative;
+  border-top-right-radius: 0;
+  border-top: none;
 }
 
 .jp-Globus-search .jp-Search-filterList {
-    position: absolute;
-    background: white;
-    width: 80%;
-    top: 76px;
-    right: 0;
-    z-index: 10;
+  position: absolute;
+  background: white;
+  width: 80%;
+  top: 76px;
+  right: 0;
+  z-index: 10;
 }
 
 .jp-Globus-search .jp-Search-resultGroup {
-    position: relative;
+  position: relative;
 }
 
 .jp-Globus-search .jp-Search-filterCheckbox {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 .jp-Globus-activity .jp-Activity-menuOverview::before {
-    background: var(--jp-Globus-icon-info) no-repeat;
+  background: var(--jp-Globus-icon-info) no-repeat;
 }
 
 .jp-Globus-activity .jp-Globus-menuBtn::before {
-    content: '';
-    display: inline-block;
-    position: relative;
-    top: 4px;
-    width: 16px;
-    height: 16px;
-    background-size: contain;
-    margin-right: 5px;
+  content: "";
+  display: inline-block;
+  position: relative;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  margin-right: 5px;
 }
 
 .jp-Globus-search .jp-Globus-menu {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    min-height: 30px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  min-height: 30px;
 }
 
 .jp-Globus-search .jp-Globus-list {
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .jp-Globus-search .jp-Search-menuBack {
-    max-width: 30px;
-    background: white var(--jp-Globus-icon-back) no-repeat center;
-    background-size: contain;
+  max-width: 30px;
+  background: white var(--jp-Globus-icon-back) no-repeat center;
+  background-size: contain;
 }
 
 .jp-Globus-search .jp-Search-menuOverview {
-    background: white;
-    cursor: auto;
+  background: white;
+  cursor: auto;
 }
 
 .jp-Globus-search .jp-Globus-listItemSubtitle {
-    white-space: pre-wrap;
-    overflow-wrap: normal;
+  white-space: pre-wrap;
+  overflow-wrap: normal;
 }
 
 .jp-Globus-search .jp-Search-overview {
-    overflow: auto;
+  overflow: auto;
 }

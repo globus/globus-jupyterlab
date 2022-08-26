@@ -8,6 +8,7 @@ node_modules/
 *.tsbuildinfo
 .DS_Store
 __pycache__
+*-secrets.yaml
 
 # Ensure embedme does not run ont node_modules README.md files.
 **/node_modules/**/README.md

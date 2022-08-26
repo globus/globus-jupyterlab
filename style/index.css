@@ -1,8 +1,8 @@
-@import 'stylesheets/variables.css';
-@import 'stylesheets/utils.css';
-@import 'stylesheets/home.css';
-@import 'stylesheets/widget_manager.css';
-@import 'stylesheets/widgets/globus_connect_personal.css';
-@import 'stylesheets/widgets/file_manager.css';
-@import 'stylesheets/widgets/activity.css';
-@import 'stylesheets/widgets/search.css';
+@import "stylesheets/variables.css";
+@import "stylesheets/utils.css";
+@import "stylesheets/home.css";
+@import "stylesheets/widget_manager.css";
+@import "stylesheets/widgets/globus_connect_personal.css";
+@import "stylesheets/widgets/file_manager.css";
+@import "stylesheets/widgets/activity.css";
+@import "stylesheets/widgets/search.css";
