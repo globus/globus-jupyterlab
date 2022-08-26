@@ -1,357 +1,368 @@
 .jp-Globus-file-manager {
-    flex: 1 1 auto;
-    display: block;
-    overflow-y: auto;
+  flex: 1 1 auto;
+  display: block;
+  overflow-y: auto;
 }
 
 .jp-Globus-file-manager .jp-FileManager-searchInfo {
-    background: white;
-    border: 1px solid var(--jp-Globus-borderGray);
-    padding: 5px 10px;
-    color: var(--jp-Globus-textGray);
-    font-style: italic;
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
+  background: white;
+  border: 1px solid var(--jp-Globus-borderGray);
+  padding: 5px 10px;
+  color: var(--jp-Globus-textGray);
+  font-style: italic;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .jp-Globus-file-manager .jp-FileManager-shareInfo {
-    background: white;
-    border: 1px solid var(--jp-Globus-borderGray);
-    padding: 5px 10px;
-    color: var(--jp-Globus-textGray);
-    font-style: italic;
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
+  background: white;
+  border: 1px solid var(--jp-Globus-borderGray);
+  padding: 5px 10px;
+  color: var(--jp-Globus-textGray);
+  font-style: italic;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuSelect {
-    width: 60px;
+  width: 60px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuUpFolder {
-    background: var(--jp-Globus-icon-up-arrow) no-repeat center;
-    background-size: 16px 16px;
+  background: var(--jp-Globus-icon-up-arrow) no-repeat center;
+  background-size: 16px 16px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuRefresh {
-    background: var(--jp-Globus-icon-refresh) no-repeat center;
-    background-size: 16px 16px;
+  background: var(--jp-Globus-icon-refresh) no-repeat center;
+  background-size: 16px 16px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuOptions {
-    background: var(--jp-Globus-icon-hamburger) no-repeat center;
-    background-size: 16px 16px;
-    max-width: 30px;
-    border-left: 1px solid var(--jp-Globus-borderGray);
-    max-height: inherit;
+  background: var(--jp-Globus-icon-hamburger) no-repeat center;
+  background-size: 16px 16px;
+  max-width: 30px;
+  border-left: 1px solid var(--jp-Globus-borderGray);
+  max-height: inherit;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuSort {
-    text-align: left;
+  text-align: left;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuSort::before {
-    content: '';
-    float: left;
-    height: 30px;
-    width: 30px;
-    background: var(--jp-Globus-icon-angle-arrow-down) no-repeat center;
-    background-size: 13px 13px;
+  content: "";
+  float: left;
+  height: 30px;
+  width: 30px;
+  background: var(--jp-Globus-icon-angle-arrow-down) no-repeat center;
+  background-size: 13px 13px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuSort.jp-Globus-active::before {
-    background: var(--jp-Globus-icon-angle-arrow-up) no-repeat center;
-    background-size: 13px 13px;
+  background: var(--jp-Globus-icon-angle-arrow-up) no-repeat center;
+  background-size: 13px 13px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuUpFolder:hover,
 .jp-Globus-file-manager .jp-FileManager-menuOptions:hover,
 .jp-Globus-file-manager .jp-FileManager-menuRefresh:hover {
-    background-color: white;
+  background-color: white;
 }
 
 .jp-Globus-file-manager .jp-FileManager-dirMenu {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .jp-Globus-file-manager .jp-FileManager-fileList {
-    overflow: auto;
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    max-height: 40vh;
+  overflow: auto;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  max-height: 40vh;
 }
 
 .jp-Globus-file-manager .jp-FileManager-dirOptions {
-    position: absolute;
-    top: 75px;
-    right: 0;
-    width: 75%;
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    z-index: 10;
+  position: absolute;
+  top: 75px;
+  right: 0;
+  width: 75%;
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  z-index: 10;
 }
 
 .jp-Globus-file-manager .jp-FileManager-dirGroup {
-    position: relative;
+  position: relative;
 }
 
 .jp-Globus-file-manager .jp-Globus-header {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .jp-Globus-file-manager .jp-Globus-header::after {
-    content: '';
-    display: inline-block;
-    float: right;
-    margin-right: 20px;
-    height: 15px;
-    width: 15px;
-    background: var(--jp-Globus-icon-angle-arrow-up) no-repeat;
-    background-size: contain;
-    filter: brightness(0) invert(100%);
+  content: "";
+  display: inline-block;
+  float: right;
+  margin-right: 20px;
+  height: 15px;
+  width: 15px;
+  background: var(--jp-Globus-icon-angle-arrow-up) no-repeat;
+  background-size: contain;
+  filter: brightness(0) invert(100%);
 }
 
 .jp-Globus-file-manager .jp-Globus-header.jp-Globus-active::after {
-    background-image: var(--jp-Globus-icon-angle-arrow-down);
+  background-image: var(--jp-Globus-icon-angle-arrow-down);
 }
 
 .jp-Globus-file-manager .jp-Globus-header.jp-Globus-active {
-    margin-bottom: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .jp-Globus-file-manager .jp-Globus-listItem {
-    user-select: text;
+  user-select: text;
 }
 
 .jp-Globus-file-manager .jp-Globus-listItem.jp-FileManager-fileType::before {
-    background: var(--jp-Globus-icon-file) no-repeat;
-    background-size: contain;
+  background: var(--jp-Globus-icon-file) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-Globus-listItem.jp-FileManager-dirType::before {
-    background: var(--jp-Globus-icon-dirFolder) no-repeat;
-    background-size: contain;
+  background: var(--jp-Globus-icon-dirFolder) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-fileList .jp-Globus-listItem::before {
-    content: '';
-    display: inline-block;
-    float: left;
-    margin-right: 10px;
-    height: 32px;
-    width: 32px;
-    flex: 0 0 auto;
+  content: "";
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  height: 32px;
+  width: 32px;
+  flex: 0 0 auto;
 }
 
-.jp-Globus-file-manager .jp-FileManager-fileList .jp-Globus-listItem.jp-Globus-selected {
-    background-color: var(--jp-Globus-selectBlue);
+.jp-Globus-file-manager
+  .jp-FileManager-fileList
+  .jp-Globus-listItem.jp-Globus-selected {
+  background-color: var(--jp-Globus-selectBlue);
 }
 
-.jp-Globus-file-manager .jp-FileManager-fileList .jp-Globus-listItem.jp-Globus-selected:before {
-    filter: brightness(0) invert(1);
+.jp-Globus-file-manager
+  .jp-FileManager-fileList
+  .jp-Globus-listItem.jp-Globus-selected:before {
+  filter: brightness(0) invert(1);
 }
 
-.jp-Globus-file-manager .jp-FileManager-fileList .jp-Globus-listItem.jp-Globus-selected * {
-    color: white;
+.jp-Globus-file-manager
+  .jp-FileManager-fileList
+  .jp-Globus-listItem.jp-Globus-selected
+  * {
+  color: white;
 }
 
 .jp-Globus-file-manager .jp-FileManager-dirOptions .jp-Globus-listItem::before {
-    content: '';
-    display: inline-block;
-    float: left;
-    margin-right: 10px;
-    height: 32px;
-    width: 32px;
-    background-size: contain;
+  content: "";
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  height: 32px;
+  width: 32px;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuOption {
-    line-height: 32px;
-    color: var(--jp-Globus-textGray);
-    border-color: transparent;
+  line-height: 32px;
+  color: var(--jp-Globus-textGray);
+  border-color: transparent;
 }
 
 .jp-Globus-file-manager .jp-FileManager-menuOption:hover {
-    background-color: transparent;
-    text-decoration: underline;
-    filter: brightness(0);
-    margin-bottom: 0;
+  background-color: transparent;
+  text-decoration: underline;
+  filter: brightness(0);
+  margin-bottom: 0;
 }
 
 .jp-Globus-file-manager .jp-FileManager-optionShare::before {
-    background: var(--jp-Globus-icon-shareFolder) no-repeat;
+  background: var(--jp-Globus-icon-shareFolder) no-repeat;
 }
 
 .jp-Globus-file-manager .jp-FileManager-optionTransfer::before {
-    background: var(--jp-Globus-icon-transfer) no-repeat;
+  background: var(--jp-Globus-icon-transfer) no-repeat;
 }
 
 .jp-Globus-file-manager .jp-FileManager-optionNewFolder::before {
-    background: var(--jp-Globus-icon-newFolder) no-repeat;
+  background: var(--jp-Globus-icon-newFolder) no-repeat;
 }
 
 .jp-Globus-file-manager .jp-FileManager-optionRename::before {
-    background: var(--jp-Globus-icon-renameFolder) no-repeat;
+  background: var(--jp-Globus-icon-renameFolder) no-repeat;
 }
 
 .jp-Globus-file-manager .jp-FileManager-optionDelete::before {
-    background: var(--jp-Globus-icon-deleteFolder) no-repeat;
+  background: var(--jp-Globus-icon-deleteFolder) no-repeat;
 }
 
-.jp-Globus-file-manager .jp-FileManager-dirOptions .jp-Globus-listItem.jp-Globus-disabled {
-    pointer-events: none;
-    cursor: default;
-    filter: brightness(180%);
+.jp-Globus-file-manager
+  .jp-FileManager-dirOptions
+  .jp-Globus-listItem.jp-Globus-disabled {
+  pointer-events: none;
+  cursor: default;
+  filter: brightness(180%);
 }
 
 .jp-Globus-file-manager .jp-FileManager-createShareBtn {
-    align-self: center;
-    margin: 10px;
+  align-self: center;
+  margin: 10px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-createShareBtn:after {
-    content: '';
-    display: inline-block;
-    float: right;
-    height: 20px;
-    width: 20px;
-    margin-right: 20px;
-    background: var(--jp-Globus-icon-start) no-repeat;
-    background-size: contain;
+  content: "";
+  display: inline-block;
+  float: right;
+  height: 20px;
+  width: 20px;
+  margin-right: 20px;
+  background: var(--jp-Globus-icon-start) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferResult {
-    align-self: center;
-    background: transparent;
-    margin: 10px
+  align-self: center;
+  background: transparent;
+  margin: 10px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-startTransferBtn {
-    align-self: center;
-    line-height: 20px;
+  align-self: center;
+  line-height: 20px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-startTransferBtn::after {
-    content: '';
-    display: inline-block;
-    float: right;
-    height: 20px;
-    width: 20px;
-    margin-right: 20px;
-    background: var(--jp-Globus-icon-start) no-repeat;
-    background-size: contain;
+  content: "";
+  display: inline-block;
+  float: right;
+  height: 20px;
+  width: 20px;
+  margin-right: 20px;
+  background: var(--jp-Globus-icon-start) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferOptionsBtn {
-    align-self: center;
-    margin-top: -1px;
-    border: 1px solid var(--jp-Globus-borderGray);
-    background: var(--jp-Globus-bgGray);
-    color: black;
+  align-self: center;
+  margin-top: -1px;
+  border: 1px solid var(--jp-Globus-borderGray);
+  background: var(--jp-Globus-bgGray);
+  color: black;
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferOptionsBtn::after {
-    content: '';
-    display: inline-block;
-    float: right;
-    margin-left: 10px;
-    height: 15px;
-    width: 15px;
-    background: var(--jp-Globus-icon-angle-arrow-down) no-repeat;
-    background-size: contain;
-    filter: brightness(0) invert(30%);
+  content: "";
+  display: inline-block;
+  float: right;
+  margin-left: 10px;
+  height: 15px;
+  width: 15px;
+  background: var(--jp-Globus-icon-angle-arrow-down) no-repeat;
+  background-size: contain;
+  filter: brightness(0) invert(30%);
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferOptionsBtn.jp-Globus-active {
-    margin-bottom: -1px;
-    border-bottom-color: var(--jp-Globus-bgGray);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    z-index: 1;
+  margin-bottom: -1px;
+  border-bottom-color: var(--jp-Globus-bgGray);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  z-index: 1;
 }
 
-.jp-Globus-file-manager .jp-FileManager-transferOptionsBtn.jp-Globus-active::after {
-    background-image: var(--jp-Globus-icon-angle-arrow-up);
+.jp-Globus-file-manager
+  .jp-FileManager-transferOptionsBtn.jp-Globus-active::after {
+  background-image: var(--jp-Globus-icon-angle-arrow-up);
 }
 
 .jp-Globus-file-manager .jp-FileManager-transferOptions {
-    border: 1px solid var(--jp-Globus-borderGray);
-    background: var(--jp-Globus-bgGray);
-    padding: 10px;
-    margin-top: -1px;
-    white-space: pre-wrap;
+  border: 1px solid var(--jp-Globus-borderGray);
+  background: var(--jp-Globus-bgGray);
+  padding: 10px;
+  margin-top: -1px;
+  white-space: pre-wrap;
 }
 
 .jp-Globus-file-manager .jp-FileManager-newDir {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-.jp-Globus-file-manager .jp-FileManager-newDirCancel, .jp-Globus-file-manager .jp-FileManager-newDirAccept {
-    flex: 0 1 auto;
-    height: 18px;
-    width: 18px;
-    cursor: pointer;
+.jp-Globus-file-manager .jp-FileManager-newDirCancel,
+.jp-Globus-file-manager .jp-FileManager-newDirAccept {
+  flex: 0 1 auto;
+  height: 18px;
+  width: 18px;
+  cursor: pointer;
 }
 
 .jp-Globus-file-manager .jp-FileManager-newDirAccept {
-    margin: 0 6px;
-    background: var(--jp-Globus-icon-check-circle) no-repeat;
-    background-size: contain;
+  margin: 0 6px;
+  background: var(--jp-Globus-icon-check-circle) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-newDirCancel {
-    background: var(--jp-Globus-icon-fail-circle) no-repeat;
-    background-size: contain;
+  background: var(--jp-Globus-icon-fail-circle) no-repeat;
+  background-size: contain;
 }
 
 .jp-Globus-file-manager .jp-FileManager-newDirInput {
-    flex: 1 1 auto;
-    font-size: 0.9em;
-    margin-bottom: 0;
+  flex: 1 1 auto;
+  font-size: 0.9em;
+  margin-bottom: 0;
 }
 
 .jp-Globus-file-manager .jp-FileManager-sortOptions {
-    flex: 1 1 auto;
-    margin: 10px;
-    padding: 5px;
+  flex: 1 1 auto;
+  margin: 10px;
+  padding: 5px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-sortButton {
-    flex: 1 1 auto;
-    cursor: pointer;
-    max-width: 26px;
-    height: 26px;
-    margin-right: 10px;
-    background: var(--jp-Globus-icon-list-sort-down) no-repeat center;
-    background-size: 18px 18px;
-    border: 1px solid var(--jp-Globus-borderGray);
+  flex: 1 1 auto;
+  cursor: pointer;
+  max-width: 26px;
+  height: 26px;
+  margin-right: 10px;
+  background: var(--jp-Globus-icon-list-sort-down) no-repeat center;
+  background-size: 18px 18px;
+  border: 1px solid var(--jp-Globus-borderGray);
 }
 
 .jp-Globus-file-manager .jp-FileManager-sortButton.jp-Globus-active {
-    background: var(--jp-Globus-icon-list-sort-up) no-repeat center;
-    background-size: 18px 18px;
+  background: var(--jp-Globus-icon-list-sort-up) no-repeat center;
+  background-size: 18px 18px;
 }
 
 .jp-Globus-file-manager .jp-FileManager-sortGroup {
-    justify-content: right;
-    align-items: center;
-    background-color: white;
+  justify-content: right;
+  align-items: center;
+  background-color: white;
 }
 
 .jp-Globus-file-manager .jp-Globus-listItemSubtitle {
-    margin-right: 15px;
+  margin-right: 15px;
 }

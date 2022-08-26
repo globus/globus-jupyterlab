@@ -1,8 +1,7 @@
 {
-    "NotebookApp": {
-      "nbserver_extensions": {
-        "globus_jupyterlab": true
-      }
+  "NotebookApp": {
+    "nbserver_extensions": {
+      "globus_jupyterlab": true
     }
   }
-  
+}
