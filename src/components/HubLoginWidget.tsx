@@ -65,7 +65,12 @@ export const HubLogin = (props) => {
           Error {apiError.response.status}: {apiError.response.statusText}.
         </strong>{" "}
         {apiError.details && apiError.details}
-        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
       </div>
     );
   }
@@ -77,7 +82,8 @@ export const HubLogin = (props) => {
           {apiError && (
             <div id="api-error" className="alert alert-danger">
               <strong>
-                Error {apiError.response.status}: {apiError.response.statusText}.
+                Error {apiError.response.status}: {apiError.response.statusText}
+                .
               </strong>{" "}
               Please try again.
             </div>
@@ -158,8 +164,14 @@ export const HubLogin = (props) => {
                   id="code-input"
                   className="form-control mb-3"
                   name="code-input"
-                  onChange={handleHubInputChange}></input>
-                <button type="button" className="btn btn-primary" ref={hubLoginButton} onClick={handleHubLogin}>
+                  onChange={handleHubInputChange}
+                ></input>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  ref={hubLoginButton}
+                  onClick={handleHubLogin}
+                >
                   Continue
                 </button>
               </div>
