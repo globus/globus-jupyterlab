@@ -79,7 +79,7 @@ const App = (props: any): JSX.Element => {
     await requestAPI<any>("logout");
     window
       .open(
-        "https://globus.org/logout",
+        "https://app.globus.org/logout",
         "Logout of Globus",
         "height=600,width=800"
       )
