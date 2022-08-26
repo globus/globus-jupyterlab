@@ -2,6 +2,7 @@ from logging import exception
 import urllib
 import globus_sdk
 from typing import List
+from globus_sdk.scopes import TransferScopes
 from globus_jupyterlab.exc import DataAccessScopesRequired
 from globus_jupyterlab.handlers.base import BaseAPIHandler
 from globus_jupyterlab.handlers import exception_handlers
@@ -66,15 +67,23 @@ class AutoAuthURLMixin(BaseAPIHandler):
                 self.gconfig.get_transfer_scopes()
             )
         except DataAccessScopesRequired:
+            new_scopes = []
             dependent_scope = globus_sdk.scopes.GCSCollectionScopeBuilder(
                 self.get_endpoint_or_collection()
             )
-            return [
-                self.login_manager.apply_dependent_scopes(
-                    base, [dependent_scope.data_access]
+            transfer_with_data_access = self.login_manager.apply_dependent_scopes(
+                self.gconfig.transfer_scope, [dependent_scope.data_access]
+            )
+            new_scopes.append(transfer_with_data_access)
+
+            custom_t_scope = self.gconfig.get_transfer_submission_scope()
+            if custom_t_scope:
+                custom_w_dep = self.login_manager.apply_dependent_scopes(
+                    custom_t_scope, [transfer_with_data_access]
                 )
-                for base in self.gconfig.get_transfer_scopes()
-            ]
+                new_scopes.append(custom_w_dep)
+
+            return new_scopes
 
     def get_required_identities(self, domains: List[str]) -> List[str]:
         authorizer = self.login_manager.get_authorizer("auth.globus.org")

@@ -24,6 +24,7 @@ class GlobusConfig:
 
     default_client_id = "64d2d5b3-b77e-4e04-86d9-e3f143f563f7"
     base_scopes = [TransferScopes.all, AuthScopes.profile, AuthScopes.openid]
+    transfer_scope = TransferScopes.all
     globus_auth_code_redirect_url = "https://auth.globus.org/v2/web/auth-code"
 
     @property
@@ -107,15 +108,10 @@ class GlobusConfig:
 
     def get_transfer_scopes(self) -> List[str]:
         """
-        Get all known transfer scopes required by Globus JupyterLab. Typically this
-        is only globus_sdk.scopes.TransferScopes.all, but if GLOBUS_TRANSFER_SUBMISSION_SCOPE
-        is set, it will return a list containing both.
+        Get transfer scope required by Globus Jupyterlab.
+        This should always be globus_sdk.scopes.TransferScopes.all
         """
-        scopes = [TransferScopes.all]
-        custom_transfer_scope = self.get_transfer_submission_scope()
-        if custom_transfer_scope:
-            scopes.append(custom_transfer_scope)
-        return scopes
+        return [self.transfer_scope]
 
     def get_collection_id(self) -> str:
         """
