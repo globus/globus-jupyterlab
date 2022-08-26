@@ -18,9 +18,7 @@ import "bootstrap/js/dist/alert.js";
 
 const App = (props: any): JSX.Element => {
   // Local state values
-  const [selectedJupyterItems, setSelectedJupyterItems] = useState({
-    isEmpty: true,
-  });
+  const [selectedJupyterItems, setSelectedJupyterItems] = useState();
 
   // Global Recoil state values
   const setConfig = useSetRecoilState(ConfigAtom);
@@ -36,7 +34,6 @@ const App = (props: any): JSX.Element => {
   const getJupyterItems = async () => {
     let directories = [];
     let files = [];
-
     let selectedJupyterItemsTemp = {};
 
     for (let file of props.jupyterItems) {
@@ -62,11 +59,6 @@ const App = (props: any): JSX.Element => {
 
     selectedJupyterItemsTemp["directories"] = directories;
     selectedJupyterItemsTemp["files"] = files;
-
-    // If we have any file or folder, the payload is not empty
-    if (directories.length || files.length) {
-      selectedJupyterItemsTemp["isEmpty"] = false;
-    }
 
     // Transfer direction inferred from selected files/folders
     if (
@@ -94,6 +86,7 @@ const App = (props: any): JSX.Element => {
       .focus();
     window.location.reload();
   };
+
   return (
     <div className="container pt-5">
       <div className="row">
@@ -106,14 +99,10 @@ const App = (props: any): JSX.Element => {
           <hr className="mb-3 mt-3" />
         </div>
       </div>
-      {!selectedJupyterItems["isEmpty"] ? (
-        <EndpointSearch
-          factory={props.factory}
-          selectedJupyterItems={selectedJupyterItems}
-        />
-      ) : (
-        <p className="fw-bold text-danger">No files selected</p>
-      )}
+      <EndpointSearch
+        factory={props.factory}
+        selectedJupyterItems={selectedJupyterItems}
+      />
     </div>
   );
 };
