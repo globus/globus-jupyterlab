@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.9](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b8...v1.0.0b9) (2022-08-30)
+
+### Features
+
+- show required action to user if activation is required ([0380bde](https://github.com/globus/globus-jupyterlab/commit/0380bde9a6ddfc57dc97b49402dff16cea7644df))
+
+### Bug Fixes
+
+- Mapped collections not working when using a custom resource server ([8272b1d](https://github.com/globus/globus-jupyterlab/commit/8272b1d5de8203ce26a7f246b8048ef83245b861))
+- Update Globus logout link redirect ([3254bb2](https://github.com/globus/globus-jupyterlab/commit/3254bb2e1891052d04a99296f8f180b334e632fe))
+
 ## [1.0.0-beta.8](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b7...v1.0.0b8) (2022-07-21)
 
 ### Features
