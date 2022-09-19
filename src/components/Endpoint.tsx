@@ -119,8 +119,6 @@ const Endpoint = (props) => {
       setEndpointList(listItems);
     } catch (error) {
       setLoading(false);
-      setAPIError({ ...error, ...{ global: true } });
-
       let error_response = await error.response.json();
 
       /*
@@ -155,6 +153,8 @@ const Endpoint = (props) => {
             )
             .focus();
         }
+      } else {
+        setAPIError({ ...error, ...{ global: true } });
       }
     }
 

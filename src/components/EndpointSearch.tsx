@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { requestAPI } from "../handler";
-import { Route, useHistory } from "react-router-dom";
+import { Route, useHistory, useLocation } from "react-router-dom";
 
 import Endpoint from "./Endpoint";
 import Endpoints from "./Endpoints";
@@ -11,11 +11,17 @@ const EndpointSearch = (props) => {
   const [endpointValue, setEndpointValue] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const endpointSearch = useRef();
+  const endpointSearch = useRef<HTMLInputElement>();
   const history = useHistory();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname == "/endpoints") {
+      endpointSearch.current.style.display = "block";
+    }
+  }, [location]);
 
   const handleEndpointClick = (event) => {
-    // @ts-ignore
     endpointSearch.current.style.display = "none";
   };
 
@@ -44,7 +50,6 @@ const EndpointSearch = (props) => {
   };
 
   const handleShowSearch = () => {
-    // @ts-ignore
     endpointSearch.current.style.display = "block";
   };
 
