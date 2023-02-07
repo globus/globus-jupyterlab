@@ -292,95 +292,89 @@ const Endpoint = (props) => {
     setAPIError(null);
     setLoading(false);
     setTransfer(null);
-
+  
     var destinationEndpoint = endpoint.id;
     var sourceEndpoint = config.collection_id;
     var transferItems = [];
-
-    if (selectedEndpointItems.length > 1) {
+  
+    if (selectedEndpointItems.length == 0) {
       setLoading(false);
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "Please only select one remote directory to transfer data to",
+          statusText: "Please select one remote directory to transfer data to",
         },
       });
-    } else if (selectedEndpointItems[0].type == "file") {
+    } else if (selectedEndpointItems.length > 1) {
       setLoading(false);
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "To transfer to an endpoint, you must select a directory for a destination",
+          statusText: "Please only select one remote directory to transfer data to",
         },
       });
-    } else {
-      // Loop through selectedJupyterItems from props
-      if (props.selectedJupyterItems.directories.length) {
-        for (let directory of props.selectedJupyterItems.directories) {
-          let destinationPath = selectedEndpointItems.length
-            ? _path.posix.resolve(
-                endpointList.path,
-                selectedEndpointItems[0].name,
-                directory.path
-              )
-            : _path.posix.resolve(endpointList.path, directory.path);
-
-          let sourcePath = _path.posix.resolve(
-            config.collection_base_path,
-            directory.path
-          );
-
-          transferItems.push({
-            source_path: sourcePath,
-            destination_path: destinationPath,
-            recursive: true,
-          });
-        }
-      }
-
-      if (props.selectedJupyterItems.files.length) {
-        for (let file of props.selectedJupyterItems.files) {
-          let destinationPath = selectedEndpointItems.length
-            ? _path.posix.resolve(
-                endpointList.path,
-                selectedEndpointItems[0].name,
-                file.path
-              )
-            : _path.posix.resolve(endpointList.path, file.path);
-
-          let sourcePath = _path.posix.resolve(
-            config.collection_base_path,
-            file.path
-          );
-
-          transferItems.push({
-            source_path: sourcePath,
-            destination_path: destinationPath,
-            recursive: false,
-          });
-        }
-      }
-
-      let transferRequest = {
-        source_endpoint: sourceEndpoint,
-        destination_endpoint: destinationEndpoint,
-        // Label is now supported:
-        // label: "TEST LABEL",
-        DATA: transferItems,
-      };
-
-      try {
-        const transferResponse = await requestAPI<any>("submit_transfer", {
-          body: JSON.stringify(transferRequest),
-          method: "POST",
+    } else if (selectedEndpointItems.length == 1) {
+      if (selectedEndpointItems[0].type == "file") {
+        setLoading(false);
+        setAPIError({
+          response: {
+            status: "DirectorySelectionError",
+            statusText: "To transfer to an endpoint, you must select a directory for a destination",
+          },
         });
-        setLoading(false);
-        setTransfer(transferResponse);
-      } catch (error) {
-        setLoading(false);
-        setAPIError(error);
+      } else {
+        // Loop through selectedJupyterItems from props
+        if (props.selectedJupyterItems.directories.length) {
+          for (let directory of props.selectedJupyterItems.directories) {
+            let destinationPath = selectedEndpointItems.length
+              ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, directory.path)
+              : _path.posix.resolve(endpointList.path, directory.path);
+  
+            let sourcePath = _path.posix.resolve(config.collection_base_path, directory.path);
+  
+            transferItems.push({
+              source_path: sourcePath,
+              destination_path: destinationPath,
+              recursive: true,
+            });
+          }
+        }
+  
+        if (props.selectedJupyterItems.files.length) {
+          for (let file of props.selectedJupyterItems.files) {
+            let destinationPath = selectedEndpointItems.length
+              ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, file.path)
+              : _path.posix.resolve(endpointList.path, file.path);
+  
+            let sourcePath = _path.posix.resolve(config.collection_base_path, file.path);
+  
+            transferItems.push({
+              source_path: sourcePath,
+              destination_path: destinationPath,
+              recursive: false,
+            });
+          }
+        }
+  
+        let transferRequest = {
+          source_endpoint: sourceEndpoint,
+          destination_endpoint: destinationEndpoint,
+          // Label is now supported:
+          // label: "TEST LABEL",
+          DATA: transferItems,
+        };
+  
+        try {
+          const transferResponse = await requestAPI<any>("submit_transfer", {
+            body: JSON.stringify(transferRequest),
+            method: "POST",
+          });
+          setLoading(false);
+          setTransfer(transferResponse);
+        } catch (error) {
+          setLoading(false);
+          setAPIError(error);
+        }
       }
     }
   };
