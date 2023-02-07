@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.10](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b9...v1.0.0b10) (2023-02-07)
+
+### Bug Fixes
+
+- Error during transfer when no directory is selected ([6d335b2](https://github.com/globus/globus-jupyterlab/commit/6d335b2b301f0cc6a085f8676192cb2310510071))
+- Search bar disappears after back to search is cicked ([6ef2da7](https://github.com/globus/globus-jupyterlab/commit/6ef2da78ed914daac22917d160528e36f27df916))
+
 ## [1.0.0-beta.9](https://github.com/globus/globus-jupyterlab/compare/v1.0.0b8...v1.0.0b9) (2022-08-30)
 
 ### Features
