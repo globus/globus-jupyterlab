@@ -369,7 +369,11 @@ const Endpoint = (props) => {
           Error {apiError.response.status}: {apiError.response.statusText}.
         </strong>{" "}
         {apiError.details && apiError.details}
-        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button
+          type="button"
+          className="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"></button>
       </div>
     );
   }
@@ -379,7 +383,13 @@ const Endpoint = (props) => {
   }
 
   if (hubResponse) {
-    return <HubLogin config={config} endpoint={endpoint} hubResponse={hubResponse} />;
+    return (
+      <HubLogin
+        config={config}
+        endpoint={endpoint}
+        hubResponse={hubResponse}
+      />
+    );
   }
 
   return (
@@ -388,10 +398,14 @@ const Endpoint = (props) => {
         <div className="mt-3">
           <h5>Browsing Collection {endpoint ? endpoint.display_name : endpointID}</h5>
           <div className="btn-group mb-4 mt-2">
-            <button className="btn btn-sm btn-outline-primary" onClick={() => history.goBack()}>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              onClick={() => history.goBack()}>
               <i className="fa-solid fa-turn-up"></i> Up one folder
             </button>
-            <button className="btn btn-sm btn-outline-primary" onClick={props.handleShowSearch}>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              onClick={props.handleShowSearch}>
               <i className="fa-solid fa-magnifying-glass"></i> Show search
             </button>
           </div>
@@ -409,7 +423,11 @@ const Endpoint = (props) => {
                   Check Status of Request <i className="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
               </p>
-              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"></button>
             </div>
           )}
 
@@ -419,15 +437,23 @@ const Endpoint = (props) => {
                 Error {apiError.response.status}: {apiError.response.statusText}.
               </strong>{" "}
               {apiError.details && apiError.details}
-              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"></button>
             </div>
           )}
           <br />
 
-          <div id="endpoint-list" className="border col-8 rounded py-3">
+          <div
+            id="endpoint-list"
+            className="border col-8 rounded py-3">
             {endpointList["DATA"].map((listItem, index) => {
               return (
-                <div className="form-check ms-3" key={index}>
+                <div
+                  className="form-check ms-3"
+                  key={index}>
                   {listItem["type"] == "dir" ? (
                     <>
                       <input
@@ -465,10 +491,16 @@ const Endpoint = (props) => {
 
           <div id="transfer-direction">
             <div className="btn-group mt-4">
-              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleTransferToJupyter}>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
+                onClick={handleTransferToJupyter}>
                 <i className="fa-solid fa-arrow-left"></i> Transfer To JupyterLab
               </button>
-              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleTransferFromJupyter}>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
+                onClick={handleTransferFromJupyter}>
                 <i className="fa-solid fa-arrow-right"></i> Transfer From JupyterLab
               </button>
             </div>
@@ -476,7 +508,9 @@ const Endpoint = (props) => {
         </div>
       ) : (
         <div>
-          <button className="btn btn-sm btn-primary mb-2 mt-3" onClick={() => history.goBack()}>
+          <button
+            className="btn btn-sm btn-primary mb-2 mt-3"
+            onClick={() => history.goBack()}>
             Back
           </button>
           <p>No files or folders found</p>
