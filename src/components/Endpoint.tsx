@@ -145,13 +145,7 @@ const Endpoint = (props) => {
           setAPIError(null);
           setHubResponse(error_response);
         } else {
-          window
-            .open(
-              error_response.login_url,
-              "Globus Login",
-              "height=600,width=800"
-            )
-            .focus();
+          window.open(error_response.login_url, "Globus Login", "height=600,width=800").focus();
         }
       } else {
         setAPIError({ ...error, ...{ global: true } });
@@ -170,10 +164,7 @@ const Endpoint = (props) => {
 
         let start = checkboxes.indexOf(lastChecked);
         let end = checkboxes.indexOf(event.target);
-        checked = checkboxes.slice(
-          Math.min(start, end),
-          Math.max(start, end) + 1
-        );
+        checked = checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1);
 
         checked.forEach((el) => {
           el.checked = start < end ? true : false;
@@ -224,16 +215,12 @@ const Endpoint = (props) => {
     var sourceEndpoint = endpoint.id;
     var transferItems = [];
 
-    if (
-      props.selectedJupyterItems.directories.length === 0 ||
-      props.selectedJupyterItems.directories.length > 1
-    ) {
+    if (props.selectedJupyterItems.directories.length === 0 || props.selectedJupyterItems.directories.length > 1) {
       setLoading(false);
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "To transfer to Jupyter Hub, you must select only one directory to transfer to",
+          statusText: "To transfer to Jupyter Hub, you must select only one directory to transfer to",
         },
       });
     } else if (props.selectedJupyterItems.files.length) {
@@ -241,17 +228,13 @@ const Endpoint = (props) => {
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "To transfer to Jupyter Hub, you must select a directory for a destination",
+          statusText: "To transfer to Jupyter Hub, you must select a directory for a destination",
         },
       });
     } else {
       // Loop through selectedEndpointItems from state
       for (let selectedEndpointItem of selectedEndpointItems) {
-        let sourcePath = _path.posix.resolve(
-          endpointList.path,
-          selectedEndpointItem.name
-        );
+        let sourcePath = _path.posix.resolve(endpointList.path, selectedEndpointItem.name);
         let destinationPath = _path.posix.resolve(
           config.collection_base_path,
           props.selectedJupyterItems.directories[0].path,
@@ -297,90 +280,84 @@ const Endpoint = (props) => {
     var sourceEndpoint = config.collection_id;
     var transferItems = [];
 
-    if (selectedEndpointItems.length > 1) {
+    if (selectedEndpointItems.length == 0) {
       setLoading(false);
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "Please only select one remote directory to transfer data to",
+          statusText: "Please select one remote directory to transfer data to",
         },
       });
-    } else if (selectedEndpointItems[0].type == "file") {
+    } else if (selectedEndpointItems.length > 1) {
       setLoading(false);
       setAPIError({
         response: {
           status: "DirectorySelectionError",
-          statusText:
-            "To transfer to an endpoint, you must select a directory for a destination",
+          statusText: "Please only select one remote directory to transfer data to",
         },
       });
-    } else {
-      // Loop through selectedJupyterItems from props
-      if (props.selectedJupyterItems.directories.length) {
-        for (let directory of props.selectedJupyterItems.directories) {
-          let destinationPath = selectedEndpointItems.length
-            ? _path.posix.resolve(
-                endpointList.path,
-                selectedEndpointItems[0].name,
-                directory.path
-              )
-            : _path.posix.resolve(endpointList.path, directory.path);
-
-          let sourcePath = _path.posix.resolve(
-            config.collection_base_path,
-            directory.path
-          );
-
-          transferItems.push({
-            source_path: sourcePath,
-            destination_path: destinationPath,
-            recursive: true,
-          });
-        }
-      }
-
-      if (props.selectedJupyterItems.files.length) {
-        for (let file of props.selectedJupyterItems.files) {
-          let destinationPath = selectedEndpointItems.length
-            ? _path.posix.resolve(
-                endpointList.path,
-                selectedEndpointItems[0].name,
-                file.path
-              )
-            : _path.posix.resolve(endpointList.path, file.path);
-
-          let sourcePath = _path.posix.resolve(
-            config.collection_base_path,
-            file.path
-          );
-
-          transferItems.push({
-            source_path: sourcePath,
-            destination_path: destinationPath,
-            recursive: false,
-          });
-        }
-      }
-
-      let transferRequest = {
-        source_endpoint: sourceEndpoint,
-        destination_endpoint: destinationEndpoint,
-        // Label is now supported:
-        // label: "TEST LABEL",
-        DATA: transferItems,
-      };
-
-      try {
-        const transferResponse = await requestAPI<any>("submit_transfer", {
-          body: JSON.stringify(transferRequest),
-          method: "POST",
+    } else if (selectedEndpointItems.length == 1) {
+      if (selectedEndpointItems[0].type == "file") {
+        setLoading(false);
+        setAPIError({
+          response: {
+            status: "DirectorySelectionError",
+            statusText: "To transfer to an endpoint, you must select a directory for a destination",
+          },
         });
-        setLoading(false);
-        setTransfer(transferResponse);
-      } catch (error) {
-        setLoading(false);
-        setAPIError(error);
+      } else {
+        // Loop through selectedJupyterItems from props
+        if (props.selectedJupyterItems.directories.length) {
+          for (let directory of props.selectedJupyterItems.directories) {
+            let destinationPath = selectedEndpointItems.length
+              ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, directory.path)
+              : _path.posix.resolve(endpointList.path, directory.path);
+
+            let sourcePath = _path.posix.resolve(config.collection_base_path, directory.path);
+
+            transferItems.push({
+              source_path: sourcePath,
+              destination_path: destinationPath,
+              recursive: true,
+            });
+          }
+        }
+
+        if (props.selectedJupyterItems.files.length) {
+          for (let file of props.selectedJupyterItems.files) {
+            let destinationPath = selectedEndpointItems.length
+              ? _path.posix.resolve(endpointList.path, selectedEndpointItems[0].name, file.path)
+              : _path.posix.resolve(endpointList.path, file.path);
+
+            let sourcePath = _path.posix.resolve(config.collection_base_path, file.path);
+
+            transferItems.push({
+              source_path: sourcePath,
+              destination_path: destinationPath,
+              recursive: false,
+            });
+          }
+        }
+
+        let transferRequest = {
+          source_endpoint: sourceEndpoint,
+          destination_endpoint: destinationEndpoint,
+          // Label is now supported:
+          // label: "TEST LABEL",
+          DATA: transferItems,
+        };
+
+        try {
+          const transferResponse = await requestAPI<any>("submit_transfer", {
+            body: JSON.stringify(transferRequest),
+            method: "POST",
+          });
+          setLoading(false);
+          setTransfer(transferResponse);
+        } catch (error) {
+          setLoading(false);
+          setAPIError(error);
+        }
       }
     }
   };
@@ -392,12 +369,7 @@ const Endpoint = (props) => {
           Error {apiError.response.status}: {apiError.response.statusText}.
         </strong>{" "}
         {apiError.details && apiError.details}
-        <button
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="alert"
-          aria-label="Close"
-        ></button>
+        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     );
   }
@@ -407,29 +379,19 @@ const Endpoint = (props) => {
   }
 
   if (hubResponse) {
-    return (
-      <HubLogin config={config} endpoint={endpoint} hubResponse={hubResponse} />
-    );
+    return <HubLogin config={config} endpoint={endpoint} hubResponse={hubResponse} />;
   }
 
   return (
     <>
       {endpointList["DATA"].length > 0 ? (
         <div className="mt-3">
-          <h5>
-            Browsing Collection {endpoint ? endpoint.display_name : endpointID}
-          </h5>
+          <h5>Browsing Collection {endpoint ? endpoint.display_name : endpointID}</h5>
           <div className="btn-group mb-4 mt-2">
-            <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => history.goBack()}
-            >
+            <button className="btn btn-sm btn-outline-primary" onClick={() => history.goBack()}>
               <i className="fa-solid fa-turn-up"></i> Up one folder
             </button>
-            <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={props.handleShowSearch}
-            >
+            <button className="btn btn-sm btn-outline-primary" onClick={props.handleShowSearch}>
               <i className="fa-solid fa-magnifying-glass"></i> Show search
             </button>
           </div>
@@ -443,34 +405,21 @@ const Endpoint = (props) => {
                 <a
                   className="alert-link"
                   href={`https://app.globus.org/activity/${transfer["task_id"]}`}
-                  target="_blank"
-                >
-                  Check Status of Request{" "}
-                  <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                  target="_blank">
+                  Check Status of Request <i className="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
               </p>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
+              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           )}
 
           {apiError && (
             <div className="alert alert-danger alert-dismissible col-8 fade show">
               <strong>
-                Error {apiError.response.status}: {apiError.response.statusText}
-                .
+                Error {apiError.response.status}: {apiError.response.statusText}.
               </strong>{" "}
               {apiError.details && apiError.details}
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
+              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           )}
           <br />
@@ -487,14 +436,11 @@ const Endpoint = (props) => {
                         value={JSON.stringify(listItem)}
                         ref={(el) => (itemsRef.current[index] = el)}
                         onChange={handleEndpointSelect}
-                        data-list-item-name={listItem["name"]}
-                      ></input>
+                        data-list-item-name={listItem["name"]}></input>
                       <label>
                         <Link
-                          to={`/endpoints/${endpointID}/items/${listItem["name"]}?full-path=${endpointList["path"]}${listItem["name"]}`}
-                        >
-                          <i className="fa-solid fa-folder-open"></i>{" "}
-                          {listItem["name"]}
+                          to={`/endpoints/${endpointID}/items/${listItem["name"]}?full-path=${endpointList["path"]}${listItem["name"]}`}>
+                          <i className="fa-solid fa-folder-open"></i> {listItem["name"]}
                         </Link>
                       </label>
                     </>
@@ -506,8 +452,7 @@ const Endpoint = (props) => {
                         value={JSON.stringify(listItem)}
                         ref={(el) => (itemsRef.current[index] = el)}
                         onChange={handleEndpointSelect}
-                        data-list-item-name={listItem["name"]}
-                      ></input>
+                        data-list-item-name={listItem["name"]}></input>
                       <label>
                         <i className="fa-solid fa-file"></i> {listItem["name"]}
                       </label>
@@ -520,31 +465,18 @@ const Endpoint = (props) => {
 
           <div id="transfer-direction">
             <div className="btn-group mt-4">
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-secondary"
-                onClick={handleTransferToJupyter}
-              >
-                <i className="fa-solid fa-arrow-left"></i> Transfer To
-                JupyterLab
+              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleTransferToJupyter}>
+                <i className="fa-solid fa-arrow-left"></i> Transfer To JupyterLab
               </button>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-secondary"
-                onClick={handleTransferFromJupyter}
-              >
-                <i className="fa-solid fa-arrow-right"></i> Transfer From
-                JupyterLab
+              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleTransferFromJupyter}>
+                <i className="fa-solid fa-arrow-right"></i> Transfer From JupyterLab
               </button>
             </div>
           </div>
         </div>
       ) : (
         <div>
-          <button
-            className="btn btn-sm btn-primary mb-2 mt-3"
-            onClick={() => history.goBack()}
-          >
+          <button className="btn btn-sm btn-primary mb-2 mt-3" onClick={() => history.goBack()}>
             Back
           </button>
           <p>No files or folders found</p>
