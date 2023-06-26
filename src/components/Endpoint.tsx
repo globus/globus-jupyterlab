@@ -214,6 +214,10 @@ const Endpoint = (props) => {
     setLastChecked(event.target);
   };
 
+  const handleRefreshList = (event) => {
+    listEndpointItems(endpointID, path);
+  };
+
   const handleTransferToJupyter = async (event) => {
     event.preventDefault();
     setAPIError(null);
@@ -425,6 +429,12 @@ const Endpoint = (props) => {
               onClick={props.handleShowSearch}
             >
               <i className="fa-solid fa-magnifying-glass"></i> Show search
+            </button>
+            <button
+              className="btn btn-sm btn-outline-primary"
+              onClick={handleRefreshList}
+            >
+              <i className="fa-solid fa-rotate-right"></i> Refresh List
             </button>
           </div>
 
