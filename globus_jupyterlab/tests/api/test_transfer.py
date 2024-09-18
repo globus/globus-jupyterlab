@@ -181,7 +181,12 @@ def test_transfer_submission_normal(
         data={"task_id": "my_taks_id"}
     )
     body = json.dumps(
-        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [],
+            "label": "My Transfer",
+        }
     )
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
@@ -209,6 +214,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("foo.txt", "foo.txt", False),
             "Base case, no path translation",
@@ -227,6 +233,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("foo.txt", "foo.txt", False),
             "Rationally configured environment",
@@ -245,6 +252,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("foo.txt", "foo.txt", False),
             "Missing Trailing Slash",
@@ -263,6 +271,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("foo.txt", "foo.txt", False),
             "Test Translating Destination",
@@ -281,6 +290,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("/shared/foo.txt", "foo.txt", False),
             "Test Collection Base Path",
@@ -299,6 +309,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("shared/foo.txt", "foo.txt", False),
             "Test Relative Collection Base Path",
@@ -317,6 +328,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("/shared/foo.txt", "foo.txt", False),
             "Test both posix basepath with collection basepath",
@@ -335,6 +347,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             ("/shared/foo.txt", "foo.txt", False),
             "Test trailing slash",
@@ -353,6 +366,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             500,
             "Test no hub collection for transfer",
@@ -371,6 +385,7 @@ def test_transfer_submission_normal(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
             400,
             "Test transfer is outside share path",
@@ -422,7 +437,12 @@ def test_401_transfer_submission_normal(
         "401 error!", http_status=401
     )
     body = json.dumps(
-        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [],
+            "label": "My Transfer",
+        }
     )
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
@@ -470,6 +490,7 @@ def test_transfer_submission_custom_valid_non_hub_service(
                     "recursive": False,
                 }
             ],
+            "label": "My Transfer",
         }
     )
     response = yield http_client.fetch(
@@ -486,7 +507,7 @@ def test_transfer_submission_custom_valid_non_hub_service(
             "transfer": {
                 "source_endpoint": "mysource",
                 "destination_endpoint": "mydest",
-                "label": None,
+                "label": "My Transfer",
                 "DATA": [
                     {
                         "source_path": "foo.txt",
@@ -529,6 +550,7 @@ def test_transfer_submission_custom_valid_hub_service(
                     "recursive": False,
                 }
             ],
+            "label": "My Transfer",
         }
     )
     response = yield http_client.fetch(
@@ -553,6 +575,7 @@ def test_transfer_submission_custom_valid_hub_service(
                         "recursive": False,
                     }
                 ],
+                "label": "My Transfer",
             },
         },
     )
@@ -575,7 +598,12 @@ def test_transfer_submission_custom_no_task_id_returned(
         data={"task_id": "my_taks_id"}
     )
     body = json.dumps(
-        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [],
+            "label": "My Transfer",
+        }
     )
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
@@ -602,7 +630,12 @@ def test_transfer_submission_custom_resource_server_error(
         data={"task_id": "my_taks_id"}
     )
     body = json.dumps(
-        {"source_endpoint": "mysource", "destination_endpoint": "mydest", "DATA": []}
+        {
+            "source_endpoint": "mysource",
+            "destination_endpoint": "mydest",
+            "DATA": [],
+            "label": "My Transfer",
+        }
     )
     response = yield http_client.fetch(
         base_url + f"/submit_transfer", raise_error=False, method="POST", body=body
